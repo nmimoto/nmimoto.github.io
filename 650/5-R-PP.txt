@@ -1,0 +1,100 @@
+
+
+
+#--- Gift Accepting Problem ---
+  
+
+
+
+hist(rnorm(1000,100,10))
+
+
+
+
+y=100
+lambda = 1
+c = 5
+
+q = 1-pnorm(y,100,10)
+
+X = rnorm(5000,100,10)
+
+(X-y)
+
+((X-y)>0)
+
+((X-y)>0)*(X-y)
+
+
+mean(((X-y)>0)*(X-y))
+
+
+
+
+#--- Find optimal y ---
+
+for (i in 70:130) {
+  y=i 
+  X = rnorm(5000,100,10)
+  print(  c(i, mean(((X-y)>0)*(X-y)))   )
+}
+
+
+
+
+
+#--- Simulate Gift Accept/Reject ---
+
+y = 98
+
+X=rnorm(5000,100,10)  # 5000 Gifts
+T=rexp(5000,1)       # 5000 interarrival time of gifts
+
+
+acc = which(X>y)[1]   # order of accepted gift
+acc
+sum(T[1:acc])         # time of acceptance
+Cost = c*T            # Cost of waiting
+X[acc]                # value of accepted gift
+
+
+#- put them in loop
+
+y=98
+
+c=5
+lambda=1
+
+T = 0
+Cost = 0
+Val = 0
+for (i in 1:10000){
+
+  X=rnorm(5000,100,10)  # 5000 Gifts
+  T=rexp(5000,lambda)        # 5000 interarrival time of gifts
+
+  acc    = which(X>y)[1]   # order of accepted gift
+  T[i]   = sum(T[1:acc])   # time of acceptance 
+  Cost[i] = c*T[i]            # Cost of waiting
+  Val[i] = X[acc]          # value of accepted gift
+
+}
+
+Ret = Val - Cost
+
+
+hist(Ret)
+mean(Ret)
+sd(Ret)
+
+
+
+
+
+
+
+
+#---
+
+T = rexp(100,5)
+plot(cumsum(T))

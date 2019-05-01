@@ -1,0 +1,336 @@
+
+
+
+#--- Define Matrix Power Function ---
+  
+  m.power <- function(P,n){
+    if (n==1){ 
+       P1=P 
+    } else if (n>1) {
+      P1=P
+      for (i in 1:(n-1)){ P1 = P1 %*% P }
+    }
+    return(P1)
+  }
+
+
+
+
+
+#--- One-day Weather model ---
+
+  A = c(.5,.5,.6,.4)
+  P = matrix(A, 2,2, byrow=T)
+  P
+  
+  m.power(P,10)
+  
+
+
+
+
+#--- Two-day Weather model ---
+
+  A = c(.8,.2,0,0,  0,0,.5,.5,  .6,.4,0,0,  0,0,.3,.7  )
+  P = matrix(A, 4,4, byrow=T)
+  P
+
+  m.power(P,10)
+  
+  
+
+
+
+
+#--- Bonus-Malus model ---
+
+  lambda = 2
+  a0 = dpois(0,   lambda)
+  a1 = dpois(1,   lambda)
+  a2 = dpois(2,   lambda)
+  a3 = 1-ppois(2, lambda)
+
+  A = c(a0,a1,a2,a3,  a0,0,a1,a2+a3,  0,a0,0,a1+a2+a3,  0,0,a0,a1+a2+a3 )
+  P = matrix(A, 4,4, byrow=T)
+  P
+  
+  m.power(P,10)
+
+  
+
+
+
+
+#--- Ex 4.14 ---
+
+  A = c(.5,.5,0,0,0,
+        .5,.5,0,0,0,
+        0,0,.5,.5,0,
+        0,0,.5,.5,0,
+        .25,.25,0,0,.5)
+  P = matrix(A, 5, 5, byrow=T)
+  P
+  
+  m.power(P,10)
+
+ 
+
+
+
+#--- Ex 4.13 ---
+
+  A = c(0, 0,.5,.5,
+        1, 0, 0, 0,  
+        0,.5, 0,.5,
+        0,.5, 0,.5  )
+        
+  P = matrix(A, 4, 4, byrow=T)
+  P
+  
+  m.power(P,10)
+
+ 
+
+#--- Ex ---
+
+  A = c(.5, .5, 0, 0,
+        .5, .5, 0, 0,
+        .25,.25,0, 0,
+         0,  0, 0, 1  )
+        
+  P = matrix(A, 4, 4, byrow=T)
+  P
+  
+  m.power(P,10)
+
+ 
+
+
+
+
+#---
+
+  A = c(.5,.5,0,
+        .5,.5,0,
+        .33,.33,.34)
+       
+  P = matrix(A, 3, 3, byrow=T)
+  P
+  
+  m.power(P,10)
+
+
+
+
+
+#--- Periodic Random Walk
+
+A = c( 0, 1, 0, 0, 0, 0,
+      .5, 0,.5, 0, 0, 0,    
+       0,.5, 0,.5,0,  0,    
+       0, 0,.5, 0,.5, 0,    
+       0, 0, 0,.5, 0,.5,
+       0, 0, 0, 0, 1, 0 )
+
+  P = matrix(A, 6, 6, byrow=T)
+  P
+
+
+  m.power(P,10)
+  m.power(P,11)
+
+  P1 = P
+  for (n in 2:90){
+    P1 = P1 + m.power(P,n)
+  }
+
+  P1
+  P1/90
+  
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#--- Mean Visit Time Calculation ---
+
+
+
+
+A = c(.5, .5, 0,    .5,.5,0,    .33,.33,.34 )
+P = matrix(A, 3,3,byrow=T)
+
+
+
+e <- c(1,1)
+Q <- P[-2,]  #remove 2nd row
+Q <- Q[,-2]  #remove 2nd column
+Q
+
+
+I <- diag(2) #identity matrix
+
+m <- solve(I-Q) %*% e
+m            #mean vist time to state 2
+
+
+
+
+
+A = c(.8,.2, 0, 0,    0, 0,.5,.5,    .6,.4, 0, 0,    0, 0,.3,.7  )
+P = matrix(A, 4,4,byrow=T)
+
+
+e <- c(1,1,1)
+Q <- P[-1,]  #remove 1st row
+Q <- Q[,-1]  #remove 1st column
+Q
+
+
+I <- diag(3) #identity matrix
+
+m <- solve(I-Q) %*% e
+m            #mean vist time to state 1 (ss)
+
+
+
+
+
+
+#--- Coin toss Problem ---
+
+A = c( 0,.5,.5, 0, 0, 0, 0, 0, 0,
+       0, 0, 0,.5,.5, 0, 0, 0, 0,
+       0, 0, 0, 0, 0,.5,.5, 0, 0,
+       0, 0, 0,.5,.5, 0, 0, 0, 0,
+       0, 0, 0, 0, 0,.5,.5, 0, 0,
+       0, 0, 0, 0, 0,.5, 0,.5, 0,
+       0, 0, 0, 0,.5, 0, 0, 0,.5,
+       0, 0, 0, 0, 0, 0, 0, 1, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 1  )
+
+P = matrix(A, 9,9,byrow=T)
+
+
+
+
+e <- matrix(1, 8, 1)
+Q <- P[-8,]  #remove 8th row
+Q <- Q[,-8]  #remove 8th column
+Q
+
+
+I <- diag(8) #identity matrix
+
+m <- solve(I-Q) %*% e
+m            #mean vist time to state 8
+
+
+m.power(P,2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#--- Branching Process ----
+
+
+X100 <- X50 <- 0
+for (k in 1:1000){
+  X=10
+  for (i in 2:100) {
+
+    X[i] = sum(rpois(X[i-1],1.4))
+
+  }
+  X100[k] = X[100]
+  X50[k] = X[50]
+}
+hist(X100)
+
+
+
+
+
+
+
+#--- Hardy-Weinberg Law of Genetics ---
+
+p = .1
+q = .2
+r = .7
+
+A <- c(p+r/2, 0, q+r/2,    0, q+r/2, p+r/2,   p/2+r/4, q/2+r/4,  1/2)
+
+P = matrix(A, 3,3, byrow=T)
+
+
+c(p,q,r) %*% P
+
+m.power(P,100)
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#--- Sotck Control Problem ----
+
+
+S  <- 20
+la <- 10
+
+
+# replenish line: small s = 4 
+
+
+
+P = matrix(0, 21,21)
+
+#--- line i=0:3
+P[1,] = c(1-ppois(S-1, la), dpois(S-(1:S), la) )
+P[2,] = P[1,]  #- for i=1
+P[3,] = P[1,]  #- for i=2
+P[4,] = P[1,]  #- for i=3
+
+
+#--- Line i>=4 
+
+for (i in 4:20){
+
+  P[i+1,] = c(1-ppois(i-1, la), dpois( i-(1:i), la), rep(0, S-i) )
+  
+}
+
+P
+
+
+A <- m.power(P,200)
+
+A[1,]   #- long run distribution of stock level
+
+
+sum(A[1,] * (0:20))  #- average stock level
+
+
+sum(A[1, 1:4]) #- ordering frequency

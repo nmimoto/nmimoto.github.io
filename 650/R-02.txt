@@ -1,0 +1,64 @@
+#
+# Monte Carlo Integration
+#
+##############################
+
+
+
+#--- int_0^1 e^(-x) dx --------
+True <- 1-exp(-1); True
+
+
+
+
+#--- numerical integration -----
+f1 <- function(x)   {  exp(-x) }
+NI <- integrate( f1, 0, 1)
+
+str(NI)   # see what's inside
+NI$value  # only the value of the integral 
+
+
+
+
+#--- Monte Carlo Integration ---
+n <- 10000
+
+U <- runif(n, 0, 1)
+X <- exp(-U)
+MCI <- mean(X); MCI
+
+ME <- 1.96*sqrt( var(X)/n ); ME
+
+
+
+
+
+#--- MCI with Antithetic Variates ---
+
+n <- 5000
+U <- runif(n, 0, 1)
+V <- 1-U
+
+cor(U,V)
+
+X <- exp(-U)
+Y <- exp(-V)
+
+cor(X,Y)
+
+AT   <- (X+Y)/2 
+MCI2 <- mean(AT); MCI2
+
+ME2  <- 1.96*sqrt( var(AT)/n ); ME2
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+
+
+
+#--- Machine Repair Model ---
+
+
+lambda <- 1/2   # break rate
+mu     <- 1/1   # fix rate (av time to fix 1/mu)
+M      <- 5    # num of machines
+
+
+
+#-- Limit distributions
+  P0 <- function(lambda, mu, M){
+  
+    N = 1:M
+  
+    A = (lambda/mu)^N * factorial(M)/factorial(M-N)  #note that N is vectorized 
+  
+    return(1/(1+sum(A)))
+  
+  } 
+  
+  P.n <- function(n, lambda, mu, M) {
+  
+    N = 1:M
+    
+    A = (lambda/mu)^N * factorial(M)/factorial(M-N)  #note that N is vectorized 
+  
+    Pn = (lambda/mu)^n * factorial(M)/factorial(M-n)  * (1/(1+sum(A)))
+  
+    return(Pn)
+  }
+    
+  
+  
+  Pj    = P0(lambda, mu, M)
+  Pj[2] = P.n(1, lambda, mu, M)
+  Pj[3] = P.n(2, lambda, mu, M)
+  Pj[4] = P.n(3, lambda, mu, M)
+  Pj[5] = P.n(4, lambda, mu, M)
+  Pj[6] = P.n(5, lambda, mu, M)
+  Pj
+
+  plot(0:5, Pj, type="l")
+
+
+
+
