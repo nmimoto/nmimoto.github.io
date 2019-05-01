@@ -1,0 +1,129 @@
+
+#----------------------------------
+#  Best Prize Problem
+
+n=10
+k=floor(n/exp(1))
+
+X = runif(n, 10, 100)
+
+rank(X)             # 1 is smallest 
+abs(rank(X)-(n+1))  # 1 is largest
+
+
+n=20
+k=floor(n/exp(1))
+
+X = runif(n, 10, 100)
+X.rank = abs(rank(X)-(n+1))  
+
+
+Bench = max(X[1:k])
+Bench
+
+Choices = X[(k+1):n]
+
+which( Choices>Bench )
+
+Acc.ix_0 = which(Choices>Bench)
+
+if (length(Acc.ix_0)>0) {
+  Acc.ix = min(Acc.ix_0)
+} else {
+  Acc.ix = length(Choices)
+}
+
+Acc = Choices[Acc.ix]
+
+Acc.rank = X.rank[X==Acc]
+
+
+
+
+#--- 2. Put it in the loop ---
+
+n=100
+k=floor(n/exp(1))
+
+Acc.rank = 0
+Acc = 0
+Best1 = 0
+Best2 = 0
+for (i in 1:5000){
+  X = runif(n, 10, 100)
+  X.rank = abs(rank(X)-(n+1))  
+
+  Best1[i]=X[X.rank==1]
+  Best2[i]=X[X.rank==2]
+
+  Bench = max(X[1:k])
+  Choices = X[(k+1):n]
+  Acc.ix_0 = which(Choices>Bench)
+
+  if (length(Acc.ix_0)>0) {
+    Acc.ix = min(Acc.ix_0)
+  } else {
+    Acc.ix = length(Choices)
+  }
+  Acc[i] = Choices[Acc.ix]
+  Acc.rank[i] = X.rank[X==Acc[i]]
+}
+
+hist(Acc.rank)
+
+hist(Acc)
+
+
+plot(Best1, Acc)
+
+
+mean(Acc.rank<10)
+
+
+
+
+
+
+#--- 3. Write as a function ---
+
+n=100
+k=floor(n/exp(1))
+
+Best <- function(n,k) {
+
+    Acc.rank = 0
+    Acc = 0
+    Best1 = 0
+    Best2 = 0
+    for (i in 1:5000){
+      X = runif(n, 10, 100)
+      X.rank = abs(rank(X)-(n+1))  
+    
+      Best1[i]=X[X.rank==1]
+      Best2[i]=X[X.rank==2]
+    
+      Bench = max(X[1:k])
+      Choices = X[(k+1):n]
+      Acc.ix_0 = which(Choices>Bench)
+    
+      if (length(Acc.ix_0)>0) {
+        Acc.ix = min(Acc.ix_0)
+      } else {
+        Acc.ix = length(Choices)
+      }
+      Acc[i] = Choices[Acc.ix]
+      Acc.rank[i] = X.rank[X==Acc[i]]
+    }
+    
+  return(mean(Acc.rank<10))
+
+}
+
+Best(100, 36)
+
+
+
+
+
+
+

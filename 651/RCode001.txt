@@ -1,0 +1,196 @@
+
+
+
+
+#---------------------
+# Pooled blood test Example 
+
+n=1000
+
+Av=0
+
+for (j in 1:5000) {
+  T=0
+  for (i in 1:n) {
+    X <- rbinom(1,10,.1)
+    if (X<1) { T[i] = 1} else { T[i]=11 }    
+  }
+  Av[j] = mean(T)
+}
+
+hist(Av)
+
+
+
+
+
+
+
+
+
+#----------------------
+# Batch Testing Example 
+
+
+n=500
+k=50
+R1 = 1-phyper(k, 50,950,n)
+R2 = 1-phyper(k,100,900,n)
+R3 = 1-phyper(k,150,850,n)
+R4 = 1-phyper(k,200,800,n)
+
+plot(c(R1,R2,R3,R4), type="l", ylim=c(0,1))
+
+ A = .25 *((1-R1)*185    +  R1*162.5 - .015*n)
+B = .25 *((1-R2)*170    +  R2*162.5 - .015*n)
+C = .25 *((1-R3)*155    +  R3*162.5 - .015*n)
+D = .25 *((1-R4)*140    +  R4*162.5 - .015*n)
+
+
+A+B+C+D
+
+
+
+
+
+#--------------------------------
+#  Caputure-Recapture Example 
+
+
+
+N=5000
+m=200
+n=200
+
+X = rhyper(5000,m,N-m,n)
+X
+
+Nhat = n*m/X
+
+sum(Nhat>=4500 & Nhat <=5500) / 5000
+sum(Nhat>=4000 & Nhat <=6000) / 5000
+
+
+
+
+
+
+#-----------------------------------------
+# Central Limit Theorem at Work
+
+n = 100
+m = 5000
+
+for( i in 1:5000) {
+
+  # X = runif(n, 0, 1)
+  X = rexp(n, 1/5)
+
+  Xbar[i] = mean(X)
+
+}
+
+hist(Xbar, freq=F)
+abline(v=5, col="red")
+
+qqnorm(Xbar)
+
+mean(Xbar)
+sd(Xbar)
+var(Xbar)
+
+
+
+#-----------------------------------------
+# Fininte Sample Property of MME for Gamma(a,b)
+
+n = 100
+m = 5000
+
+ahat=bhat=0
+for( i in 1:5000) {
+
+  X = rgamma(n, 2, scale=4)
+
+  bhat[i] = (mean(X^2)-mean(X)^2)/mean(X) #MME for gamma
+  ahat[i] = mean(X)/bhat[i]
+}
+
+
+layout(matrix(1:2, 1, 2))
+hist(ahat, freq=F)
+abline(v=2, col="red")
+
+hist(bhat, freq=F)
+abline(v=4, col="red")
+
+
+
+qqnorm(Xbar)
+
+mean(Xbar)
+sd(Xbar)
+var(Xbar)
+
+
+
+
+
+
+
+
+
+#-----------------------------------------
+# Catching the Train Example
+
+  X = rexp(5000, 1/10)       # Train arrive: (3+X)
+  Y = runif(5000, 0, 30)     # You arrive:   (2:50+Y)
+
+
+# Catch:   3+X > (2:50+Y)
+# Catch:  10+X > Y
+# Catch: -10+Y < X
+
+  (-10+Y < X)         # True = Caught the train
+  sum(-10+Y < X)      # how many times caught the train
+  sum(-10+Y < X)/5000
+
+
+
+
+# Wait:  3+X - (2:50+Y)  | only when you catch the train
+# Wait:  10+X-Y          | given that you caught the train
+
+  #- Calculate Waiting time given you caught the train 
+
+    Catch = (-10+Y < X)    # 1 means caught the train 
+
+    Wait = (10+X-Y) * Catch 
+    Wait[Wait>0]
+    mean(Wait[Wait>0])   # Estimate of E(Wait|caught the train)
+
+    1.96*sd(Wait[Wait>0])/sqrt(5000)   # Half-length of 95% CI 
+
+
+
+  #- Calculate how late you were given you missed the train 
+
+    Miss = 1-Catch
+
+    HowLate = (10+X-Y) * Miss
+
+    HowLate[HowLate<0]
+
+    mean(HowLate[HowLate<0])  # Estimate of E(How late | missed the train)
+
+    1.96*sd(HowLate[HowLate<0])/sqrt(5000)   # Half-length of 95% CI 
+
+
+
+
+
+
+
+
+
+
