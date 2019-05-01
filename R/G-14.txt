@@ -1,0 +1,20 @@
+
+
+#---------------------------------------------------------
+# In the loop, use the function and assign it to automatically named variables
+
+
+A <- function(n) {
+  b <-  n*10-5
+  return(b)
+}
+
+
+
+
+for (i in 10:15){
+
+   assign(paste("Year_", i, sep=""),  A(i*2)  )
+
+}
+

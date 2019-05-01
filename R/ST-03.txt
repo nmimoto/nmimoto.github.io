@@ -1,0 +1,309 @@
+#
+#  Goodness-of-Fit test for loss distributions 
+#
+#======================================================================================
+
+X <- c(300,     400,     2800,    4500,    4900,    5000,    7700,    9600,    10400,
+       10600,   11200,   11400,   12200,   12900,   13400,   14100,   15500,   19300,
+       19400,   22100,   24800,   29600,   32200,   32500,   33700,   34300,   37300,
+       39500,   39900,   41200,   42800,   45900,   49200,   54600,   56700,   57200,
+       57500,   59100,   60800,   62500,   63600,   66400,   66900,   68100,   68900,
+       71100,   72100,   79900,   80700,   83200,   84500,   84600,   86600,   88600,
+       91700,   96600,   96900,   106800,  107800,  111900,  113000,  113200,  115000,
+       117100,  119300,  122000,  123100,  126600,  127300,  127600,  127900,  128000,
+       131300,  132900,  134300,  134700,  135800,  146100,  150300,  171800,  173200,
+       177700,  183000,  183300,  190100,  209400,  212900,  225100,  226600,  233200,
+       234200,  244900,  253400,  261300,  261800,  273300,  276200,  284300,  316300,
+       322600,  343400,  350700,  395800,  406900,  423200,  437900,  442700,  457800,
+       463000,  469300,  469600,  544300,  552700,  566700,  571800,  596500,  737700,
+       766100,  846100,  852700,  920300,  981100,  988300, 1078800, 1117600, 1546800,
+       2211000, 2229700, 3961000, 4802200)
+
+
+
+
+Fn <- ecdf(X)   #- Fn becomes an function
+
+plot( ecdf(X) )
+
+length(X)
+mean(X)
+var(X)
+sd(X)
+
+
+
+t=seq(1,5000000, 100)
+plot(t,  Fn(t), type="l" )
+lines(t,pexp(t,1/mean(X)), col="red")
+
+
+
+#--- MLE ------------------
+library(MASS)
+
+  #- Exp
+  Exp.hat <- fitdistr(X, "exponential"  )$estimate
+
+  plot(t, Fn(t), type="l" )
+  lines(t, pexp(t, Exp.hat), col="red" )
+
+  #- Gamma
+  fitdistr(X, "gamma", start=list(shape=1, scale=1))$estimate   #- Gamma MLE needs starting point
+
+  M1 <- mean(X)
+  M2 <- mean(X^2)
+  b.hat <- (M2 - M1^2)/ M1   #MME
+  a.hat <- M1 / b.hat
+
+  Gam.hat <- fitdistr(X, "gamma", start=list(shape=a.hat, scale=b.hat))$estimate
+  Gam.hat
+
+  plot(t, Fn(t), type="l" )
+  lines(t, pgamma(t, shape=Gam.hat[1], scale=Gam.hat[2]), col="blue" )
+
+
+  #- LogNormal
+  Ln.hat <- fitdistr(X, "lognormal")$estimate
+  Ln.hat
+
+  plot(t, Fn(t), type="l" )
+  lines(t, plnorm(t, Ln.hat[1], Ln.hat[2]), col="green" )
+
+
+  #- All Three
+  plot(t, Fn(t), type="l" )
+  lines(t, plnorm(t, Ln.hat[1], Ln.hat[2]), col="green" )
+  lines(t, pgamma(t, shape=Gam.hat[1], scale=Gam.hat[2]), col="blue" )
+  lines(t, pexp(t, Exp.hat), col="red" )
+
+
+
+#--- K-S test ---------------------------------------
+KS1 <- Fn(t) - pexp(t, 1/mean(X))
+KS2 <- Fn(t) - pgamma(t, shape=Gam.hat[1], scale=Gam.hat[2])
+KS3 <- Fn(t) - plnorm(t, Ln.hat[1], Ln.hat[2])
+
+max( abs(KS1) )
+max( abs(KS2) )
+max( abs(KS3) )
+
+
+plot(KS1, type="l", col="red"); abline(h=0)
+lines(KS2, col="blue")
+lines(KS3, col="green")
+
+
+#- Built in KS test (p-value can't be used since parameters are estimated) - 
+ks.test(X, "pexp", 1/mean(X))  #- same as KS1
+ks.test(X, "pgamma", shape=Gam.hat[1], scale=Gam.hat[2])
+ks.test(X, "plnorm", Ln.hat[1], Ln.hat[2])  
+
+
+#--- MC simulation to get CV for K-S test 
+n <- length(X)
+Ln.hat
+t <- seq(1,5000000, 100)
+
+
+KS1.sim <- 0
+Exp.hat.sim <- matrix(0, 5000,1)
+for (i in 1:5000) {
+  X.sim      <- rexp(n, 1/mean(X)) 
+  Fn.sim     <- ecdf(X.sim)
+  Exp.hat.sim[i]<- fitdistr(X.sim, "exponential")$estimate
+  KS1.sim[i] <- max( abs( Fn.sim(t) - pexp(t, Exp.hat.sim[i]) ))
+}
+hist(KS1.sim)
+
+
+
+KS2.sim <- 0
+Gam.hat.sim <- matrix(0, 5000,2)
+for (i in 1:5000) {
+  X.sim      <- rgamma(n, shape=Gam.hat[1], scale=Gam.hat[2]) 
+  Fn.sim     <- ecdf(X.sim)
+  M1 <- mean(X.sim)
+  M2 <- mean(X.sim^2)
+  b.hat <- (M2 - M1^2)/ M1   #MME
+  a.hat <- M1 / b.hat
+  Gam.hat.sim[i, ] <- fitdistr(X.sim, "gamma", start=list(shape=a.hat, scale=b.hat))$estimate
+  KS2.sim[i] <- max( abs( Fn.sim(t) - pgamma(t, shape=Gam.hat.sim[i,1], scale=Gam.hat.sim[i,2]) ))
+}
+hist(KS2.sim)
+
+
+
+KS3.sim <- 0
+Ln.hat.sim <- matrix(0, 5000,2)
+for (i in 1:5000) {
+  X.sim      <- rlnorm(n, 11.587475,  1.603259) 
+  Fn.sim     <- ecdf(X.sim)
+  Ln.hat.sim[i, ] <- fitdistr(X.sim, "lognormal")$estimate
+  KS3.sim[i] <- max( abs( Fn.sim(t) - plnorm(t, Ln.hat.sim[i,1], Ln.hat.sim[i,2]) ))
+  #plot(t, Fn.sim(t), type="l" )
+  #lines(t, plnorm(t, Ln.hat.sim[i,1], Ln.hat.sim[i,2]), col="green" ) 
+}
+hist(KS3.sim)
+
+
+
+sort(KS1.sim)[4750]
+sort(KS2.sim)[4750]
+sort(KS3.sim)[4750]
+
+sort(KS1.sim)[4500]
+sort(KS2.sim)[4500]
+sort(KS3.sim)[4500]
+
+
+
+
+
+#- Q-Q plots -----------------------------------------
+n <- length(X)
+t <- ((0:n-1)+.5)/n
+s
+X1 <- sort(X)
+
+qqplot(qexp(t, 1/mean(X)),                             X1, main="Exponential Q-Q Plot", ylab="Sample Quantiles")
+abline(0,1)
+
+qqplot(qgamma(t, shape=Gam.hat[1], scale=Gam.hat[2] ), X1, main="Gamma Q-Q Plot", ylab="Sample Quantiles")
+abline(0,1)
+
+qqplot(qlnorm(t, Ln.hat[1], Ln.hat[2] ),               X1, main="Lognormal Q-Q Plot", ylab="Sample Quantiles")
+abline(0,1)
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------
+#--- Stable Distribution -----------------------------------
+
+
+  #-- alpha=2 is N(0,sqrt(2)) --
+  library("stabledist")
+  x <- seq(-10,10,.1)
+  plot( x, dstable(x, alpha=2,beta=0))
+  lines(x, dnorm(x, 0, sqrt(2)), col='red')
+
+
+  #-- alpha=1 is Cauchy --
+  x <- seq(-10,10,.1)
+  plot(x, dstable(x, alpha=1,beta=0))
+  lines(x, dcauchy(x), col='red')
+
+  #-- alpha=? --
+  x <- seq(-10,10,.1)
+  plot(x, dstable(x, alpha=1.8, beta=0))
+  lines(x, dnorm(x, 0, sqrt(2)), col='red')
+
+
+
+
+
+
+
+
+
+
+#--- 1. GOF test with Kolmogolov-Smirnov (known null) -----------
+
+  #-- limiting distribution under null is sup of |BB(F(t))|
+  D1 <- D2 <- D3 <- 0
+  for (itt in 1:1000){
+    X1 <- rnorm(100,  0, 1)
+    X2 <- rnorm(1000, 0, 1)
+    X3 <- rnorm(5000, 0, 1)
+    D1[itt] <- ks.test( X1, "pnorm", 0, 1)$statistic
+    D2[itt] <- ks.test( X2, "pnorm", 0, 1)$statistic
+    D3[itt] <- ks.test( X3, "pnorm", 0, 1)$statistic
+  }
+  x <- seq(0,5,.1)
+  E1 <- ecdf( sqrt(100 )*D1 ); sort(sqrt(100 )*D1)[950]  #1.323159
+  E2 <- ecdf( sqrt(1000)*D2 ); sort(sqrt(1000)*D2)[950]
+  E3 <- ecdf( sqrt(5000)*D3 ); sort(sqrt(5000)*D3)[950]
+  plot( x, E1(x), type='l')
+  lines(x, E2(x), col='red')
+  lines(x, E3(x), col='green')
+
+
+
+#--- 2. Compare limiting distribution for Normal vs Exp ------
+#         for known null and location-scale null
+  D1 <- D2 <- D3 <- D4 <- 0
+  for (itt in 1:1000){
+    X1 <- rnorm(1000,  2, 3)
+    X2 <- rexp(1000, .5)
+    D1[itt] <- ks.test( X1, "pnorm", 2,        3     )$statistic
+    D2[itt] <- ks.test( X1, "pnorm", mean(X1), sd(X1))$statistic
+    D3[itt] <- ks.test( X2, "pexp",  .5              )$statistic
+    D4[itt] <- ks.test( X2, "pexp",  1/mean(X2)      )$statistic
+  }
+  x <- seq(0,5,.1)
+  E1 <- ecdf( sqrt(n)*D1 ); sort(sqrt(n)*D1)[950]  #1.323159
+  E2 <- ecdf( sqrt(n)*D2 ); sort(sqrt(n)*D2)[950]
+  E3 <- ecdf( sqrt(n)*D3 ); sort(sqrt(n)*D3)[950]
+  E4 <- ecdf( sqrt(n)*D4 ); sort(sqrt(n)*D4)[950]
+  plot( x, E1(x), type='l')
+  lines(x, E2(x), col='red')
+  lines(x, E3(x), col='green')
+  lines(x, E4(x), col='blue')    #black and green is same because they are both known null, but not red and blue
+
+
+
+
+#--- 3. Comparing limting distribution of -------------------------
+#         known null vs location-scale null for Nomral
+  library("stabledist")
+  n <- 1000
+  D1 <- D2 <- D3 <- 0
+  for (itt in 1:1000){
+    X1 <- rnorm(n, 0, 1)
+    X2 <- rnorm(n, 2, 3)
+    D1[itt] <- ks.test( X1, "pnorm", 0, 1)$statistic
+    D2[itt] <- ks.test( X1, "pnorm", mean(X1), sd(X1))$statistic
+    D3[itt] <- ks.test( X2, "pnorm", mean(X2), sd(X2))$statistic
+  }
+  x <- seq(0,3,.1)
+  E1 <- ecdf( sqrt(n)*D1 );  sort(sqrt(n)*D1)[950]  # 1.34146
+  E2 <- ecdf( sqrt(n)*D2 );  sort(sqrt(n)*D2)[950]  # 0.90658
+  E3 <- ecdf( sqrt(n)*D3 );  sort(sqrt(n)*D3)[950]  # 0.92042
+  plot( x, E1(x), type='l')
+  lines(x, E2(x), col='red')
+  lines(x, E3(x), col='green')
+
+
+
+
+#--- 3. Rejecting stable(a=1.9) with location-scale null -----------
+  library("stabledist")
+  n <- 1000
+  D1 <- D2 <- 0
+  for (itt in 1:1000){
+    X1 <- rnorm(n,  2,  3)
+    X2 <- rstable(n, alpha=1.9, beta=0)
+    D1[itt] <- ks.test( X1, "pnorm", mean(X1), sd(X1))$statistic
+    D2[itt] <- ks.test( X2, "pnorm", mean(X2), sd(X2))$statistic
+  }
+  x <- seq(0,5,.1)
+  E1 <- ecdf( sqrt(n)*D1 );  CV05=sort(sqrt(n)*D1)[950]
+  E2 <- ecdf( sqrt(n)*D2 );  power=sum(sqrt(n)*D2>CV05)/1000
+  plot( x, E1(x), type='l')
+  lines(x, E2(x), col='red')
+  abline(v=CV05)
+  CV05
+  power
+
+
+
+
+
+
+
+

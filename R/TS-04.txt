@@ -1,0 +1,286 @@
+#
+#
+#  ARFIMA and estimation of d
+#
+#
+#############################################
+require(fracdiff)
+require(longmemo) 
+
+
+
+#-----------------------------------------------
+#--- A. ARFIMA(0,d,0) and 3 estimators for d ---
+
+
+
+#--- Generate ARFIMA(0,d,0) ----------------
+GetX.0d0 <- function(d,n,ittMax,burn.in){
+  X <- matrix(0, ittMax, n)
+  for (i1 in 1:ittMax) {
+    fds.sim <- fracdiff.sim(n, ar=NULL, ma=NULL, d=d, n.start=burn.in, rand.gen=function(x) rnorm(x, 0, 1) )
+    X[i1,]  <- fds.sim$series
+  }
+  return(X)  
+}
+
+
+#--- Generate ARFIMA(1,d,0) ----------------
+GetX.1d0 <- function(d,n,ittMax,burn.in){
+  X <- matrix(0, ittMax, n)
+  for (i1 in 1:ittMax) {
+    fds.sim <- fracdiff.sim(n, ar=c(.5), ma=NULL, d=d, n.start=burn.in, rand.gen=function(x) rnorm(x, 0, 1) )
+    X[i1,]  <- fds.sim$series
+  }
+  return(X)  
+}
+
+
+#--- Estimate d with mle -------------------
+Estim.d.mle <- function(x,nar1,nma1,ittMax){
+  d1 <- matrix(0,ittMax,1)
+  for (i1 in 1:ittMax) {
+    x <- X[i1,]
+    fitted <- tryCatch( fracdiff(x, nar=nar1, nma=nma1), error=function(ss){return(NA)}  ) # MLE
+    d1[i1] <- fitted$d
+  }
+  return( d1 )    
+}
+
+
+#--- Estimate d with mle -------------------
+Estim.d.whi <- function(x,nar1,nma1,ittMax){
+# was in afmtools() package. only available in archive now
+
+  d1 <- matrix(0,ittMax,1)
+  for (i1 in 1:ittMax) {
+    x <- X[i1,]
+    fitted <- tryCatch( arfima.whittle(x, nar=nar1, nma=nma1) , error=function(ss){return(NA)}  ) 
+    d1[i1] <- fitted
+  }
+  return( d1 )    
+}
+
+
+#--- Estimate d with local whittle -------------------
+Estim.d.lw <- function(x,m,ittMax){
+  locWhittle <- function(x, m2) {
+    lw <- function(d, x, m1){
+
+      n     <- length(x)
+      j     <- 1:m1
+
+      peri1 <- per(x)  #per() is Periodgram in longmemo() package
+      peri  <- peri1[2:(m1+1)]
+
+      freq <- 2*pi*j/n
+      result <- log(sum(freq^(2*d)*peri))-(2*d)/m1 * sum(log(freq))
+    }
+
+    optimize(lw, interval=c(0, .5), x=x, m1=m2)$minimum
+  }
+
+  d1 <- matrix(0,ittMax,1)
+  for (i1 in 1:ittMax) {
+    x <- X[i1,]
+    fitted <- locWhittle(x,m2=m)  # need m->inf and m/n->0
+    d1[i1] <- fitted
+  }
+  return( d1 )    
+}
+
+
+
+
+
+#---------------------------------------------------------- 
+#---------------------------------------------------------- 
+d <- .2
+
+X1      <- GetX.0d0(d=d, n=5000, ittMax=100, burn.in=10000)
+X2      <- GetX.1d0(d=d, n=5000, ittMax=100, burn.in=10000)
+
+d.hat1 <- Estim.d.mle(X1,0,0,ittMax=100)
+
+d.hat3 <- Estim.d.lw(X1,m=1000,ittMax=100)
+
+
+d.hat21 <- Estim.d.mle(X2,1,0,ittMax=100)
+d.hat23 <- Estim.d.lw(X2,m=1000,ittMax=100)
+d.hat24 <- Estim.d.mle(X2,0,0,ittMax=100)
+
+d.hat2 <- Estim.d.whi(X1,0,0,ittMax=100) # not working
+
+
+layout( matrix(1:3, 1, 3) )
+hist(d.hat21, main="", xlab=""); title("aaa");
+hist(d.hat23, main="", xlab=""); title("bbb");
+hist(d.hat24, main="", xlab=""); title("ccc");
+
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat1), sqrt(mean((d.hat1-d)^2)))
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat2), sqrt(mean((d.hat2-d)^2)))
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat3), sqrt(mean((d.hat3-d)^2)))
+
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat21), sqrt(mean((d.hat21-d)^2)))
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat23), sqrt(mean((d.hat23-d)^2)))
+sprintf("MLE mean:%3.3f, rMSE:%3.3f \n", mean(d.hat24), sqrt(mean((d.hat24-d)^2)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  #--- 4. Compare 3 estimators after Nonpara-Reg ---
+  par1  <- 0
+  par2  <- 0
+  par3  <- 0
+  x <- (1:n)/n
+  x1 <- matrix(0, 100, n)
+  for (i in 1:100) {
+
+    #-- LM with linear trend --
+    err <- fracdiff.sim(n, ar=NULL, ma=NULL, d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )$series
+    Y <- 1+4*x+err
+
+    #-- N-W nonparametirc regression --
+    x1[i,] <- Y-ksmooth(x,Y)$y
+
+    par1[i] <- tryCatch( fracdiff(x1)$d,                      error=function(ss){return(NA)} )
+    par2[i] <- tryCatch( arfima.whittle(x1, nar=0, nma=0)$d,  error=function(ss){return(NA)} )
+    par3[i] <- tryCatch( locWhittle(x1, n^.8),                error=function(ss){return(NA)} )
+  }
+
+  layout( matrix(1:3, 1, 3) )
+  hist(par1); hist(par3); hist(par2) 
+
+
+
+
+
+
+
+
+
+
+#--- Long Memory Moving Average ------------
+LMMA_maker <- function(grid1, n, d, c0){
+
+  #--- ARFIMA(0,d,0) coefficients ---
+  s1 = seq(0,100)
+  b1 = gamma(s1+d) /(gamma(s1+1) *gamma(d))
+  s2 = seq(101,grid1)
+  b2 = s2^(-1+d) / gamma(d)
+  A2 = rev(c(b1,b2))
+  
+  
+  
+  #--- LMMA method ---  
+  A22 = c(1, ( seq(1,grid1)^(-(1-d)) ) * c0)
+  A22 = rev(A22)
+  
+  
+  xi = rnorm(n+grid1, 0, 1)
+   
+  X    = rep(0, n)
+  X22  = rep(0, n)
+  for (i in 1:n){
+     X[i]   = sum( A2  * xi[i:(grid1+i)] );
+     X22[i] = sum( A22 * xi[i:(grid1+i)] );
+  }
+  
+  return(X22)
+
+}
+
+
+
+d=.3; grid1=150; n=5000; 
+x1 <- LMMA_maker(grid1, n, d, 1/gamma(d))
+plot(x1, type='l')
+
+
+
+  #--- Compare 3 estimators for LMMA for different c ---
+  par1  <- 0
+  par2  <- 0
+  par3  <- 0
+  x <- (1:n)/n
+  x1 <- matrix(0, 100, n)
+  for (i in 1:100) {
+
+    #-- LMMA with constant c (c=1/gamma(d) for ARFIMA(0,d,0)) --
+    C0 = .5  #1/gamma(d)
+    x1 <- x1 <- LMMA_maker(grid1, n, d, C0)
+
+    par1[i] <- tryCatch( fracdiff(x1)$d,                      error=function(ss){return(NA)} )
+    par3[i] <- tryCatch( locWhittle(x1, n^.8),                error=function(ss){return(NA)} )
+  }
+
+  c(  mean(par1), mean(par3)  )
+  layout( matrix(1:3, 1, 3) )
+  hist(par1); hist(par3); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+print(date())
+
+ar1 <- 0
+ma1 <- 0
+d1  <- .35
+sd1 <- 1
+
+
+
+
+#--- Estimate marginal var by iid simulation
+#  (about 2.5min for 10k itt  1min with XPSone) ---
+Y <- rep(0, 10000)
+for (i in 1:10000) {
+  a <- fracdiff.sim(1000, ar=ar1, ma=ma1, d=d1, n.start=500, rand.gen=function(x) rnorm(x, 0, sd1) )$series
+  Y[i] <- a[1000]
+}
+print( var(Y) )
+print(date())
+
+
+
+
+
+
+
+
+
+
+
+

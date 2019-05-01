@@ -1,0 +1,88 @@
+#------------------------
+# Housing Data example from http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html
+
+housing <- read.csv("http://gozips.uakron.edu/~nmimoto/R/landdata-states.csv")
+
+View(housing)
+
+colnames(housing)
+# [1] "State"            "region"           "Date"             "Home.Value"
+# [5] "Structure.Cost"   "Land.Value"       "Land.Share..Pct." "Home.Price.Index"
+# [9] "Land.Price.Index" "Year"             "Qrtr"
+
+
+library(ggplot2)
+
+  #- Histogram of all Home.Value pooled (all states, all times)
+  p1 <- ggplot(housing, aes(x = Home.Value))
+  p1 + geom_histogram()
+  p1 + geom_histogram(stat = "bin", binwidth=4000)
+
+
+  #- Timeseries of Home.Value by state 
+  p2 <- ggplot(housing, aes(x = Date, y = Home.Value))
+  
+  p2 + geom_line(aes(color = State))                #- Overlay  Home.Value for each state
+  p2 + geom_line() + facet_wrap(~State, ncol = 10)  #- Panel of Home.Value for each state
+
+
+  #- Pick two states and plot Home.Value over time
+  p3 <- ggplot(subset(housing, State %in% c("MA", "TX")),  aes(x=Date, y=Home.Value, color=State))
+  p3 + geom_point()
+
+  #- Pick 2001 Q1, log-scatter plot with regression line
+
+  hp2001Q1         <- subset(housing, Date==2001.25)                                  # pick only 2001 Q1
+  hp2001Q1$reg     <- fitted(   lm(Structure.Cost~log(Land.Value), data=hp2001Q1)  )  # fitted regression line
+  
+  p4      <- ggplot(hp2001Q1, aes(x=    Land.Value , y=Structure.Cost))
+  p4.logx <- ggplot(hp2001Q1, aes(x=log(Land.Value), y=Structure.Cost))
+
+  p4      + geom_point()
+  p4.logx + geom_point()
+  p4.logx + geom_point(aes(color=Home.Value)) + geom_line(aes(y=reg))    # add reg line
+  p4.logx + geom_text(aes(label=State), size = 3)                        # use state name instead
+
+  library("ggrepel")                                                     # install.packages("ggrepel") 
+  p4.logx + geom_point()  + geom_text_repel(aes(label=State), size=3)    # add text to scatter plot 
+  p4.logx + geom_point(aes(color=Home.Value, shape=region), size=4) + geom_text_repel(aes(label=State), size=3)
+  
+  
+
+
+
+#----------------------------
+# MPG dataset
+library(ggplot2)
+
+dataset=mtcars #- dataset contained in package ggplot2.
+
+
+# create factors with value labels
+mtcars$gear <- factor(mtcars$gear,levels=c(3,4,5),labels=c("3gears","4gears","5gears"))
+mtcars$am   <- factor(mtcars$am,levels=c(0,1), 	  labels=c("Automatic","Manual"))
+mtcars$cyl  <- factor(mtcars$cyl,levels=c(4,6,8), labels=c("4cyl","6cyl","8cyl"))
+
+# KDE plots for mpg grouped by gear
+qplot(mpg, data=mtcars, geom="density", fill=gear, alpha=I(.5),
+      main="Distribution of Gas Milage", xlab="Miles Per Gallon", ylab="Density")
+
+
+# Scatterplot of mpg vs. hp for each combo of gears and cylinders
+qplot(hp, mpg, data=mtcars, shape=am, color=am, facets=gear~cyl, size=I(3),
+   xlab="Horsepower", ylab="Miles per Gallon")
+
+
+# Separate regressions of mpg on weight for each number of cylinders
+qplot(wt, mpg, data=mtcars, geom=c("point", "smooth"),
+   method="lm", formula=y~x, color=cyl,
+   main="Regression of MPG on Weight",
+   xlab="Weight", ylab="Miles per Gallon")
+
+
+
+# Boxplots of mpg by number of gears
+# observations (points) are overlayed and jittered
+qplot(gear, mpg, data=mtcars, geom=c("boxplot", "jitter"),
+   fill=gear, main="Mileage by Gear Number",
+   xlab="", ylab="Miles per Gallon")

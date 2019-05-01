@@ -1,0 +1,45 @@
+#
+#  Global vs local variables
+#    how to use "<<-" to set global variable and functions
+#    7/11/2011
+#
+#===========================================================
+
+if (stage==2) {
+
+  a <- function(x) {
+    b <- 3
+    return( b*x)
+  }
+
+  a(5)    # use function above
+  b       # can't find
+
+
+  #--- set global variable with "<<-" -----
+  a <- function(x) {
+    b <<- 3
+    return( b*x)
+  }
+
+  a(5)    # use function above
+  b       # now this is 3
+
+  #--- now set global function ---
+  k <- function(x) {
+    b <<- function(x) print(x*20)
+    return(5*x)
+  }
+
+  k(5)
+  b
+  b(3)
+
+}
+
+
+
+
+
+
+

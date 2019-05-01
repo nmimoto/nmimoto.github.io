@@ -1,0 +1,46 @@
+
+
+#--------------------------------------
+#--- Random Walk
+e <- rnorm(1000, 0, sd=1)
+X <- cumsum(e)
+
+
+plot(X, ylim=c(-4*sqrt(1000), 4*sqrt(1000)))
+
+
+for (i in 1:100){
+
+  e <- rnorm(1000, 0,1)
+  X <- cumsum(e)
+  lines(X)
+  readline("---")
+
+}
+
+
+
+#--------------------------------------
+#--- Scale to be Bro Mo
+
+n = 1000
+
+e <- rnorm(n, 0, sd=1/sqrt(n))
+X <- cumsum(e)
+
+plot((1:n)/n, X, ylim=c(-4,4))
+
+
+Y <- 0
+for (i in 1:1000){
+
+  e <- rnorm(n, 0,1/sqrt(n))
+  X <- cumsum(e)
+  lines((1:n)/n, X)
+  readline("---")
+  Y[i] <- X[n]
+
+}
+
+var(Y)
+

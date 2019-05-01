@@ -1,0 +1,112 @@
+
+
+
+#--- Basic GARCH simulation with fGARCH package ----
+install.packages("fGarch")   # required first time
+library(fGarch)              # required every time you restart R 
+
+
+
+n     <- 1000
+theta <- c(.024, .06, .88) #GARCH parameter
+
+
+#--- GARCH(1,1) Simulation with gaussian error
+spec1 <- garchSpec(model = list(omega=theta[1], alpha=theta[2], beta=theta[3]),  cond.dist="norm")
+Y     <- garchSim(spec1, n = n, extended=T)   # Y has 3 columns: garch sigma eps
+
+
+
+#--- GARCH(1,1) Simulation with t error
+spec2 <- garchSpec(model = list(omega=theta[1], alpha=theta[2], beta=theta[3]),  cond.dist = "std")
+Y     <- garchSim(spec2, n = n, extended=FALSE)
+
+
+#--- GARCH(1,1) Simulation skewed GED error
+spec3 <- garchSpec(model = list(mu=.05,  skew=.9,  shape=1.45, omega=theta[1], alpha=theta[2], beta=theta[3]),  cond.dist="sged")
+Y     <- garchSim(spec3, n = n, extended=FALSE)
+
+
+
+#--- GARCH(1,1) estimation with different error distribution -----
+out1 <-  garchFit(~ garch(1,1), data=Y,                      cond.dist="norm",  include.mean = FALSE, trace = FALSE)
+out1 <-  garchFit(~ garch(1,1), data=Y, shape=10,            cond.dist="std",   include.mean = FALSE, trace = FALSE)
+out1 <-  garchFit(~ garch(1,1), data=Y, shape=1.45, skew=.9, cond.dist="sged",  include.mean = FALSE, trace = FALSE)
+out1 <-  garchFit(~ garch(1,1), data=Y, shape=11.2, skew=.9, cond.dist="sstd",  include.mean = FALSE, trace = FALSE)
+
+
+
+estim <- out1@fit$par     #-- estimated parameters
+res_p <- out1@residuals   #-- this is not the garch residuals!!!!
+res1  <- Y/out1@sigma.t   #-- this is the residuals
+print(out1@fit$ics)       #-- AIC and BIC are here
+
+
+
+
+
+
+#--- See how closely sigma is estimated ---
+spec1 <- garchSpec(model = list(omega=theta[1], alpha=theta[2], beta=theta[3]),  cond.dist="norm")
+Y     <- garchSim(spec1, n = 1000, extended=T)   # Y has 3 columns: garch sigma eps
+out1  <-  garchFit(~ garch(1,1), data=Y[,1], cond.dist="norm", include.mean = FALSE, trace = FALSE)
+
+w_k_tilde <- function(u, Y) {
+  Y_sq <- Y^2
+  n    <- length(Y_sq)            
+
+  C         <- numeric(1)
+  C[1]      <- u[1] / (1-u[3])  
+  C[2:n]    <- u[2] * ( u[3] * rep(1,n-1) )^(0:(n-2))  
+
+  w_k_tilde     <- C[1] 
+  for (k in 2:n) {
+      w_k_tilde[k]    <- C[1] +  sum( C[2:k]*Y_sq[(k-1):1] )
+  }
+  return(w_k_tilde )
+}
+
+sigSq <- w_k_tilde(out1@fit$par, Y[,1])
+
+cbind(Y[,2], out1@sigma.t, sqrt(sigSq))
+
+
+
+
+
+
+
+record_estim <- numeric(0)
+for (i in 1:1000) {
+
+    Y    <- garchSim(spec1, n = n, extended=FALSE)
+
+    out1 <-  garchFit(~ garch(1,1), data=Y, cond.dist="norm", include.mean = FALSE, trace = FALSE)
+
+    estim <- out1@fit$par
+    res_p <- out1@residuals   #-- this is not the garch residuals!!!!
+    res1  <- Y/out1@sigma.t   #-- this is the residuals
+
+    printt<- 0
+    if (printt==1) {
+      print(out1)
+
+      print(c(estim, sd(res1)) )
+      Randomness.test(res1)
+      plot(density(res1))
+      t <- seq(-5,5,.01)
+      lines(t, dnorm(t), col="red")
+      # lines(t, dt(t,10), col="red")
+
+      print(out2@fit$ics)   # AIC and BIC are here
+    }
+
+    print(i)
+    record_estim <- rbind(record_estim, estim)
+  }
+  print(sd(record_estim))
+
+}
+
+
+

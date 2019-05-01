@@ -1,0 +1,71 @@
+#
+# Monte Carlo Integration and AT variates
+#
+##############################
+
+
+
+#--- int_0^1 e^(-x) dx --------
+True <- 1-exp(-1); True
+
+
+
+
+#--- numerical integration -----
+f1 <- function(x)   {  exp(-x) }
+NI <- integrate( f1, 0, 1)
+
+str(NI)   # see what's inside
+NI$value  # only the value of the integral 
+
+
+
+
+#--- Monte Carlo Integration ---
+n <- 10000
+
+U <- runif(n, 0, 1)
+Y <- exp(-U)
+MCI <- mean(Y)
+MCI
+
+ME <- 1.96 * sqrt( var(Y)/n )
+ME
+
+
+
+
+
+#--- MCI with Antithetic Variates ---
+n <- 5000
+
+U <- runif(n, 0, 1)
+V <- 1-U
+cor(U,V)
+
+Y1 <- exp(-U)
+Y2 <- exp(-V)
+cor(Y1,Y2)
+
+AT   <- (Y1+Y2)/2 
+MCI2 <- mean(AT)
+MCI2
+
+mean( c(Y1,Y2) )
+mean( (Y1+Y2)/2)   # same as above  
+var( c(X,Y) )      # 10000 realization
+var( (X+Y)/2 )     # 5000 numbers
+
+ME2  <- 1.96*sqrt( var(AT)/n )
+ME2
+
+
+
+
+
+
+
+
+
+
+

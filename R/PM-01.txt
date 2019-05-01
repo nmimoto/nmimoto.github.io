@@ -1,0 +1,73 @@
+#
+#
+#  Generating RV using Inverse and Accept-Rejec Methods
+#
+#
+#############################################
+
+
+
+#--- Inverse Transformation Exp
+  X <- rexp(2000, .5)
+  hist(X)
+
+  Y <- pexp(X,.5)
+  hist(Y)
+
+  # this looks uniform
+  X <- unif(2000, 0,1); hist(X)
+  Y <- qexp(X, .5) ;
+  hist(Y)
+
+
+  lambda <- 5
+  Z <- -log(X)/ lambda
+  hist(Z,freq=F)
+  t <- seq(0,2,.01)
+  lines(t,dexp(t,5))
+  c(mean(X), var(X))
+
+
+
+
+#--- Inverse Transformation Geometric
+  n <- 10000
+  p <- .3
+  U <- runif(n)
+  G <- ceiling( log(U) / log(1-p) -1 )
+  hist(G, freq=F, breaks=(0:20)-.5)
+  t <- 0:20
+  lines(t, dgeom(t,.3), type="p", col="red")
+  plot.stepfun(G)
+  lines(t, pgeom(t,.3), type="p", col="red")
+
+
+
+
+
+#--- Acceptance Rejection Beta(2,2)
+  n   <- 1000
+  i   <- 0       # index for acceptance
+  gen <- 0     # index for generation
+  y <- numeric(0)
+  
+  while ( i < n) {
+    X1  <- runif(1)
+    gen <- gen + 1
+     
+    u <- runif(1, 0, 1.5)   
+    if ( u < 6*X1*(1-X1) ) {
+      i <- i+1
+      y[i] <- X1
+    } 
+  }
+  
+  c(n, gen)
+  hist(y, freq=F)
+  t <- seq(0,1,.01)
+  lines(t, dbeta(t,2,2), col="green")
+
+
+
+
+

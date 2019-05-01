@@ -1,0 +1,94 @@
+###
+###  Numerical Integral Examples
+###
+############################################
+
+
+#--- Single integral from 0 to 1 --------------------------------------------
+  f <- function(t){ 1/t^(1/2) }
+  F <- integrate(f, 0, Inf)
+  F  
+
+
+
+#--- Single integral with param d from (x1 to x2) -------------------------
+  F <- function(x1,x2, d) {
+    f       <- function(x,d){ (1/(6*d^4))*(x^3)*exp(-x/d) }
+    f.dx    <- function(  d){ integrate( function(x){sapply(x, function(x) f(x=x, d=d))}, x1, x2 )$value }
+    return(f.dx(d))
+  } 
+  F(0,Inf, .3)
+
+
+
+#--- Double int with param d from (x1 to x2), (y1 to y2) ------------------
+  F <- function(x1,x2, y1,y2, d){
+    f       <- function(x,y,d){ (x^3-y)*exp(-x/d-y) }
+    f.dx    <- function(  y,d){ integrate( function(x){sapply(x, function(x) f(x=x,y=y,d=d))}, x1, x2 )$value }
+    f.dx.dy <- function(    d){ integrate( function(y){sapply(y, function(y) f.dx( y=y,d=d))}, y1, y2 )$value }
+    return(f.dx.dy(d))
+  } 
+  F(0,Inf, 0, Inf, .3)
+
+
+
+#--- Triple integral with two parameters a and b --------------------------
+  F <- function(x1,x2, y1,y2, z1,z2, a,b) { 
+    f          <- function(x,y,z,a,b){ (x^3-y-z)*exp(-x/a -y/b -z) }
+    f.dx       <- function(  y,z,a,b){ integrate( function(x){sapply(x, function(x) f(x=x,y=y,z=z,a=a,b=b))}, x1, x2 )$value }
+    f.dx.dy    <- function(    z,a,b){ integrate( function(y){sapply(y, function(y) f.dx( y=y,z=z,a=a,b=b))}, y1, y2 )$value }
+    f.dx.dy.dz <- function(      a,b){ integrate( function(z){sapply(z, function(z) f.dx.dy(  z=z,a=a,b=b))}, z1, z2 )$value }
+    return(f.dx.dy.dz(a,b))
+  } 
+  F(0,Inf, 0,Inf, 0,Inf, .3,4)
+
+
+
+#--- Quadruple integral -----------------------------------------------------
+  F <- function(x1,x2, y1,y2, z1,z2, v1,v2, a,b) { 
+    f             <- function(x,y,z,v,a,b){ (x^3-y-z-v)*exp(-x/a -y/b -z -v/b) }
+    f.dx          <- function(  y,z,v,a,b){ integrate( function(x){sapply(x, function(x) f(x=x,y=y,z=z,v=v,a=a,b=b))}, x1, x2 )$value }
+    f.dx.dy       <- function(    z,v,a,b){ integrate( function(y){sapply(y, function(y) f.dx( y=y,z=z,v=v,a=a,b=b))}, y1, y2 )$value }
+    f.dx.dy.dz    <- function(      v,a,b){ integrate( function(z){sapply(z, function(z) f.dx.dy(  z=z,v=v,a=a,b=b))}, z1, z2 )$value }
+    f.dx.dy.dz.dv <- function(        a,b){ integrate( function(v){sapply(v, function(v) f.dx.dy.dz(   v=v,a=a,b=b))}, v1, v2 )$value }
+    return(f.dx.dy.dz.dv(a,b))
+  } 
+  F(0,5, 0,5, 0,6, 0,8, .3,4)
+
+
+
+
+
+
+#--- Integrate() with error aversion ---------------------------------------
+  f1 <- function(t) {sapply(t, function(x) genD(density_f0, x)$D[2]^2) }
+  tryCatch( integrate(f1, -Inf,Inf),
+            error=function(x){
+              100*integrate(function(x) f1(x)/100, -Inf, Inf)$value } )
+
+  f2 <- function(x) density_f0_pp(x)^2
+  integrate(f2, -Inf,Inf)
+
+
+
+#--- Numerical derivative -------------------------------------------------
+  source("F:/R/mimoto/mimoto_F0_001.R")
+  pick.distrib("gaussian", 0, 1)
+  library(numDeriv)
+
+
+  t <- seq(-5,5,.1)
+  d1 <- sapply(t, function(x) genD(density_f0, x)$D[1]) # 1st deriv
+  d2 <- sapply(t, function(x) genD(density_f0, x)$D[2]) # 2nd deriv
+
+  plot(t, density_f0_p(t), type='l')
+  lines(t, d1, col='blue')
+
+  plot(t, density_f0_pp(t), type='l')
+  lines(t, d2, col='blue')
+
+
+
+
+
+

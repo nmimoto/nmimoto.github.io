@@ -1,0 +1,35 @@
+###
+###
+###  Download Daily Stock Prices from Yahoo.com and store as CSV
+###
+###
+###---------------------------------------------------------
+
+
+
+
+# Define Date Range for download
+srtDate <- as.Date("2000-01-01")
+endDate <- as.Date("2019-03-08")    # will be SAVED
+
+
+library(quantmod)
+source("https://www.uakron.edu/statistics/faculty/nmimoto/R/TS-90.txt")
+
+
+#-- Download Historical SPY Prices for reference of trading days
+SPY <- getSymbols("SPY", src = "yahoo", auto.assign=F, 
+                  return.class="xts", from = srtDate, to = endDate+1)
+
+
+print(head(SPY))
+print(tail(SPY))
+
+
+print(SPY)
+
+
+
+
+
+

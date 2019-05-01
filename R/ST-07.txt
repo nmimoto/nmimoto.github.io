@@ -1,0 +1,103 @@
+##
+##
+##  Markov Chain Example
+##
+##
+##--------------------------------
+
+
+#--- Sunny - Rainy Example
+A <- c(.8,.2, 0, 0)     # SS
+B <- c( 0, 0,.5,.5)     # SR
+C <- c(.6,.4, 0, 0)     # RS
+D <- c( 0, 0,.3,.7)     # RR
+
+
+P <- matrix(c(A,B,C,D), 4,4, byrow=TRUE)  # Define Trans Matrix
+P
+
+matrix(c(1, 0, 0, 0), 1,4) %*% P   # Tomorrow's prob with Today=1
+
+matrix(c(0, 0, 1, 0), 1,4) %*% P   # Tomorrow's prob with Today=3
+
+
+P2 <- P %*% P    # Matrix Multiplication
+P2
+
+#[1,] 0.64 0.16 0.10 0.10
+#[2,] 0.30 0.20 0.15 0.35
+#[3,] 0.48 0.12 0.20 0.20
+#[4,] 0.18 0.12 0.21 0.49
+
+
+P3 <- P2 %*% P
+P3
+
+n  <- 5
+Pn <- P %*% P
+for (i in 1:(n-1)) { Pn <- Pn %*% P }
+Pn
+
+#[1,] 0.4678172 0.1523568 0.1446710 0.2351550
+#[2,] 0.4340130 0.1477320 0.1549405 0.2633145
+#[3,] 0.4570704 0.1510976 0.1477320 0.2441000
+#[4,] 0.4232790 0.1464600 0.1579887 0.2722723
+
+n  <- 10
+Pn <- P %*% P
+for (i in 1:(n-1)) { Pn <- Pn %*% P }
+Pn
+
+
+n  <- 20
+Pn <- P %*% P
+for (i in 1:(n-1)) { Pn <- Pn %*% P }
+Pn
+
+
+n  <- 100
+Pn <- P %*% P
+for (i in 1:(n-1)) { Pn <- Pn %*% P }
+Pn
+
+#[1,] 0.45 0.15 0.15 0.25
+#[2,] 0.45 0.15 0.15 0.25
+#[3,] 0.45 0.15 0.15 0.25
+#[4,] 0.45 0.15 0.15 0.25
+
+
+
+matrix(c(.45, .15, .15, .25), 1,4) %*% P
+
+#[1,] 0.45 0.15 0.15 0.25
+
+
+
+
+#-- Chronological Simulatin of the same MC ---
+
+X <- 1   # Initial State
+for (i in 1:5000) {
+
+    Xcur <- X[i]
+
+    if (Xcur==1) {
+        X[i+1] <- rbinom(1,1,.2)+1  # 1 or 2
+    } else if (Xcur==2) {
+        X[i+1] <- rbinom(1,1,.5)+3 # 3 or 4
+    } else if (Xcur==3) {
+        X[i+1] <- rbinom(1,1,.4)+1 # 1 or 2
+    } else if (Xcur==4) {
+        X[i+1] <- rbinom(1,1,.7)+3 # 3 or 3
+    }
+
+}
+plot(X, type="o", xlim=c(0,200))    # See how states change over time
+
+mean(X==1)       # Proprotion of times X was in state1
+mean(X==2)       # Proprotion of times X was in state2
+mean(X==3)       # Proprotion of times X was in state3
+mean(X==4)       # Proprotion of times X was in state4
+
+
+which(X==1)

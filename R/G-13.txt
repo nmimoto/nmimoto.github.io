@@ -1,0 +1,79 @@
+
+
+
+#--- Time Stamp manipulaiton -----------------------
+
+  X <- c("2015-02-05 20:00:00",
+         "2015-02-05 21:00:00",
+         "2015-02-05 22:00:00",
+         "2015-02-05 23:00:00",
+         "2015-02-06 00:00:00",
+         "2015-02-06 01:00:00",
+         "2015-02-06 02:00:00",
+         "2015-02-06 03:00:00",
+         "2015-02-06 04:00:00"   )
+
+
+  X1 <- as.Date(X, format="%Y-%m-%d") #- read in date as date
+
+  X1 <- strftime(X, format="%Y-%m-%d %H:%M:%S") #- does the same, but can handle time as well
+
+  strftime(X1, format="%Y") #- extract just year
+
+  strftime(X1, format="%m") #- extract just month
+
+  as.numeric(strftime(X1, format="%Y")) *3 -10      #- manipulate as numbers
+
+
+
+
+
+#--- Time Stamp manipulaiton 2 ----------------------
+
+  X <- c("20150205", "20150206", "20150207", 
+         "20150208", "20150209", "20150210"  ) 
+         
+  X1 <- paste(substr(X, 1,4),"-",substr(X,5,6),"-",substr(X,7,8), sep="")
+
+  X2 <- as.Date(X1, format="%Y-%m-%d")
+
+
+
+
+
+
+#--- Read in System Time and format ------------------
+
+  format(Sys.time(), "%Y-%m-%d %H:%M")   #  "2016-01-07 07:54"
+
+  format(Sys.time(), "%m-%d-%a at %H")   #  "01-07-Thu on 07"
+
+  format(Sys.time(), "%A_%b%d_%H")       #  "Thu_Jan07_07"
+
+
+
+
+
+#--- Find Day of week -----------------------
+
+
+  X <- c("1997-04-17",  "2013-07-22",  "2005-03-30",  "1977-11-29",
+         "2001-08-25",  "2016-02-14",  "2015-02-06"  )
+
+  Days <- c("Sun","Mon","Tue","Wed","Thu","Fri","Sat")
+
+
+  as.POSIXlt(X)$wday          #- 0 to 6, 0=Sunday
+  Days[as.POSIXlt(X)$wday+1]  #- Sun to Sat
+
+
+
+  library(xts)
+
+  Wd <- xts(Days[as.POSIXlt(X)$wday+1], order.by=as.Date(X, format="%Y-%m-%d"))
+
+
+
+
+
+

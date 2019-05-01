@@ -1,0 +1,177 @@
+#
+#  Basic R commands and examples
+#
+#=====================================================
+
+
+
+#--- Getting Help --------------------------
+  ?exponential
+  ??"exponential distribution"
+  apropos("keyword")
+  RSiteSearch("keyword")
+
+
+#--- Installing and loading packages -------
+  install.packages("sos")
+  require("sos")
+  ???markov
+
+
+#--- Combine two script lines into one ------------
+  X <- 3
+  X
+  X <- 3; X
+
+
+
+#--- Defining function -------------------------
+  myFunc <- function( a ) {
+    b <- (a+3)/2
+    return(b)
+  }
+
+
+
+
+#--- Read/Write Files----------------------------
+  DD <- read.csv("FrazierPARMA11residuals.csv")
+  DD <- read.csv("FrazierPARMA11residuals.csv", stringsAsFactors=FALSE)
+
+  DD <- read.table("FrazierPARMA11residuals.txt")
+  unlist(DD)
+  attach(DD)
+
+  write.table(file="table.txt", X)
+
+
+
+#--- Read table off of clipboard ---------------
+  Data <- read.table(file = "clipboard", sep = " ", header=TRUE)
+  attach(Data)
+
+
+
+#--- define file or variable name by putting strings together -----
+  infile <- paste("n",n,"_",k,".Rdata",sep="")
+  load(infile)
+
+
+
+
+
+#--- If else ---------------------------------------
+  switch(a, { k <- "first" }, { k <- 4; j<- 2})
+
+  ifelse(x>2, y<-"yes", y<-"no")
+  if (x==0) {  } else { }
+
+  if (X==0) {
+      do X
+  } else if (X==1) {
+      do Y
+  } else if (X==2) {
+      do Z
+  } else do W
+
+
+
+  for (i in 1:10) {  }
+  while ( i < 10 ) {  i <- i+1 }
+
+  for (i in 1:1000) { 
+    if (i %% 100==0) { print(c(i, date()) ) }
+  }
+
+
+  #--- if is not vectorized.  ifelse is.
+
+
+#------------------------------------------------
+  str(x)
+  mode(x)
+
+  x %%  y  remainder
+  x %/% y  modulus
+
+  options(warn = -1)
+
+  all.equal(x, y)   # near equality
+  identical(x, y)   # equality
+
+  stage <- readline("stage:")
+
+
+
+#--- Read Files----------------------------
+  read.csv("FrazierPARMA11residuals.csv")
+  read.table("FrazierPARMA11residuals.txt")
+  unlist()
+
+  save(x, y, file = "xy.Rdata")
+
+
+  write.table(file="table.txt", X)
+
+  sample(x,10, replace=T) # bootstrap sampling
+
+  X.hw$drop2 <- apply(X.hw, 1, function(x) min((1:8)[x==min(x)]) ) # gives col # of min HW score for each row
+
+
+
+
+#--- define file or variable name by putting strings together -----
+  infile <- paste("n",n,"_",k,".Rdata",sep="")
+  load(infile)
+
+
+
+#--- keep track to computation time ---
+  system.time( rnorm(100) )
+  
+  tic <- date()
+  rnorm(100)
+  tac <- date()
+  rbind(tic, tac)
+
+
+
+
+#--- Char and String -------------------------------
+  x <- "10101001010100101010100101010101001001010"
+  y <- 0
+  for ( i in 1:nchar(x)) {
+    y[i] <- as.integer( substr(x, start=i, stop=i) )
+  }
+  y <- rbinom(50, 1, .1)
+  Box.test(y)
+
+
+
+
+#--- Checking ---------------------------------------
+  is.na(x)
+  is.nan(x)
+  exists("x")
+
+
+
+
+#--- Printing values on screen ---------------------
+
+  k=1
+  print( paste("value of k is:  ", k), sep="" )
+
+
+  k=10/23
+  cat( sprintf( "\n    value of k is %.3f \n\n\n", k ) )
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,52 @@
+#
+#    USe try() and tryCatch() to loop going despite the error
+#    4/15/2011
+#
+#===========================================================
+
+x <- rnorm(100, 2, 1)
+x
+which(x<0)
+
+
+log(x)
+log("a")
+
+
+#--- Define nonsensical function that gives error for neg x ---------
+log.a <- function(x){
+  ifelse(x<0, a <- log("a"), a<- log(x))
+  return(a)
+}
+
+
+#--- This loop stops at where x is negetive value, because of log.a function.
+T <- 0
+for (i in 1:100) {
+  print(i)
+  T[i] <- log.a(x[i])
+}
+
+
+#--- You can Use try() to keep the loop going ------------------------
+T <- 0
+for (i in 1:100) {
+  print(i)
+  T[i] <- try( log.a(x[i]), TRUE )  #TRUE supresses the error message
+  #T[i] <- try( log.a(x[i]), FALSE )
+}
+T             #loop goes on despite of the error
+mean(T)       #Even though loop finishes, we still can't do this because of error message
+
+
+
+#--- Use tryCatch() to get better output for error case -------------------------------
+T <- 0
+for (i in 1:100) {
+  print(i)
+  T[i] <- tryCatch( log.a(x[i]), error=function(ss){return(NA)}  )   # put NA if error is given
+}
+T
+mean(T)                           #Loop finishes, and still can't do this b/c of NA, but....
+mean(  T[which(is.na(T)==0)]  )   #now we can do this
+

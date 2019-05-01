@@ -1,0 +1,217 @@
+#
+#
+#  ARFIMA Marginal Variance and Long-run variance 
+#
+#
+#####################################################
+library(fracdiff)
+
+
+
+#-- ARFIMA generation (takes about 10min for n=5000 itt=1000) ---
+#-- See ARFIMA generation file --
+  d      <- .3
+  n      <- 5000
+  ittMax <- 1000
+
+  X <- matrix(0, ittMax, n) 
+  for (i in 1:ittMax) {
+    if (i %% 100==0) { print(i) } 
+    fds.sim  <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )
+    X[i,]    <- fds.sim$series
+  }
+
+
+  #load("ARFIMA0d0.Rdata")   #- load X_d1 X_d2 X_d3 X_d4
+
+
+
+#-- Theoretical long run variance ---
+#  Var(\bar X) * n^(1-2d)  ->  C_theta
+LRvar.0d0 <- function(d){
+  c0      <- 1/gamma(d)
+  v.theta <- c0^2 * beta(d,1-2*d) / (d*(1+2*d)) 
+  return(v.theta)
+}
+
+LRvar.0d0(.2)
+
+
+#-----
+LRvar.1d0 <- function(d,p1,t1){
+  # This formula has sign convention  \Ph=1+p1+p2  \Th=1+t2+t3  
+  Th <- 1+t1
+  Ph <- 1+p1
+  c.ga    <- 1/pi * Th^2/Ph^2 * gamma(1-2*d) * sin(pi*d)
+  v.theta <- c.ga / (d*(1+2*d)) 
+  return(v.theta)
+}
+
+LRvar.1d0(.2,-.5) #fracdiff has 1-phi convention
+
+
+
+
+
+
+#--- 1. Check how long range variance converge to theoretical value ---
+
+  d <-     .4
+  X <- 3*X_d4     #- when X=3*X_1, we have to
+
+  #-- Long run variance (var of Xbar across itterations) ---
+  nn <- c(1000, 5000, 20000, 40000)
+  sig2_upper <- numeric(0) 
+  sig2_lower <- numeric(0) 
+  for (i in 1:length(nn)) {
+  
+    n <- nn[i]
+    Xbar <- apply(X[,1:n],  1, mean); 
+    VarX <- apply(X[,1:n],  1, var)         ##<-- when d is large, this is way off 
+    
+    sig2_upper <- (n-1)*var(Xbar/sqrt(VarX)) / qchisq(.025, n-1) *n^(1-2*d) 
+    sig2_lower <- (n-1)*var(Xbar/sqrt(VarX)) / qchisq(.975, n-1) *n^(1-2*d) 
+
+    print( sprintf(" n=%6d  (%.3f, %.3f) ", n, sig2_lower, sig2_upper))
+
+  }
+  print( sprintf(" n= Inf    (  %.3f ) ", LRvar.0d0(d) ))
+
+
+
+  #-- If you use HAC estimator for long-run variance --
+  source("LM-GOF_functions.txt")
+
+  nn <- c(1000, 5000, 20000, 40000)
+  HAC_upper <- numeric(0) 
+  HAC_lower <- numeric(0) 
+  for (i in 1:length(nn)) {
+  
+    n <- nn[i]
+    q <- n^.5
+
+    Cs   <- T5RhoHat(X[,1:n], n, q, 1000, 2)
+    VarX <- apply(X[,1:n],  1, var)         ##<-- when d is large, this is way off 
+    
+    C1_hat_HAC = Cs[,3] / ( VarX * q^(1+2*d) )
+    HAC_lower = sort(C1_hat_HAC)[25]  
+    HAC_upper = sort(C1_hat_HAC)[975] 
+    print( sprintf(" n=%6d  (%.3f, %.3f) ", n, HAC_lower, HAC_upper))
+
+  }
+  print( sprintf(" n= Inf    (  %.3f ) ", LRvar.0d0(d) ))
+
+
+
+
+
+#--- 2. Check how marginal variance converge to theoretical value (not complete) ---
+
+  d <-   .2
+  X <- X_d2
+
+  #-- Marginal Variance (across itterations) ---
+  nn <- c(1000, 5000, 20000, 40000)
+  for (i in 1:length(nn)) {
+  
+    n <- nn[i]
+    Xbar <- apply(X[,1:n],  1, mean); 
+    print( sprintf(" n=%6d  (%.3f, %.3f) ", 
+          n, 999*var(Xbar)/qchisq(.975, 999)*n^(1-2*d),  999*var(Xbar)/qchisq(.025, 999)*n^(1-2*d) ))
+  
+  }
+  print( sprintf(" n= Inf    (  %.3f ) ", LRvar.0d0(d) ))
+
+
+
+var(X[1,])
+var(X[5,])
+var(X[17,])   # around 1.23 
+mean(apply(X, 1, var))
+
+
+
+
+
+
+
+
+
+
+
+
+#------------------------------
+# long run variance with 1000 ittMax (1.5h) 
+#   \begin{table}[!hb]
+#   \begin{center}
+#   \caption{
+#       95\% confidence interval for $n^{1-2d} Var(\bar X_n)$ 
+#       obtained by sample variance for various values of $n$
+#       when $X$ is ARFIMA(0,d,0)
+#    } 
+#   \begin{tabular}{|c|c|c|c|c|}
+#   \hline
+#    n     & d=.1             & .2              & .3             & .4             \\
+#   \hline
+#    1000  & (17.641, 21.025) & (8.713, 10.384) & (5.261, 6.270) & (3.699, 4.409) \\
+#    5000  & ( 4.760,  5.673) & (3.255,  3.879) & (2.577, 3.072) & (2.790, 3.326) \\
+#    20000 & ( 1.583,  1.886) & (1.438,  1.714) & (1.493, 1.780) & (2.143, 2.555) \\
+#    40000 & ( 0.872,  1.040) & (0.958,  1.142) & (1.161, 1.384) & (1.803, 2.149) \\
+#    limit & 0.954            & 0.995           & 1.190          & 1.930          \\
+#   \hline
+#   \end{tabular}
+#   \end{center}
+#   \end{table}
+
+
+
+#------------------------------
+# long run variance with 1000 ittMax (1.5h) 
+# ARFIMA1d0
+#   \begin{table}[!hb]
+#   \begin{center}
+#   \caption{
+#       95\% confidence interval for $n^{1-2d} Var(\bar X_n)$ 
+#       obtained by sample variance for various value of $n$ 
+#       when $X$ is ARFIMA(1,d,0) with $\phi_1=.5.$
+#    } 
+#   \begin{tabular}{|c|c|c|c|c|}
+#   \hline
+#    n     & d=.1             & .2               & .3               & .4               \\
+#   \hline
+#    1000  & (68.273, 81.369) & (36.048, 42.962) & (18.834, 22.447) & (14.664, 17.477) \\
+#    5000  & (17.418, 20.759) & (13.664, 16.285) & ( 9.984, 11.900) & (10.031, 11.956) \\
+#    20000 & ( 5.925,  7.062) & ( 5.925,  7.061) & ( 5.655,  6.740) & ( 7.500,  8.939) \\
+#    40000 & ( 3.294,  3.926) & ( 3.806,  4.536) & ( 4.167,  4.967) & ( 6.629,  7.901) \\
+#    limit &   3.817          &   3.980          &   4.760          &   7.721          \\
+#   \hline
+#   \end{tabular}
+#   \end{center}
+#   \end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+ 
+ 
+
+
+
+
+

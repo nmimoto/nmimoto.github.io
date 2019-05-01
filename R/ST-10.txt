@@ -1,0 +1,80 @@
+##
+##  VaR and Tail VaR
+##
+##--------------------------------
+
+
+
+#--- Normal (mean=0, var=1) ---
+X <- rnorm(10000, 0, 1)
+qnorm(.95,0,1)
+
+mean(X[X>qnorm(.95,0,1)])
+mean(X>qnorm(.95,0,1))
+
+  # For 5%:
+  # VaR  = 1.65
+  # TVaR = 2.085 (estimate)
+         
+
+
+#--- t-distribution (Standardized t. mean=0, var=1) ---
+library(fGarch)
+
+X <- rstd(10000,mean=0,sd=1,nu=5)
+qstd(.95,0,1,5)
+mean(X[X>qstd(.95,0,1,5)])
+mean(X>qstd(.95,0,1,5))
+
+  # For 5%:
+  # VaR  = 1.56
+  # TVaR = 2.27 (estimate)
+
+
+
+#--- Exponential (mean=1, var=1) ---
+X <- rexp(10000, 1)
+qexp(.95,1)
+mean(X[X>qexp(.95,1)])
+mean(X>qexp(.95,1))
+
+  # For 5%:
+  # VaR  = 2.996
+  # TVaR = 3.996
+
+
+
+#--- Log-normal (mean=1, var=1)---
+X <- rlnorm(10000, -log(2)/2, sqrt(log(2)))
+mean(X)
+var(X)
+VaR.LN <- qlnorm(.95, -log(2)/2, sqrt(log(2)))
+VaR.LN
+mean(X[X>VaR.LN])
+mean(X>VaR.LN)
+
+  # For 5%:
+  # VaR  = 2.781
+  # TVaR = 4.198 (estimate)
+
+
+
+#--- 1-param Pareto (Pareto I. mean=1, var=1) ---
+library(VGAM)
+
+a = 2.414
+th = (a-1)/a
+var <- (th^2 * a) / ( (a-1)^2 * (a-2) )
+var
+mean <- a*th/(a-1)
+mean
+
+X <- rpareto(10000, scale=th, shape=a)
+VaR.PA <- qpareto(.95, scale=th, shape=a)
+VaR.PA
+mean(X[X>VaR.PA])
+mean(X>VaR.PA)
+
+  # For 5%:
+  # VaR  = 2.026
+  # TVaR = 3.3234 (estimate)

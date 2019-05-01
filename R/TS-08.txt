@@ -1,0 +1,57 @@
+#
+#
+#  ARFIMA generation
+#    For n=40k and ittMax=1000, it takes about 90min
+#
+#####################################################
+library(fracdiff)
+library(fGarch)     #- for rstdt() distribution
+library(stabledist) #- for rstable() distribution
+
+#- fracdiff has ARMA sign convention as \Phi = 1-p1-p2...  \Th= 1-t1-t2    \Ph(B) X_t = \Th(B) e_t
+
+d      <-     .2
+oFile  <- "temp2.Rdata"
+n      <- 20000
+ittMax <- 1000
+
+
+ST <- date()
+X  <- matrix(0, ittMax, n) 
+for (i in 1:ittMax) {
+  if (i %% 100==0) { print(i) } 
+  #fds.sim  <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )
+  #fds.sim  <- fracdiff.sim(n, ar=c(.5), ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )
+  #fds.sim  <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rstd(x, 0, 1, 40) )
+  #fds.sim  <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rstable(x, alpha=1.9,beta=0) )
+  fds.sim   <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) (rexp(x,1)-1)  )
+
+  X[i,]  <- fds.sim$series
+}
+                 X_d2 <- X
+save(file=oFile, X_d2)
+
+
+
+note <- "Std Gaussian ARFIMA(0,d,0) n=80k and ittMax=1000 made by TS-8.txt"
+save(file="ARFIMA1d0_n40k.Rdata", X_d1, X_d2, X_d3, X_d4, note)
+
+
+
+
+
+
+
+
+  
+
+
+
+
+ 
+ 
+
+
+
+
+

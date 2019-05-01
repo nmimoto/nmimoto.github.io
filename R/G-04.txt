@@ -1,0 +1,227 @@
+#--- Vectors --------------------------------
+  X <- 11:21
+  X <- X[-(3:5)]     #removes x[3:5]
+  rep(0,10)          # ten 0's
+  rep(1:5,3)         # 1:5,1:5,1:5
+  rep(1:5,each=3)    # 111 222 333 
+  seq(-1,1,.01)
+  c(1,5,4)
+  c(2,3, X)
+
+  rev(X)             #flips vector
+  t(X)               #transpose  !! teking t() on array doesn't do it!!!
+  (X>15 & X<=19)     #logical
+  sum(X>15 & X<=19)
+  X[X>15 & X<=19]
+  (1:length(X))[X>15 & X<=19]
+
+  any(x > 0.8)       # True if any of x are < 0.8
+  all(x < 0.8)       # True if all of x are < 0.8
+
+  sort(X, index.return=T)
+  unlist( sort(X, index.return=T)[2]  )      # index of sorted vec
+  which( abs(x-5.2) == min(abs(x-5.2)) )     # index of entry closest to 5.2
+
+
+
+
+#--- Call vector elements by name --------------------
+  X <- c("A"=2, "B"=3)
+  names(X)[1] <- "SS"
+  X
+
+
+
+
+#--- Set operations with Vector ----------------------------
+  
+  a <- c(1,3,4,5,7,8,9,29)
+  b <- c(3,20,4,11,8)
+
+  union(a,b)
+  intersect(a,b)
+  setdiff(a,b)
+
+  setequal(a,b)         #- is set a equal to set b?
+
+  is.element(a, b)      # takes each element of a, and askes if it is in b.
+
+
+
+#--- Find index of a match in vector A. (not done)   ----------------------------
+
+  X <- c(1,3,5,11,23,33,47)
+  which(X==3)              #- find index of a that holds 3
+
+
+  b <- c(3,11,33)
+  which(X %in% b)          #- find index of b in X.  
+
+  b <- c(3,9,33)
+  which(X %in% b)          #- gives error since 9 is not in X
+
+
+
+
+
+
+
+
+
+#--- Find match to a vector inside longer vector ----------------------------
+  n.vmatch <- function(x,y){
+    n <- length(x)
+    m <- length(y)
+
+    j <- numeric(0)
+    for (i in 1:(n-m+1)) {
+      if ( sum(x[i:(i+m-1)]==y) == m ) { j <- c(j,i) }
+    }
+    return(j)
+  }
+
+  n.vmatch(c(1,0,0,0,1,0,1,1), c(1,1,1))
+
+  n.vmatch(c(1,0,0,0,1,1,1,1), c(1,1,1))
+
+
+
+
+
+
+
+
+
+
+#--- Matrix ---------------------------------
+  x <- matrix(1:6, 2, 3)           #2x3 matrix
+  x <- matrix(1:6, 2, 3, byrow=T)         
+
+  y <- 1:10
+  dim(y) <- c(2,5)
+
+  z1 <- 2:6
+  z2 <- 3:7
+  z  <- cbind(z1, z2)  #column bind 
+  z  <- rbind(z1, z2)  #row bind
+
+  y * .5
+  y * 1:5  #funny multipication
+  
+  y; z; y * z      #elementwise multiplication
+
+  y %*% t(z)          #matrix multiplication               
+
+
+  
+
+#--- Call matrix elements by their name ----------------
+  x <- matrix(1:9, 3, 3, byrow=T)             
+  rownames(x) <- c("up", "middle", "down")               
+  colnames(x) <- c("left", "center", "right")  
+  x
+  x["up","right"]                         
+
+  rownames(x)[1] <- "top"
+  x      
+
+
+
+#--- Row-wise Mean and Sum--------------------------
+  x <- matrix(1:6, 2, 3, byrow=T)         
+
+  rowMeans(x)  #row-wise mean
+  rowSums(x)
+
+  colMeans(x)  #column-wise mean
+  colSums(x)
+
+  apply(x, 1, mean)
+
+
+
+
+#--- 3d array -------------------------------
+  X <- array(0, c(10, 3, 3) )
+  X[1,,]
+
+
+
+
+#--- All possible combinations ----------------
+  install.packages("gtools")
+  library(gtools)
+
+
+  permutations(2, 5, c(-1,1), repeats.allowed=TRUE)   #- all 2^5=32 possible seqences of (-1,1)
+
+  permutations(4,2, 1:4, repeats.allowed=TRUE) #all coordinates of 4x4 matrix
+
+  combinations(10, 5)           #- all choose(10, 5) = 252 possible group of 5 
+
+  combinations(10, 2, 1:10)    #- All choose(10,2) = 45 possible pairs 
+
+  combinations(10, 2, 1:10, repeats.allowed=TRUE)  #- above + (a,a)
+  
+  permutations(10, 2, 1:10, repeats.allowed=TRUE)  #- All 100 possible sequence
+
+
+
+
+
+#--- Find rows in matrix that match with vector x (study later)-----------
+  rowmatch <- function(A,B) {
+    #-- Rows in A that match the rows in B
+    f <- function(...) paste(..., sep=":")
+   if(!is.matrix(B)) B <- matrix(B, 1, length(B))
+    a <- do.call("f", as.data.frame(A))
+    b <- do.call("f", as.data.frame(B))
+    match(b, a)
+  }
+
+  A <- matrix(1:1000, 100, 10, byrow=TRUE)
+  B <- matrix(21:40, 2, 10, byrow=TRUE)
+  rowmatch(A, B )
+
+  b <- 51:60
+  rowmatch(A, b)
+
+
+
+#--- Find index of n maximum elements of matrix ----
+
+  MM <- matrix(runif(400, 0, 100), 20, 20)
+
+  ixM <- sort(MM, decreasing=T, index.return=T)$ix
+
+  A <- matrix(c(1:20), dim(MM)[1], dim(MM)[2], byrow=F)  #- matrix with row numbers
+  B <- matrix(c(1:20), dim(MM)[1], dim(MM)[2], byrow=T)  #- matrix with col numbers
+
+
+  cbind(MM[ixm], A[ixM], B[ixM])  #- element, and its row, and column
+
+  cbind(A[ixM], B[ixM])[A[ixM] < B[ixM]]  #- only elements in upper triangle 
+
+
+
+
+#--- Vectorize a function -----
+  mu_hat <- function(t) { 
+
+    sub1 <- function(t){  sum( t-(1:5) ) }
+    sapply( t, sub1 ) 
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+

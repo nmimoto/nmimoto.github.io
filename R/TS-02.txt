@@ -1,0 +1,58 @@
+#
+#
+# ARIMA(p,d,q)
+#
+#
+###############################################
+
+
+#--- Basic Simulation with ARIMA(p,d,q) ---
+  mu <- 5
+  x  <- arima.sim(n = 250, list(ar = c(-0.6, .2), ma = c(0.5) )) + mu
+
+  plot(x, type="o")
+  acf(x)
+
+
+#-- Estimate parameters
+  est <- arima(x, order = c(2, 0, 0))  # fit ARMA(2,1)
+  est
+
+
+#-- Prediction
+  x.p     <- predict(est, n.ahead=10, se.fit=TRUE)
+  x.pred  <- ts(x.p$pred, start=n+1)
+  x.se1   <- ts(x.pred + 1.96*x.p$se, start=n+1)
+  x.se2   <- ts(x.pred - 1.96*x.p$se, start=n+1)
+
+
+#-- Plot with prediction
+  ts.plot(cbind(x, x.pred, x.se1, x.se2), type="o",
+          col=c('black','red', 'black', 'black'), lty=c(1,2,2,2), xlim=c(0,n+10))
+
+
+
+
+
+#----------------------------------------------------------------------
+#--- Generate ARIMA with customized errors from outside
+  err5 <- rt(300, 5)
+  x   <- arima.sim(n = 300, list(ar = c(.4, .3)), innov=err5)
+
+
+
+
+#--- Estimation with different methods
+  Est  <- arima(X, order=c(1,0,1))  
+  Est  <- arima(X, order=c(1,0,1), method="CSS")  
+  Est  <- arima(X, order=c(1,0,1), method="ML", init=c(0,0,0) )  
+
+  Est$coef
+  Est$var.coef
+
+
+
+
+
+
+

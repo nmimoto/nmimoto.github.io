@@ -1,0 +1,127 @@
+#
+#
+#  Goodness-of-Fit graphical check 
+#    (Empirical Distribution Function, Kernel density estimator, qqplot)
+#
+################################################
+
+
+
+  X <- c(300,     400,     2800,    4500,    4900,    5000,    7700,    9600,    10400,
+         10600,   11200,   11400,   12200,   12900,   13400,   14100,   15500,   19300,
+         19400,   22100,   24800,   29600,   32200,   32500,   33700,   34300,   37300,
+         39500,   39900,   41200,   42800,   45900,   49200,   54600,   56700,   57200,
+         57500,   59100,   60800,   62500,   63600,   66400,   66900,   68100,   68900,
+         71100,   72100,   79900,   80700,   83200,   84500,   84600,   86600,   88600,
+         91700,   96600,   96900,   106800,  107800,  111900,  113000,  113200,  115000,
+         117100,  119300,  122000,  123100,  126600,  127300,  127600,  127900,  128000,
+         131300,  132900,  134300,  134700,  135800,  146100,  150300,  171800,  173200,
+         177700,  183000,  183300,  190100,  209400,  212900,  225100,  226600,  233200,
+         234200,  244900,  253400,  261300,  261800,  273300,  276200,  284300,  316300,
+         322600,  343400,  350700,  395800,  406900,  423200,  437900,  442700,  457800,
+         463000,  469300,  469600,  544300,  552700,  566700,  571800,  596500,  737700,
+         766100,  846100,  852700,  920300,  981100,  988300, 1078800, 1117600, 1546800,
+         2211000, 2229700, 3961000, 4802200)
+
+
+
+
+#--- EDF ------------------------------------
+  ecdf(X)
+  plot.stepfun(X)
+  plot(sort(X), (1:n)/n )
+
+  #-- two EDF overlay
+  plot.stepfun(X, col="red")
+  lines(sort(Y), (1:length(Y))/length(Y), type="s", col="blue")
+
+  Fn <- ecdf(X)  #- makes Fn a function
+  Fn(3000)
+
+
+  t=seq(1,5000000, 100)
+  
+  plot(t, Fn(t), type="l" )
+  lines(t,pexp(t,1/mean(X)), col="red")
+ 
+
+
+#--- KDE ------------------------------------
+  KDE <- density(X, bw="SJ-ste", kernel="gaussian", n=14000, from=-5, to=9)
+  fn <- unlist(KDE$y)
+  h  <- unlist(KDE$bw)
+  X  <- unlist(KDE$x)
+
+
+
+#--- Q-Q plot for Normal --------------------
+  qqnorm(x)
+  n <- length(x)
+  t <- ((0:n-1)+.5)/n
+  qqplot(qlnorm(t,0,1), x, main="lognormal Q-Q Plot", ylab="Sample Quantiles")
+  abline(0,1)
+
+
+
+#---- Q-Q plots for Exp ---------------------
+
+  n <- length(X)
+  t <- ((0:n-1)+.5)/n
+
+  X1 <- sort(X)
+
+  qqplot(qexp(t, 1/mean(X)),  X1, main="Exp Q-Q Plot", ylab="Sample Quantiles")
+  abline(0,1)
+
+
+
+
+
+
+
+#--- Use ggoplot2 to overlay histograms -----
+
+
+  #- Generate male and female height data
+  D <- data.frame(
+    sex=factor(rep(c("F", "M"), each=200)),
+    weight=round(c(rnorm(200, mean=55, sd=5), rnorm(200, mean=65, sd=5)))
+  )
+  head(D)
+
+
+
+  #- Overlay two histograms
+  library(ggplot2)
+  ggplot(D, aes(x=weight, fill=sex, color=sex)) +
+      geom_histogram(position="identity", alpha=0.5)
+
+
+
+  #- Overlay two hist with mean line
+    
+  #- Summarize the data
+  library(plyr)
+  mu <- ddply(D, "sex", summarise, grp.mean=mean(weight))
+  mu
+
+  ggplot(D, aes(x=weight, fill=sex, color=sex)) +
+      geom_histogram(position="identity", alpha=0.5) +
+      geom_vline(data=mu, aes(xintercept=grp.mean, color=sex), linetype="dashed")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

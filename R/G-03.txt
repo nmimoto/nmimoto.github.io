@@ -1,0 +1,155 @@
+
+
+
+#--- Bivariate Normal pdf on contour and surface plot ---
+
+library(mvtnorm) # for dmvnorm()
+library(gtools)  # for permutations()
+library(lattice) # for persp()
+
+
+put.in.matrix <- function(t,x){
+  grid = sqrt(length(x))
+  A <- matrix(rep(0, grid^2), grid, grid)
+  for (i in 1:grid^2) {
+    A[t[i,1],t[i,2]] <- x[i]
+  }
+  return(A)
+}
+
+
+grid <- 10
+
+#--- all combo of (i,j) for i,j=1..10.  100x2 matrix  
+t   <- permutations(grid, 2, repeats.allowed=TRUE)    
+
+
+sigma <- matrix(c(6,2,2,6), 2, 2)
+mu    <- c(5,5)
+f     <- dmvnorm(t, mean=mu, sigma=sigma)   # 2d Nomal for each row of t
+
+A     <- put.in.matrix(t,f)    # sort out f, and put in 10x10 matrix
+
+
+#- 3D contour plot
+filled.contour((1:10), (1:10), A, col=rainbow(9))
+
+
+#- 3D surface plot
+for (i in 1:13) {
+    th <- (i-1)*30
+    persp((1:10), (1:10), A, theta=th, phi=20, col=rainbow(9), xlab="X", ylab="Y" )
+    readline(paste(" showing theta=",th,"hit enter for next")) # loop will wait for you to hit enter
+}
+
+
+#----------------------------------------------
+
+sigma <- matrix(c(6,2,2,6), 2, 2)
+mu     <- c(10,7)
+
+B <- matrix(0, 20, 20)
+for (i in 1:20){
+  for (j in 1:20){
+     X <- i
+     Y <- j    
+     B[i,j] <- dmvnorm(c(X,Y), mean=mu, sigma=sigma)   
+  }    
+}
+
+
+#- 3D contour plot
+filled.contour((1:20), (1:20), B, col=rainbow(9))
+
+
+#- 3D surface plot
+for (i in 1:13) {
+    th <- (i-1)*30
+    persp(1:20, 1:20, B, theta=th, phi=20, col=rainbow(9), xlab="X", ylab="Y", shade=0.75, ticktype = "detailed")
+    readline(paste(" showing theta=",th,"hit enter for next")) # loop will wait for you to hit enter
+}
+
+
+
+
+
+#----------------------------------------------
+library(gtools)
+
+
+put.in.matrix <- function(t,x){
+  A <- matrix(rep(0,grid^2), grid, grid)
+  for (i in 1:grid^2) {
+    A[t[i,1],t[i,2]] <- x[i] 
+  }
+  return(A) 
+}
+
+
+
+#--- Normal Random Field on Grid -----
+  grid <- 10
+  t    <- permutations(grid,2, repeats.allowed=TRUE) 
+  xi   <- rnorm(grid^2)
+  A    <- put.in.matrix(t,xi)
+
+  #- 3D contour plot
+  filled.contour(1:grid, 1:grid, A, col=rainbow(9))
+
+  #- 3D surface plot
+  persp(1:grid, 1:grid, A, theta=0, phi=30, col=rainbow(9) )  # require(lattice)
+
+
+
+
+
+
+         
+#---
+
+  xi <- function(t){
+    w0 <- 1
+    p1 <- 1
+    
+    a <- w0 / (1+exp((t[,1]+p1)/t[,2]))
+    return(a)
+  }
+
+  grid <- 10
+
+  t    <- permutations(grid, 2, repeats.allowed=TRUE) 
+  A    <- put.in.matrix(t,xi(t))
+
+
+  filled.contour(1:grid, 1:grid, A, col=rainbow(9), main="For each value of W1", xlab="M0", ylab="H")
+
+
+  persp(1:grid, 1:grid, A, theta=0, phi=30, col=rainbow(3) )  
+
+
+
+
+         
+#---
+
+  xi2 <- function(t){
+    p1 <- 1
+    p2 <- 3
+    
+    b <- (1+exp((t[,1]+p2)/t[,2])) / (1+exp((t[,1]+p1)/t[,2]))
+    return(b)
+  }
+
+  grid <- 10
+
+  t    <- permutations(grid, 2, repeats.allowed=TRUE) 
+  
+  A    <- put.in.matrix(t,xi2(t))
+
+
+  filled.contour((1:grid), (1:grid), A, col=rainbow(20),
+      main="For each value of Beta with p1=1, p2=3", xlab="M0", ylab="H")
+
+
+
+

@@ -1,0 +1,54 @@
+simulate30 <- function() {
+  estimate <- 0
+  n <- 30
+  for (i in 1:5000) {
+    (random.pick <- sample(1:10000,size=n)); (s <- Homes[random.pick]); 
+    estimate[i] <- sum(s)/n
+  }
+  hist(estimate,15,freq=F,xlim=c(0,.9),ylim=c(0,sqrt(n)))
+  return(estimate)
+}
+simulate100 <- function() {
+  estimate <- 0
+  n <- 100
+  for (i in 1:5000) {
+    (random.pick <- sample(1:10000,size=n)); (s <- Homes[random.pick]); 
+    estimate[i] <- sum(s)/n
+  }
+  hist(estimate,15,freq=F,xlim=c(0.2,.6),ylim=c(0,sqrt(n)))
+  p <- .4
+  x <- seq(0.1,.7,.001); lines(x , dnorm(x,p,sqrt(p*(1-p)/n)) )
+  return(estimate)
+}
+simulate1000 <- function(n) {
+  estimate <- 0
+  n <- 1000
+  for (i in 1:10000) {
+    (random.pick <- sample(1:10000,size=n)); (s <- Homes[random.pick]); 
+    estimate[i] <- sum(s)/n
+  }
+
+  hist(estimate,15,freq=F,xlim=c(.2,.6),ylim=c(0,sqrt(n)))
+  p <- .4
+  x <- seq(0.1,.7,.001); lines(x , dnorm(x,p,sqrt(p*(1-p)/n)) )
+  return(estimate)
+}
+
+
+
+(Homes <- sample(c(rep(0,6000),rep(1,4000))) )
+t(Homes)
+
+sum(Homes)
+
+n <- 10
+(random.pick <- sample(1:10000,size=n)); (s <- Homes[random.pick]); sum(s)/n
+
+n <- 30
+(random.pick <- sample(1:10000,size=n)); (s <- Homes[random.pick]); sum(s)/n
+
+
+simulate30()
+simulate100()   #N(.4,.049)
+simulate1000()  #N(.4,.015)
+

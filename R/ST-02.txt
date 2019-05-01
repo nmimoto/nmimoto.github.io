@@ -1,0 +1,68 @@
+
+
+
+
+
+#--- Law of Large Number ---
+ 
+  X <- rnorm(2000, 3, 4)
+  
+  A <- cumsum(X)/(1:2000)
+
+  plot(A, type="l")
+  abline(h=3, col="red")
+
+
+
+
+
+
+
+
+
+
+
+
+#--- Central Limit Theorem ---
+
+#- Uniform  -------
+  n <- 3
+  
+  record <- 0
+  for (i in 1:10000) {
+  
+    X <- runif(n, 0, 1)
+  
+    Xbar <- mean(X)
+    record[i] <- print(Xbar)
+  
+  }
+  
+  plot(ecdf(record))
+  t <- seq(-5,5,.1)
+  lines(t, pnorm(t, .5, sqrt(1/12/n)), col='red')
+
+
+
+
+#--- Exp CLT -----------
+  n <- 50
+  
+  record <- 0
+  for (i in 1:10000) {
+  
+    X <- rexp(n, 1)
+  
+    Xbar <- mean(X)
+    record[i] <- print(Xbar)
+  
+  }
+  
+  plot(ecdf(record))
+  t <- seq(-5,5,.01)
+  lines(t, pnorm(t, 1, sqrt(1/n)), col='red')
+
+
+
+
+

@@ -1,0 +1,166 @@
+###
+###
+###  Download Daily Stock Prices from Yahoo.com
+###
+###
+###---------------------------------------------------------
+
+###  Q-03.txt
+
+
+###---------------------------------------------------------
+###--- 1. Define rate range and download SPY first 
+
+
+# Define Date Range for download
+srtDate <- as.Date("2000-01-01")
+endDate <- as.Date("2019-03-08")    # will be SAVED
+
+
+    library(quantmod)
+    source("http://gozips.uakron.edu/~nmimoto/477/TS_R-90.txt")
+
+    # Download Historical SPY Prices for reference of trading days
+    SPY <- getSymbols("SPY", src = "yahoo", auto.assign = F, 
+                       return.class="xts", from = srtDate, to = endDate+1)
+    print(head(SPY))
+    print(tail(SPY))
+    
+    # Separate columns of SPY
+    HP_op <- Op(SPY);   HP_hi <- Hi(SPY)
+    HP_lo <- Lo(SPY);   HP_cl <- Cl(SPY) 
+    HP_ad <- Ad(SPY);   HP_vo <- Vo(SPY) 
+
+
+
+    # Example for just 1 ticker
+    # X <- getSymbols("BTC-USD", src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate+1)
+    # head(X)
+    
+
+
+
+###---------------------------------------------------------
+###--- 2. Ticker List
+
+# Zacks screened stocks 2018-09-09 (156 tickers)
+TRS <- c("AAPL", "ADM",  "AIMC", "AIN",  "AJRD", "ALL",  "ALLY", "ALSN",  "AMED", "ARCB", "ARLP", "AROC",   "ATEYY", "ATH",  "ATHN",   "ATKR", "AVAV", "AVX",  "AZPN", "AZZ",  "BANR", "BEAT", "BJRI", "BMY",   "BPOP", "CAT",  "CATM", "CBPX",   "CE",    "CELG", "CFX",   "CIGI",
+         "CLF",  "CLH",  "CMA",  "CNDT", "CONN", "CRM",  "CSX",  "CVLT",  "CY",   "DNOW", "DSW",  "EC",     "ECOL",  "EGRX", "ELY",   "ENVA",  "FCN",  "FIVN", "FIX",  "FLIR", "FOXF", "FSS",  "FTNT", "GELYY", "GES",  "GILD", "GNRC", "GWW",    "HKMPF", "HLX",  "HSNGY", "HUBG",
+         "HUN",  "ICFI", "ICUI", "ILMN", "INOV", "IRBT", "ISRG", "JOUT",  "KBR",  "KEM",  "KLAC", "KORS",   "LADR",  "LGND", "LOGI",  "LSTR",  "LULU", "MANT", "MATX", "MDR",  "MED",  "MEDP", "MLNX", "MOH",   "MSTR", "MT",   "MTOR", "MXIM",   "NAVG",  "NGVT", "NINOY", "NMIH",
+         "NOAH", "NRG",  "NSANY","NSIT", "NTAP", "NTR",  "NYLD", "ODFL",  "OSB",  "PATK", "PAYC", "PBR",    "PCH",   "PCRX", "PEN",   "PGR",   "PGTI", "PHM",  "PRI",  "PUGOY","QDEL", "RDN",  "RDWR", "REGN",  "RUSHA","SC",   "SFTBY  ","SGPYY","SIG",   "SIVB", "SKYW",  "SNE",
+         "SNN ", "SODA", "SPSC", "SRDX", "STAA", "STI",  "STRA", "SUBCY", "T",    "TCP",  "TDY",  "TELNY",  "TLSYY", "TREX", "TRN",   "UBNT",  "ULH ", "URBN", "VEEV", "VET",  "VLVLY","VRS",  "VSH",  "VSTO",  "WCG",  "WERN", "WMMVY","Y")    
+
+# Major Indeces (SPY downloaded separately) (22 tickers)
+ICS <- c("^VIX", "VXX", "^TNX", "^DJI", "^IXIC", "^RUT", "JPY=X", "GBP=X",     "EUR=X",   "CNY=X",   "DX-Y.NYB", "^FCHI", "^N225", "^HSI",  "^FTSE", "000001.SS", "^GDAXIP", "USO",     "UNG",      "GLD",   "SLV",   "PPLT") 
+
+# Dow Jones (30 tickers) 
+DJI <- c("MMM",  "AXP", "AAPL", "BA", "CAT", "CVX",  "CSCO", "KO",  "DIS", "DWDP", "XOM",  "GE",  "GS",   "HD", "IBM", "INTC", "JNJ",  "JPM", "MCD", "MRK", "MSFT", "NKE", "PFE",  "PG", "TRV", "UTX",  "UNH",  "VZ",  "V",   "WMT"  )
+
+
+# This is what actually gets downloaded
+# TICKERS <- c(TRS, ICS, DJI)
+
+TICKERS <- c("SPY",   "^DJI", "VIX",  "AAPL", "AMZN",
+             "BA",    "BABA", "BIDU", "BKNG", "CAT",  
+             "CMG",   "CRM",  "FB",   "FDX",  "GLD",
+             "GOOGL", "GS",   "LULU", "MSFT", "NFLX", 
+             "NVDA",  "SHOP", "TSLA", "WYNN"           )
+
+
+
+
+
+###---------------------------------------------------------
+###--- 3. Download What's in TICKERS from Yahoo
+for (i in 1:length(TICKERS)) {
+
+  X  <- tryCatch(getSymbols(TICKERS[i], src = "yahoo", auto.assign = F,
+                           return.class="xts", from = srtDate, to = endDate+1),
+                 error = function(ss) {return(NA)} )
+  X1 <- tryCatch( Op(X), error=function(ss){ return(NA) }); HP_op <- cbind(HP_op, X1)
+  X2 <- tryCatch( Cl(X), error=function(ss){ return(NA) }); HP_cl <- cbind(HP_cl, X2)
+  X3 <- tryCatch( Vo(X), error=function(ss){ return(NA) }); HP_vo <- cbind(HP_vo, X3)
+  X4 <- tryCatch( Hi(X), error=function(ss){ return(NA) }); HP_hi <- cbind(HP_hi, X4)
+  X5 <- tryCatch( Lo(X), error=function(ss){ return(NA) }); HP_lo <- cbind(HP_lo, X5)
+  X6 <- tryCatch( Ad(X), error=function(ss){ return(NA) }); HP_ad <- cbind(HP_ad, X6)
+
+  print(c(i, TICKERS[i],    length(X1),     
+      sum(is.na(X1)), sum(is.na(X2)), sum(is.na(X3)), sum(is.na(X4)), sum(is.na(X5)),
+      dim(HP_op)[2],  dim(HP_cl)[2],  dim(HP_vo)[2],  dim(HP_hi)[2],   dim(HP_lo)[2])   )
+      
+}
+colnames(HP_ad) <- c("SPY", TICKERS)  #- apply ticker labels
+colnames(HP_vo) <- c("SPY", TICKERS)  
+colnames(HP_op) <- c("SPY", TICKERS)  
+colnames(HP_cl) <- c("SPY", TICKERS)  
+colnames(HP_hi) <- c("SPY", TICKERS)  
+colnames(HP_lo) <- c("SPY", TICKERS)  
+tail(HP_ad)
+
+
+
+
+
+
+###---------------------------------------------------------
+###--- 4. Remove non-trading days (days that SPY was not recorded)
+non.SPY.days.ix <- numeric(0)
+for (i in 1: length(index(HP_ad))){
+  # is that date in SPY vector? If not, then 
+  if (length( which(index(SPY) %in% index(HP_ad)[i]) )==0) {  
+    non.SPY.days.ix <- c(non.SPY.days.ix, i)
+  }
+}
+if( length(non.SPY.days.ix)>0 ) {
+  HP_ad <- HP_ad[-non.SPY.days.ix, ]
+  HP_vo <- HP_vo[-non.SPY.days.ix, ]
+  HP_op <- HP_op[-non.SPY.days.ix, ]
+  HP_cl <- HP_cl[-non.SPY.days.ix, ]
+  HP_hi <- HP_hi[-non.SPY.days.ix, ]
+  HP_lo <- HP_lo[-non.SPY.days.ix, ]
+}
+# Record SPY day of the week as xts (1=Mon, 5=Fri)
+SPY.DoW <- xts(as.POSIXlt(index(SPY))$wday, order.by=index(SPY))
+# Pick out only Begginig of Week 
+BWeek.ix <- (diff(SPY.DoW)<0)
+# Have to do this if the first day of SPY is Monday
+if (SPY.DoW[1]==1) { BWeek.ix[1] <- TRUE }
+# End of week indicator
+EWeek.ix <- ((as.numeric(SPY.DoW[-1]) - SPY.DoW[-length(SPY.DoW)])<0)  
+# Have to do this if the last day is Friday
+if (SPY.DoW[endDate]==5) { 
+    EWeek.ix <- rbind(EWeek.ix, 
+                      xts(TRUE, order.by=as.Date(endDate)) )
+} 
+# Ex.  Show DoW and BWeek, EWeek indices
+head(cbind(SPY.DoW, BWeek.ix, EWeek.ix), 40)
+tail(cbind(SPY.DoW, BWeek.ix, EWeek.ix), 40)
+# Ex.  Show SPY for End of Week only
+head(SPY[(EWeek.ix)])
+# Ex.  How long is each week
+cbind( as.Date(index(SPY[(BWeek.ix)])), 
+       as.Date(index(SPY[(EWeek.ix)])), 
+       index(SPY[(BWeek.ix)]) - index(SPY[(EWeek.ix)]) 
+)
+
+
+cat( sprintf("\n\n\n\nOutputs - Does not output to .CSV file"))
+cat( sprintf("\n\nsrtDate %s \nendDate %s \n\n\n", srtDate, endDate)) 
+cat( sprintf("\n\nOutputs: HP_op, HP_cl, HP_hi, HP_lo, HP_ad, HP_vo\n\n\n"))
+cat( sprintf("\n\nThey are Matrix of size %s days x %s stocks\n\n\n\n", dim(HP_op)[1], dim(HP_op)[2] ))
+
+
+
+
+
+
+###---------------------------------------------------------
+##
+##   SPY (1), TRS (156),  ICS (22),  DJI (30),  TICKERS (put together) 
+##   HP_op, HP_cl, HP_hi, HP_lo, HP_ad, HP_vo  
+##   
+###  End of File
+
+
+
+

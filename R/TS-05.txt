@@ -1,0 +1,69 @@
+#
+#
+# Creates LM random field from normal r.f.
+# 6/22/2013
+#
+########################################
+
+put.in.matrix <- function(t,x){
+  grid <- sqrt(length(x))
+  A <- matrix(rep(0,grid^2), grid, grid)
+  for (i in 1:grid^2) {
+    A[t[i,1],t[i,2]] <- x[i] 
+  }
+  return(A) 
+}
+
+
+############################
+require(gtools) #for permulations()
+
+grid    <- 100
+d       <- .5  #between 0 < d < v/2=1
+itt.max <- 10
+mu      <- 3
+
+tic <- date()
+
+  t1 <- permutations(grid*2+1, 2, repeats.allowed=TRUE) 
+  t2 <- permutations(grid*2+1, 2, v=-grid:grid, repeats.allowed=TRUE) 
+  t3 <-  sqrt( rowSums(t2^2) )
+  t3[which(t3==0)] <- 1
+  t4 <-  t3^(-(2-d)) 
+  A2 <- put.in.matrix(t1, t4)
+  #--  filled.contour(-grid:grid, -grid:grid, A2)
+
+
+   X  <- array(0, dim=c(itt.max, grid, grid) )
+   Xi <- array(0, dim=c(itt.max, grid, grid) ) 
+
+  for (itt in 1:itt.max) {
+
+    print(itt) 
+    xi <- matrix( rnorm( (grid)^2, 0, 1), grid, grid )
+    Xi[itt,,] <- xi
+
+    for (i in 1:grid) {
+      for (j in 1:grid) {
+        i.st <- grid+2-i
+        j.st <- grid+2-j
+        A3   <- A2[i.st:(i.st+grid-1), j.st:(j.st+grid-1)] 
+        X[itt,i,j]  <- mu + sum(A3 * xi)  #long mem rand field
+ 
+        #-- if (j==1 | j==grid+1) print( c(i, j, i.st, (i.st+grid-1), j.st, (j.st+grid-1) )) #grid selection check
+        #-- if (j==80 & i==70) filled.contour(1:grid, 1:grid, A3)
+      }
+    }  
+  toc <- date()
+  print(toc)
+  }
+
+rbind(tic, toc)  #grid=200:20sec  300:2min 
+
+
+filled.contour(1:grid, 1:grid, X[itt=1,,])
+filled.contour(1:grid, 1:grid, xi[itt=1,,])
+
+
+
+

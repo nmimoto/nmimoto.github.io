@@ -1,0 +1,218 @@
+#
+#
+#  ARFIMA long range variance convergence via ACVF
+#       
+#
+#####################################################
+library(fracdiff)
+library(arfima)   #for tacvfARFIMA()
+
+
+
+#For n=40k and ittMax=1000, it takes about 90min
+# If not saved from previous run do below
+#    #-- ARFIMA generation ---
+#    d      <- .3
+#    n      <- 40000
+#    ittMax <- 1000
+#    X <- matrix(0, ittMax, n) 
+#    for (i in 1:ittMax) {
+#      if (i %% 100==0) { print(i) } 
+#      #fds.sim  <- fracdiff.sim(n, ar=NULL,  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )
+#      fds.sim  <- fracdiff.sim(n, ar=c(.5),  ma=NULL,   d=d, n.start=5000, rand.gen=function(x) rnorm(x, 0, 1) )
+#      X[i,]    <- fds.sim$series
+#    }
+
+
+load(file="ARFIMA0d0_n40k.Rdata")  # X_d1 are loaded
+
+
+
+
+
+#--- 1. Plot sample ACVF against true ACVF --------------
+d <- .1
+X <- X_d1
+
+n <- 5000
+for (itt in 1:10) {
+  x      <- X[itt,1:n]  
+  Gamma  <- acf(x, type="covariance", lag.max=50,plot=F)$acf 
+  if (itt==1) plot(0:50, Gamma, type="l", xlim=c(0,50))
+  lines(0:50, Gamma)
+
+}
+tGamma <- tacvfARFIMA(phi = c(0),   theta = c(0), dfrac = d, maxlag = 50)
+lines(0:50, tGamma, type="l", col="red", lwd=2)
+
+
+
+
+#--- 2. Estimate long run var C1 using HAC estimator (8min for all d) ----------
+
+#-----
+C1CpHat1D_12 <- function(X,d,n,q,ittMax) {
+
+  #--- For your choice of q, get all distances 
+  Dis_list_raw     = matrix(0, 1, q^2)
+  PhiPhi_list_raw1 = matrix(0, 1, q^2)
+  PhiPhi_list_raw2 = matrix(0, 1, q^2)
+  j=1;
+  for (i1 in 1:q){
+    for (j1 in 1:q){
+      Dis_list_raw[j] = abs(i1-j1)
+      PhiPhi_list_raw1[j]  = (((i1/q) >= 1/2)*2-1)  *  (((j1/q) >=1/2)*2-1) 
+      PhiPhi_list_raw2[j]  = (((i1/q) <= 1/2)*2-1)  *  (((j1/q) <=1/2)*2-1) 
+      j=j+1;
+    }
+  }
+  
+  Dis_cts  = matrix(0, q+1, 1) 
+  Phi1_cts = matrix(0, q+1, 1) 
+  Phi2_cts = matrix(0, q+1, 1) 
+  for (dist in 0:q){
+    Dis_cts[dist+1]   = length( which(Dis_list_raw==dist) )
+    Phi1_cts[dist+1]  = sum( PhiPhi_list_raw1[  which(Dis_list_raw==dist) ] )
+    Phi2_cts[dist+1]  = sum( PhiPhi_list_raw2[  which(Dis_list_raw==dist) ] )
+  }
+  
+  Cs <- matrix(0,ittMax,3)
+  GAM_hat <- matrix(0,q+1,1)
+  for (itt in 1:ittMax) {
+    x        <- X[itt,1:n] 
+    GAM_hat  <- acf(x, type="covariance", lag.max=q, plot=F)$acf 
+    dim(GAM_hat) <- c(q+1,1)
+
+    C1_hat1 = sum( Dis_cts  * GAM_hat ) / q^(1+2*d)
+    Cp_hat1 = sum( Phi1_cts * GAM_hat)  / q^(1+2*d)
+    Cp_hat2 = sum( Phi2_cts * GAM_hat)  / q^(1+2*d)
+
+    Cs[itt,] <- c(C1_hat1, Cp_hat1, Cp_hat2) 
+  }
+  colnames(Cs) <- c("C1_hat1", "Cp_hat1", "Cp_hat2")
+
+  return( Cs ) 
+
+  return(matrix(c("C1_hat1"=C1_hat1,"Cp_hat1"=Cp_hat1,"Cp_hat2"=Cp_hat2), 1, 3))
+}
+
+
+
+
+#------------------------------------------
+ST <- date()
+
+A1 <- "1000  "
+A2 <- "5000  "
+A3 <- "20000 "
+A4 <- "40000 "
+for ( ii in 1:4){
+
+  if (ii==1) {d<-.1; X<-X_d1; }
+  if (ii==2) {d<-.2; X<-X_d2; }
+  if (ii==3) {d<-.3; X<-X_d3; }
+  if (ii==4) {d<-.4; X<-X_d4; }
+
+  Cs1 <- C1CpHat1D_12(X, d, n=1000,  q=62,  ittMax=1000)
+  Cs2 <- C1CpHat1D_12(X, d, n=5000,  q=164, ittMax=1000)
+  Cs3 <- C1CpHat1D_12(X, d, n=20000, q=380, ittMax=1000)
+  Cs4 <- C1CpHat1D_12(X, d, n=40000, q=576, ittMax=1000)
+ 
+  A1 <- paste(A1, sprintf("& (%.3f, %.3f) ", sort(Cs1[,1])[50], sort(Cs1[,1])[950]))
+  A2 <- paste(A2, sprintf("& (%.3f, %.3f) ", sort(Cs2[,1])[50], sort(Cs2[,1])[950]))
+  A3 <- paste(A3, sprintf("& (%.3f, %.3f) ", sort(Cs3[,1])[50], sort(Cs3[,1])[950]))
+  A4 <- paste(A4, sprintf("& (%.3f, %.3f) ", sort(Cs4[,1])[50], sort(Cs4[,1])[950]))
+
+}
+
+A1
+A2
+A3
+A4
+
+ED <- date()
+ST
+ED
+
+
+
+
+
+#------------------------------
+# long run variance with 1000 ittMax (1.5h) 
+# X saved in ARFIMA0d0_n20k.Rdata
+#
+#   \begin{table}[!hb]
+#   \begin{center}
+#   \caption{
+#       95\% confidence interval for $n^{1-2d} Var(\bar X_n)$ 
+#       obtained by sample variance for various values of $n$ and $q=n^.6$
+#       when $X$ is ARFIMA(0,d,0)
+#    } 
+#   \begin{tabular}{|c|c|c|c|c|}
+#   \hline
+#    n     & d=.1             & .2              & .3             & .4             \\
+#   \hline
+#    1000  & (0.478, 1.396)  & (0.439, 1.321)  & (0.397, 1.430)  & (0.365, 1.445) \\
+#    5000  & (0.578, 1.263)  & (0.533, 1.275)  & (0.511, 1.422)  & (0.510, 1.515) \\
+#    20000 & (0.663, 1.180)  & (0.616, 1.220)  & (0.620, 1.348)  & (0.651, 1.623) \\
+#    40000 & (0.695, 1.178)  & (0.680, 1.210)  & (0.674, 1.350)  & (0.690, 1.629) \\
+#    limit &  0.954           & 0.995           & 1.190           & 1.930          \\
+#   \hline
+#   \end{tabular}
+#   \end{center}
+#   \end{table}
+
+
+
+#------------------------------
+# long run variance with 1000 ittMax (1.5h) 
+# X saved in ARFIMA0d0_n20k.Rdata
+# ARFIMA0d0
+#   \begin{table}[!hb]
+#   \begin{center}
+#   \caption{
+#       95\% confidence interval for $n^{1-2d} Var(\bar X_n)$ 
+#       obtained by sample variance for various value of $n$ and $q=n^.6$
+#       when $X$ is ARFIMA(1,d,0) with $\phi_1=.5.$
+#    } 
+#   \begin{tabular}{|c|c|c|c|c|}
+#   \hline
+#    n     & d=.1             & .2               & .3               & .4           \\
+#   \hline
+#     1000  & (1.786, 5.430)  & (1.663, 5.252)  & (1.501, 5.419)  & (1.437, 5.935) \\
+#     5000  & (2.343, 5.066)  & (2.214, 5.180)  & (2.037, 5.552)  & (2.010, 6.346) \\
+#     20000 & (2.591, 4.716)  & (2.533, 5.049)  & (2.459, 5.452)  & (2.503, 6.445) \\
+#     40000 & (2.781, 4.657)  & (2.711, 4.868)  & (2.641, 5.366)  & (2.803, 6.585) \\
+#    limit  &  3.817          &  3.980          &  4.760          &  7.721          \\
+#   \hline
+#   \end{tabular}
+#   \end{center}
+#   \end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+

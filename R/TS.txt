@@ -1,0 +1,175 @@
+#-- If not installed on PC ---
+#  install.packages("tseries")
+#  install.packages("xts")
+#  install.packages("forecast")
+#
+
+
+#-- To load this page --
+#
+#    source("http://gozips.uakron.edu/~nmimoto/R/TS.txt")
+#
+#
+
+
+
+library(xts)
+library(forecast)
+
+
+
+#---------------------------------------------
+Randomness.tests <- function( A, plott=TRUE) {
+
+
+  if (sum(is.na(A))>0){  A <- A[which(is.na(A)==0)]  }
+
+  library(tseries) 
+
+  L1 <- Box.test(A,   lag = 15, type = "Ljung-Box")
+  L2 <- Box.test(A,   lag = 20, type = "Ljung-Box")
+  L3 <- Box.test(A,   lag = 25, type = "Ljung-Box")
+  L4 <- Box.test(A^2, lag = 15, type = "Ljung-Box")
+  L5 <- Box.test(A^2, lag = 20, type = "Ljung-Box")
+  L7 <- jarque.bera.test(A)
+  S1 <- sd(A)
+
+  if (plott) {
+
+    layout( matrix(c(rep(1,4),2,8,3,4,5,6,7,8), 2, 6, byrow=T) )
+
+    par(oma = c(2,2,4,2) + 0.1, mar = c(4,1,1,1) + 0.1 )
+
+    plot(A, type='l', xlab="Series")
+
+    plot(density(A, bw="SJ-ste"), main= "", xlab="KDE")
+
+     acf(A, main="", xlab="ACF")
+    pacf(A, main="", xlab="PACF")
+    acf(abs(A), main="", xlab="ACF of abs(A)")
+    acf(A^2,    main="", xlab="ACF of A^2")
+    qqnorm(A,    main="", xlab="Normal q-q")
+
+  
+    
+    plot(c(-1,-1), xlim=c(0,1), ylim=c(0,1), ann=F, axes=F)
+
+    text( 0.5,0.96, paste("Box-Ljung test"), cex=1.3 )
+    text( 0.5,0.9,  paste("H=15:p=", round(L1$p.value, 3)), cex=1.2 )
+    text( 0.5,0.85, paste("H=20:p=", round(L2$p.value, 3)), cex=1.2 )
+    text( 0.5,0.8,  paste("H=25:p=", round(L3$p.value, 3)), cex=1.2 )
+    text( 0.5,0.71, paste("McLeod-Li test") , cex=1.3 )
+    text( 0.5,0.65, paste("H=15:p=", round(L4$p.value, 3)), cex=1.2 )
+    text( 0.5,0.6,  paste("H=20:p=", round(L5$p.value, 3)), cex=1.2 )
+    text( 0.5,0.35, paste("Jaque-Bera test") , cex=1.3 )
+    names(L7$p.value) <- ""
+    text( 0.5,0.3,  paste("p= ", round(L7$p.value, 4)), cex=1.2 )
+    text( 0.5,0.2,  paste("SD ", round(S1, 4)), cex=1.2 )
+
+    mtext(side = 3, line=1, outer=T, text = "Randomness.tests()", cex=1.5) #-- add big title to panel plot
+    
+    layout( matrix(1, 1, 1) )
+  }
+
+  P <- matrix(c(round(L1$p.value, 3),round(L2$p.value,3),round(L3$p.value,3),round(L4$p.value,3),
+                round(L5$p.value,3), round(L7$p.value,3),round(S1, 3) ), 1, 7)
+ 
+  colnames(P) <- c("BL15","BL20","BL25","ML15","ML20","JB","SD") 
+
+  cat("  B-L test H0: the sereis is uncorrelated\n")
+  cat("  M-L test H0: the square of the sereis is uncorrelated\n")
+  cat("  J-B test H0: the sereis came from Normal distribution\n")
+  cat("  SD         : Standard Deviation of the series\n\n")
+
+  return(P)
+}
+
+
+
+
+#---------------------------------------------
+Stationarity.tests <- function( A ) {
+
+  library(tseries) 
+
+  if (sum(is.na(A))>0){  A <- A[which(is.na(A)==0)]  }
+
+  L1 <- adf.test(A)
+  L2 <- pp.test(A)
+  L3 <- kpss.test(A)
+
+  P <- matrix(c(round(L3$p.value,3),round(L1$p.value, 3),round(L2$p.value,3)), 1, 3)
+  colnames(P) <- c("KPSS","ADF","PP")
+  rownames(P) <- c("p-val:")
+
+  return(P)
+}
+
+
+
+#--- Usage Example
+#
+#  x = rnorm(200)
+#  Randomness.tests(x)
+#  Stationarisy.tests(x)
+#
+
+
+
+
+
+
+
+#---------------------------------------------
+MV.av <- function(X,m){
+
+  # Moving avegrate of past m observations.  Only takes xts object.
+  # Output $mean and $sd, and they are also xts.
+  # If m=20, 1st $mean is mean(X[1:20]), which is indexed at 21st day.
+  
+    if (is.xts(X)) {
+    
+        n <- length(X)
+        
+        Mav1 <- xts(matrix(0,n-m,1), order.by=index(X[(m+1):n]))
+        Mav2 <- xts(matrix(0,n-m,1), order.by=index(X[(m+1):n]))
+        
+        for (i in  1:(n-m)){
+            Mav1[i] <-  mean(X[(i-1)+1:m])
+            Mav2[i] <-  sd(X[(i-1)+1:m])   
+        }
+        
+    } else {
+    
+        print("X needs to be xts")
+        
+    }
+    
+    return(list("mean"=Mav1, "sd"=Mav2))
+    
+}
+    
+    
+
+
+
+#--- Normality Test ---------------------------
+KStest <- function(X) {
+
+    n <- length(X)
+    X <- sort(X)
+    F1 <- (1:n)/n
+    F2 <- (0:(n-1))/n
+    a <- max(abs( F1 - F0(X) ))
+    b <- max(abs( F2 - F0(X) ))
+    c <- max(a,b)*sqrt(n)
+    return(c)
+    
+}
+
+
+#-- ks.test lacks the sqrt(n) scaling!!
+
+    ks.test(X, "pnorm", 0, 1)$statistic*sqrt(n)
+
+

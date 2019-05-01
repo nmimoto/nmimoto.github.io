@@ -1,0 +1,171 @@
+#
+#
+#  Plotting Examples
+#
+#
+##################################################
+
+
+x <- seq(-10,10, .01) 
+f <- function(x) { x^2+2 }
+g <- function(x) { x-3   }
+
+#--- Plot ------------------
+  plot(x,  f(x),   type="l", pch=2, cex=3, col="blue",  ylim=yy, xlim=xx, ann=F)
+
+  # type = p, l, b, c, o, h, s, S, n
+
+
+  plot(x, y, col = ifelse(y>0.5, "red", "blue"))
+
+
+#-- empty plot
+  plot(1, type="n", axes=F, xlab="", ylab="") 
+
+
+#-- Don't draw axis 
+  plot(x, f(x), xaxt="n") 
+
+
+#--- Adding titles and subtitles ----
+  m1 <- paste("  f=",f(x))
+  m2 <- paste("  Mfn=",round(mean(fn), 4))
+  ss <- paste("")
+  plot(1,1, type="n", xlab="x here", ylab="y here", main = c(m1, m2), sub=ss)
+  legend(2, .3, c("a", "b"), col=c("red", "black"), lwd=2, lty=1);
+
+
+#--- Overlay two plots (Method 1) ---
+  plot(x,  f(x), type="l" ) 
+  lines(x,  g(x))
+
+
+#--- Overlay two plots (Method 2) (limits must be defined) ---
+  plot(x,  f(x), type="l", ylim=c(-10,10), xlim=c(1,1))
+  par(new=T)
+  plot(x,  g(x), type="l", ylim=c(-10,10), xlim=c(1,1)) 
+
+
+#--- Plot two plots in different window ---
+  plot(x,  f(x), type="l", ylim=c(-10,10), xlim=c(1,1))
+  dev.new()
+  plot(x,  g(x), type="l", ylim=c(-10,10), xlim=c(1,1)) 
+
+    #- or use win.graph(width=8.5, height=11, pointsize=8)
+
+
+#--- Open new plot ---
+  dev.new()
+
+#--- Close all plot windows ---
+  graphics.off()
+
+
+#--- Panel plot using layout() ---
+  x = rnorm(100)
+  layout(  matrix(c(1,2,3,4), 2, 2, byrow = TRUE)  )
+  acf(x);       
+  pacf(x); 
+  acf(abs(x)); 
+  hist(x^2)
+
+
+#--- Put big title over panel plot ---
+  par(oma = c(0, 0, 4, 0))  #- do this first to set white space (b,l,u,r)
+
+  mtext(side=3, line=1, outer=T, text="Big Title", cex=2)  #- do this after plots
+
+
+#--- Make axis font bigger ---
+  plot(rnorm(10), type="l",  cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+
+
+#--- Insert text on plot 
+  text( 0.5,0.7, paste("Box-Ljung test"), cex=1.3 )
+
+
+#--- Add legend ---
+legend('topleft', c("rho= -1","rho= -.5","rho= 0","rho= .5","rho= 1"), lty=c(2,1,1,1,2), lwd=c(2,1,2,1,2),
+       col=c('blue', 'blue', 'black','green',"green"), bty='n', cex=1) #btx=box style (o or n)
+
+
+
+
+#--- Use mfrow() to panel plot and adjust white space in between ---
+
+  x = rnorm(100)
+
+  par(mfrow=c(1,1)); plot(1, type="n", axes=F, xlab="", ylab="") #- erace what's already there
+
+  #-  oma sets space of (bottom,left,above,right) of entire plot.  
+  #-  mar sets (b,l,a,r) of each plot panel
+  par(mfrow=c(2,2), oma = c(2,2,4,2) + 0.1, mar = c(1,1,3,1) + 0.1 )
+
+  par(mfg=c(2,1,2,2));  hist(x,cex.axis=1,cex.main=.91,main="Histogram",xlab="H")
+  par(mfg=c(1,1,2,2));   acf(x,cex.axis=1,cex.main=.91,main="",   xlab="ACF")
+  par(mfg=c(1,2,2,2));  plot(x,cex.axis=1,cex.main=.91,main="X",  ylab="X")
+  par(mfg=c(2,2,2,2));  pacf(x,cex.axis=1,cex.main=.91,main="",xlab="PACF")
+
+  mtext(side = 3, line=1, outer=T, text = "Title", cex=2) #-- add big title to panel plot
+  layout(  matrix(1, 1, 1)  ) # end splitting
+
+
+#--- Panel Plot using split.screen() -----------
+  win.graph(width=8.5, height=11, pointsize=8)
+  split.screen( c(2,2) )
+
+  screen(3); plot(rnorm(10), type="S")
+  screen(1); plot(rnorm(10))          
+  screen(2); plot(rnorm(10), type="l")
+  screen(4); plot(rnorm(10), type="h")
+
+  #-- overlay --
+  par(new=T)
+  screen(3); plot(rnorm(10, 2, 3), type="S")
+  screen(1); plot(rnorm(10, 2, 3))          
+  screen(2); plot(rnorm(10, 1, 1), type="l")
+  screen(4); plot(rnorm(10, 2, 5), type="h")
+
+
+
+#--- Auto save plot ---
+
+  dev.copy(pdf,'ITS-39.pdf')
+  dev.off()
+
+
+#--- Auto save plot 2 (auto name) ---
+
+  i = 1
+
+  outfile = paste("Rplot",i,".jpg", sep="")
+  jpeg(file=outfile,width=480,height=480,quality=100)
+  
+  plot(x,y)
+  
+  dev.off()
+
+
+
+#--- Auto save plot 3 (auto name, put in folder "plots") ---
+#---                   folder must be created before hand, and be in current working directory
+
+  for (i in 1:10) {
+
+    outfile = paste("plots/Rplot",i,".jpg", sep="")
+    jpeg(file=outfile,width=480,height=480,quality=100)
+
+    x <- rnorm(10,0,1)
+    y <- rnorm(10,2,3)
+    
+    plot(x,y)
+  
+    dev.off()
+
+}
+
+
+
+
+
+ 

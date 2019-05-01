@@ -1,0 +1,34 @@
+
+
+#--- Monthly Data TS to XTS ---
+  library(xts)
+
+  X  <- ts(1:100, start=c(1976), freq=12)
+  
+  X3 <- xts(X, order.by=as.Date(time(X)))
+  X3["1984"]
+
+  #--- XTS to TS ---
+  X4 <- ts(X3, start=as.numeric(strftime(start(X3), format="%Y")), freq=12)
+
+
+
+
+
+
+#--- as.xts will have problem this way because of Summer Time ---
+
+library(xts)
+
+X=ts(1:100, frequency=12, start=c(1976))
+X2=as.xts(X)
+X2["1984"]  #- missing Jan 1984 
+
+as.POSIXct(time(X2))  #- because Jan 1984 counted as Dec 1983
+
+time(X2) <- as.POSIXct(time(X2)) + 6*60*60  #- One way to fix it
+X2["1982"]
+
+
+
+

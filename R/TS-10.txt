@@ -1,0 +1,59 @@
+
+
+X <- c(27.57, 28.43, 24.90, 27.10, 24.73, 34.67, 30.01, 31.55, 28.07, 26.58)
+
+Y <- c(319, 147, 142, 161, 218, 242, 236, 223, 193, 166, 130, 133,
+       129, 108, 82 , 98 ,180 ,213 ,223 ,213 ,194 ,179 ,142 ,101,
+       79,   82,58  ,68  ,107 ,136 ,152 ,151 ,125 ,109 , 88 , 65,
+       90,   91,95  ,87  ,131 ,165 ,178 ,189 ,164 ,147 ,125 , 73,
+       52,   44,35  ,63  ,95  ,94  ,83  ,79  ,75  ,63  ,42  ,31,
+       28,   16,11  ,14  ,55  ,82  ,88  ,85  ,93  ,101 ,126 ,104,
+       103,  78, 67 , 79 ,130 ,147 ,168 ,165 ,151 ,119 , 96 , 77,
+       118, 122,129 ,103 ,133 ,157 ,186 ,209 ,203 ,164 ,139 ,129,
+       134, 137,156 ,198 ,282 ,311 ,311 ,307 ,290 ,265 ,230 ,216,
+       215, 262,251 ,279 ,298 ,297 ,286 ,273 ,238 ,207 ,174 ,133)
+
+X1 <- ts(X, start=1921,      freq=1)
+Y1 <- ts(Y, start=c(1921,1), freq=12)
+
+plot(X1)
+plot(Y1)
+
+
+#--- Take Annual Averages (Monthly Data) ---
+
+  Aav1  <- ts(aggregate(c(Y1), list(year=floor(time(Y1))), mean)$x, start=start(Y1), freq=1)   #- Annual Average
+  A.av1 <- ts(rep(Aav1, each=12), start=start(Y1), freq=12) #- Mtly Av as long as D1           #- Each month replaced with Ann Av
+
+
+  #---------
+  plot(X1)
+  plot(Aav1)
+
+
+  #---------
+  plot(Y1)
+  lines(A.av1, col="red")
+
+
+
+
+#--- Take Monthly Averages (Monthly Data) ---
+
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/acci.txt", header=T)
+  D1 <- ts(D, start=c(1973,1), freq=12)   #- Turn D into ts object with frequency
+
+  plot(D1, type="o", ylab="num of accidents")
+
+
+  Mav1  <- aggregate(c(D1), list(month=cycle(D1)), mean)$x           #- 1yr long Mtly Av $
+  M.av1 <- ts(Mav1[cycle(D1)], start=start(D1), freq=frequency(D1))  #- Mtly Av as long as D1
+
+
+  plot(Mav1)
+
+  plot(D1, type="o")
+  lines(M.av1, col="red")
+
+
+  plot(D1-M.av1, type="o")   #- plot the difference

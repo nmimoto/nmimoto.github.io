@@ -1,0 +1,123 @@
+
+
+
+#--- Monte Carlo Integraion for \int_0^1 exp(-x) dx ------------
+
+  theta <- (-exp(-1) + 1)  # actual answer
+
+
+  n <- 1000   
+  X <- runif(n)
+  Y <- exp(-X)
+
+  Ybar <- mean(Y)
+  Ybar 
+
+  #--- 95% CI for theta
+  ME <- 1.96*sd(Y)/sqrt(n)
+  paste("95 % CI for theta is ", Ybar, " +- ", ME)
+  Ybar + c(-ME,ME)
+  theta 
+
+
+
+
+#--- Monte Carlo Integraion for \int_2^4 exp(-x) dx ------------
+
+  theta <- (-exp(-4)+exp(-2))   #- actual answer
+
+  n <- 1000
+  X <- runif(n, 2, 4)
+  Y <- exp(-X)
+  Ybar <- mean(Y) 
+
+  #--- 95% CI for theta
+  ME <- 1.96*sd(Y)/sqrt(n)
+  paste("95 % CI for theta is ", 2*Ybar, " +- ", 2*ME)
+  2*Ybar + c(-ME,ME)
+  theta 
+
+
+
+
+
+
+#--- Antithetic Variates for \int_0^1 exp(-x) dx
+
+  theta <- (-exp(-1) + 1)  # actual answer
+
+  n <- 500
+  U <- runif(n,0,1)
+  V <- 1-U
+
+  cor(U,V)
+
+  X <- exp(-U)
+  Y <- exp(-V)
+  cor(X,Y)
+
+  T <- (X+Y)/2
+  Tbar <- mean( T )    # using antithetic variates
+  ME.t <- 1.96*sd(T) /sqrt(n)
+
+  paste("CI with Antithetic MCI ", Tbar, " +- ", ME.t)
+  Tbar + c(-ME.t,ME.t)
+  theta 
+
+
+
+  
+
+
+
+#--- Control Variates for \int_0^1 exp(-x) dx
+
+  n <- 10000
+  X <- runif(n,0,1)
+
+  Y <- X     # Use Y <- X^(-.5) see how things changes
+    #Y <- X^(-.5)
+  rho <- cor(exp(-X), Y)
+  rho 
+
+  c0 = - cov(exp(-X),Y) / var(Y)   #est of c*
+  th_1 <- mean(exp(-X))
+  th_C <- mean(exp(-X) + c0 * (Y- mean(Y)) )  # we know E(Y) = .5 if Y=X.  
+
+  SE1  <- sd(exp(-X))
+  SE.c <- sqrt( (1-rho^2)*var(exp(-X)) )
+
+  paste("CI with regular MCI ", th_1, " +- ",          1.96*SE1/sqrt(n))
+  paste("CI with Control Variates MCI ", th_C, " +- ", 1.96*SE.c/sqrt(n))
+  theta 
+
+  SE.c/SE1   # % reduction in Estimation Std Error by using Control Variates
+
+  
+
+  #--- Estimate SE1 and SE.C by iteration instead of plug-in formula ------
+  th_1 <- th_C <- 0
+  for (i in 1:1000) {
+    X <- runif(n,0,1)
+    Y <- X 
+    rho <- cor(exp(-X), Y)
+    c0 = - cov(exp(-X),Y) / var(Y)   #est of c*
+    th_1[i] <- mean(exp(-X))
+    th_C[i] <- mean(exp(-X) + c0 * (Y-.5) )  # we know E(Y) = .5
+  }
+
+  a <- c(sd(th_1), sd(th_C))    # Std Error estimated by iteration
+  b <- c(SE1/sqrt(n), SE.c/sqrt(n))              # plug-in estimation from before
+  rbind(a,b)
+
+
+
+
+
+
+
+
+
+
+
+
