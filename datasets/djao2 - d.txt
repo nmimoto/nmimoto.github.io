@@ -1,0 +1,39 @@
+
+
+Closing values of the DowJones Index of stocks 
+on the New York Stock Exchange 
+and the closing values of the Australian All Ordinaries Index 
+of Share Prices, recorded at the termination of trading.  
+
+
+251 successive trading days
+
+Sep 10, 1993 to Aug 26, 1994
+
+
+(Because of the time difference between Sydney and New York, 
+the markets do not close simultaneously in both places; however, 
+in Sydney the closing price of the Dow Jones index for the previous
+day is known before the opening of the market on any trading day.)
+
+
+
+djao2.tsm From Brockwell and Davis (2002) 
+
+
+
+
+---------------------------
+R code to load the data directly:
+
+D  <- read.table("http://gozips.uakron.edu/~nmimoto/pages/datasets/djao2.txt", header=T)
+A <- ts(D$DJ, start=c(1,1), freq=1)
+B <- ts(D$AO, start=c(1,1), freq=1)
+
+layout(matrix(1:2, 2, 1))
+plot(A, type='o')
+plot(B, type='o')
+layout(1,1,1)
+
+
+

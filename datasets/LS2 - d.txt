@@ -1,0 +1,24 @@
+sales data with leading indicator given by Box and Jenkins (1976), p. 537.
+
+n=150 daily observation
+
+
+LS2.tsm from Brockwell and Davis (2002)
+
+
+
+
+---------------------------
+R code to load the data directly:
+
+D  <- read.table("http://gozips.uakron.edu/~nmimoto/pages/datasets/LS2.txt", header=T)
+A <- ts(D$A, start=c(1,1), freq=1)
+B <- ts(D$B, start=c(1,1), freq=1)
+
+layout(matrix(1:2, 2, 1))
+plot(A, type='o')
+plot(B, type='o')
+layout(1,1,1)
+
+
+

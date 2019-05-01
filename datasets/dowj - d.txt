@@ -1,0 +1,21 @@
+The Dow Jones Utilities Index, Aug. 28–Dec. 18, 1972; 
+
+
+DOWJ.TSM from Brockwell and Davis (2002)
+
+
+
+---------------------------
+R code to load the data directly:
+
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/dowj.csv")
+D1 <- ts(D, start=c(1,1), freq=1)
+
+plot(D1, type='o')
+
+
+
+--------------------------------
+If you download the file, then save it in your working directry and:
+
+D <- read.csv("dowj.txt")
