@@ -1,0 +1,177 @@
+
+
+
+
+#--- Testing Sample Mean for Sigificance (when n=100, time series = Y)
+
+  data(color)
+  Y = color
+
+  gamma.hat <- acf(Y, type="covariance")$acf   #- extract ACVF values
+  
+  nu.hat <- gamma.hat[1] + 2*sum( (1-(1:10)/100)*gamma.hat[2:11] )
+  
+  mean(Y)
+  1.96*sqrt(nu.hat/100)   #- 95% CI
+
+
+
+#--- MA filter to visualize trend line 
+
+  t <- 1:100
+  Y <- -3 +.07*t + arima.sim(n = 100, list(ma = c(.4, .2) ) )
+  m <- filter(Y, rep(1/9, 9))
+  
+  res <- Y-m
+  
+  plot(Y, type="o")
+  lines(m, lwd=2, col="red")
+  
+  layout(c(1,2))          #- change layout of the plot window
+  plot(res, type="o" )
+  acf(res[5:96])
+  layout(1)
+
+
+  
+#--- Fitting Linear Trend by OLS
+  
+  Y <- -3 +.07*(1:100) + arima.sim(n = 100, list(ma = c(-.4, .4) ) )
+  
+  fit <- lm(Y~time(Y))
+  summary(fit)
+  res <- fit$residuals #- extract residuals
+  
+  plot(Y, type="o" ) #- plot simulated data
+  lines(fit$fitted, col="red", lwd=2) #- overlay fitted line
+
+  layout(c(1,2))
+  plot(res, type="o" )
+  acf(res)
+  layout(1)
+
+
+
+#--- Fitting Quadratic Trend 
+
+  t   <- 1:100
+  tsq <- t^2
+  Y   <- -3 +.03*t + .003*tsq + arima.sim(n=100, list(ma = c(-.4,.4)))
+  
+  plot(Y,type="o")
+  
+  fit <- lm(Y~t+tsq)         #- poly reg of degree 2
+  summary(fit)           
+  res <- fit$residuals       #- extract residuals
+
+  plot(Y, type="o" )                  #- plot simulated data
+  lines(fit$fitted, col="red", lwd=2) #- overlay fitted line
+
+  layout(c(1,2))
+  plot(res, type="o" )
+  acf(res)
+  layout(c(1,1))
+  
+  
+
+#--- Differencing Lienar Trend
+
+  t <- 1:100
+  Y <- 3 - .1*t + arima.sim(n=100, list(ar = c(.7,.2)))
+  
+  plot(Y,type="o")  #- Y is simulated data
+  Y2 <- diff(Y)     #- take the difference
+  
+  plot(Y2, type="o" )
+  
+  
+#--- Differencing Quadratic Trend
+
+  t <- 1:100
+  tsq <- t^2
+  Y <- 3 - .5*t + .1*tsq + arima.sim(n=100, list(ar = c(.7,.2)))*10
+  
+  plot(Y,type="o")
+  plot(diff(Y),type="o")
+  plot(diff(diff(Y)),type="o")
+  
+
+
+#--- RW without Drift 
+
+  e = rnorm(100) #- 100 random number from N(0,1)
+  M = cumsum(e)
+  
+  plot(M,type="o")
+  plot(M,type="l", ylim=c(-40,40))
+  
+  e = rnorm(100) #- copy and paste these 3 lines many times
+  M = cumsum(e)
+  lines(M)
+
+
+
+#--- RW without Drift 
+
+  e = rnorm(100) #- 100 random number from N(0,1)
+  M = cumsum(e)
+  
+  plot(M,type="o")
+  
+  layout(c(1,2))
+  plot(diff(M), type="o")
+  acf(diff(M))
+  layout(1)
+
+  hist(diff(M))
+
+
+#--- RW with Drift 
+
+  e = rnorm(100, .1, 1) #- 100 random number from N(.1,1)
+  M = cumsum(e)
+  
+  plot(M,type="o")
+
+
+  plot(M,type="l", ylim=c(-40,40))
+  e = rnorm(100, .1, 1) #- copy and paste these 3 lines many times
+  M = cumsum(e)
+  lines(M)
+
+
+
+#--- Temperature Data Example (Shumway) 
+
+  library(astsa)
+  
+  data(gtemp)
+  
+  plot(gtemp, type="o", ylab="Global Temperature Deviations")
+  fit <- lm(gtemp~time(gtemp));
+  
+  layout(c(1,2))
+  plot(fit$residuals, type="o")
+  plot(diff(gtemp), type="o")
+  
+  layout(c(1,2))
+  acf(fit$residuals)
+  acf(diff(gtemp))
+
+
+
+
+#--- AAPL example 
+
+  install.packages("quantmod") #- install if first time
+  
+  library(quantmod)
+  getSymbols("AAPL") #- download from Yahoo!
+  
+  X <- as.ts(AAPL$AAPL.Adjusted[400:200])
+  
+  plot(X, type="o")
+
+  layout(c(1,2))
+  plot(diff(X), type="o")
+  acf(diff(X))

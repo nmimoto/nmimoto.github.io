@@ -1,0 +1,552 @@
+#
+#
+#  Multivariate Time Series and VARMA(p,q)
+#
+#
+###########################################
+
+
+
+#-------------------------------------------------
+#--- 1. Two independent stationary time series ---
+
+
+  mu <- 5
+  x1  <- rnorm(150)
+  x2  <- rnorm(150)
+  
+  layout(matrix(1:2, 2, 1))
+  plot(x1, type="o", lwd=2)
+  plot(x2, type="o", lwd=2)
+
+  acf( cbind(x1,x2) );   #- Can use this as a basis of correlation
+
+
+
+
+#--- 1. Two independent stationary time series ---
+  mu <- 5
+  x1  <- arima.sim(n = 250, list(ar = c(0.7), ma = c(0.5) )) + mu
+  x2  <- arima.sim(n = 250, list(ar = c(0.7), ma = c(0.5) )) + mu
+  
+
+  layout(matrix(1:2, 2, 1))
+  plot(x1, type="o", lwd=2)
+  plot(x2, type="o", lwd=2)
+
+
+  acf( cbind(x1,x2) );   #- Can NOT use this as a basis of correlation
+
+
+
+  #--- Pre-whiten them 
+  Est1 <- arima(x1, order=c(1,0,1), include.mean=F)
+  Est2 <- arima(x2, order=c(1,0,1), include.mean=F)
+
+  acf( cbind(Est1$residuals,Est2$residuals) ); 
+
+
+
+
+
+
+
+
+#------------------------------------------------
+#--- 2. Two correlated stationary time series ---
+
+
+  library(forecast)
+
+  e1  <- rnorm(252)
+
+  x1 <- e1[1:250]
+  x2 <- e1[1:250] + .75*e1[3:252]
+
+
+  layout(matrix(1:2, 2, 1))
+  plot(x1, type="o")
+  plot(x2, type="o")
+
+
+  acf( cbind(x1,x2) ); 
+
+
+
+  #-- Pre-whiten them 
+  Est2 <- arima(x2, order=c(0,0,2), include.mean=FALSE ); Est2
+
+  r12  <- ts( cbind(x1, Est2$residuals) )
+  acf(r12)
+
+
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(x1); Est1
+  Est2 <- auto.arima(x2); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------
+#--- 3. Another correlated stationary time series ---
+
+
+  e1  <- rnorm(252)
+  e2  <- rnorm(252)
+
+  x1 <- e1[1:250] + .5*e1[2:251]
+  x2 <- e2[1:250] + .7*e1[2:251] + .4*e2[3:252]
+
+
+  layout(matrix(1:2, 2, 1))
+  plot(x1, type="o")
+  plot(x2, type="o")
+
+
+  acf( cbind(x1,x2) ); 
+
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(x1); Est1
+  Est2 <- auto.arima(x2); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+  #-- Independent version ---
+  e1  <- rnorm(252)
+  e2  <- rnorm(252)
+
+  x1 <- e1[1:250] + .5*e1[2:251]
+  x2 <- e2[1:250] + .7*e2[2:251] + .4*e2[3:252]
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(x1); Est1
+  Est2 <- auto.arima(x2); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------
+#--- 4. Correlated AR stationary time series ---
+
+
+  e2  <- rnorm(250)
+
+  x1  <- arima.sim(n = 252, list(ar = c(0.7) )) + mu
+  x2  <- x1[3:252] + .3*x1[2:251] + e2
+  x1  <- x1[1:250]
+
+
+  layout(matrix(1:2, 2, 1))
+  plot(x1, type="o")
+  plot(x2, type="o")
+
+
+  acf( cbind(x1,x2) ); 
+
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(x1); Est1
+  Est2 <- auto.arima(x2); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+  #-- Independent version ---
+  e1  <- rnorm(252)
+  e2  <- rnorm(252)
+
+  x1 <- e1[1:250] + .5*e1[2:251]
+  x2 <- e2[1:250] + .7*e2[2:251] + .4*e2[3:252]
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(x1); Est1
+  Est2 <- auto.arima(x2); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------
+#--- 5. Lead Sales Data ---
+
+  D  <- read.table("http://gozips.uakron.edu/~nmimoto/pages/datasets/LS2.txt", header=T)
+  A <- ts(D$A, start=c(1,1), freq=1)
+  B <- ts(D$B, start=c(1,1), freq=1)
+
+  layout(matrix(1:2, 2, 1))
+  plot(A, type='o')
+  plot(B, type='o')
+  layout(1,1,1)
+
+  acf(D)
+
+
+  A1 <- diff(A)
+  B1 <- diff(B)
+
+  layout(matrix(1:2, 2, 1))
+  plot(A1, type='o')
+  plot(B1, type='o')
+  layout(1,1,1)
+
+  acf(cbind(A1, B1))
+
+
+  #-- Pre-whiten them 
+  Est1 <- auto.arima(A1); Est1
+  Est2 <- auto.arima(B1); Est2
+
+  r12  <- ts( cbind(Est1$residuals, Est2$residuals) )
+  acf(r12)
+
+
+
+
+
+
+
+
+#----------------------------------------------------
+#--- 6. Dow Jones vs Australian Stock Index ---
+
+  library(forecast)
+  source("http://gozips.uakron.edu/~nmimoto/689/TS_R-90.txt")
+
+  D  <- read.table("http://gozips.uakron.edu/~nmimoto/pages/datasets/djao2.txt", header=T)
+  A <- ts(D$DJ, start=c(1,1), freq=1)
+  B <- ts(D$AO, start=c(1,1), freq=1)
+
+  layout(matrix(1:2, 2, 1))
+  plot(A, type='o')
+  plot(B, type='o')
+  layout(1,1,1)
+
+
+  A1 <- diff(log(A))
+  B1 <- diff(log(B))
+
+  layout(matrix(1:2, 2, 1))
+  plot(A1, type='o')
+  plot(B1, type='o')
+  layout(1,1,1)
+
+  acf(cbind(A1, B1))
+
+
+
+  #-- Check what h=1 means --
+  x <- rnorm(101)
+
+  x1 <- x[(10:100)]
+  y1 <- x[(10:100)-2] 
+  acf( cbind(x1, y1) ) 
+  cbind(x1, y1)          #h=-2 means x1 is 2-days early
+
+
+  acf( cbind(A1, B1) )
+
+  plot( A1[10:250], B1[10:250] )
+
+
+  #-- Pre-whiten them 
+  Fit1 <- auto.arima(A1); Fit1
+  Fit2 <- auto.arima(B1); Fit2
+
+  acf( cbind(Fit1$residuals, Fit2$residuals) )
+
+
+
+  #-- use vector ARMA --
+  install.packages("MTS")
+  library(MTS)
+
+
+  Fit3 <- VARMA(cbind(A1,B1), p=0, q=1, include.mean=FALSE)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+  Fit4 <- VARMA(cbind(A1,B1), p=0, q=2, include.mean=FALSE)
+  Randomness.tests( Fit4$residuals[,1] )
+  Randomness.tests( Fit4$residuals[,2] )
+  acf(Fit4$residuals)
+
+  Fit4$coef
+  Fit4$secoef
+
+  Fit5 <- VARMA(cbind(A1,B1), p=0, q=3, include.mean=FALSE)
+  Randomness.tests( Fit5$residuals[,1] )
+  Randomness.tests( Fit5$residuals[,2] )
+  acf(Fit5$residuals)
+
+
+  #--- prediction with VARMA --
+  VARMApred(Fit3, h=1)
+
+  t(Fit3$coef) %*% Fit3$residuals[249,] #- same as pred
+  Fit3$residuals[249,] %*% Fit3$coef
+
+
+
+  #--- Rolling prediction with VARMA(0,1) --
+  A1 <- diff(log(A))
+  B1 <- diff(log(B))
+
+
+  A2.h <- 0
+  B2.h <- 0
+  for (i in 1:40) {
+
+    print(i)
+
+    A2 <- window(A1, start=2+i-1, end=202+i-1)
+    B2 <- window(B1, start=2+i-1, end=202+i-1)
+
+    Fit3 <- VARMA(cbind(A2,B2), p=0, q=1, include.mean=FALSE)
+    
+    A2.h[i] <- VARMApred(Fit3, h=1)$pred[1]
+    B2.h[i] <- VARMApred(Fit3, h=1)$pred[2]
+
+  }
+
+
+  A3 <- window(A1, start=203, end=242)
+  B3 <- window(B1, start=203, end=242)
+  A2.h <- ts(A2.h, start=203)
+  B2.h <- ts(B2.h, start=203)
+
+
+  layout(matrix(1:4, 4, 1))
+  plot(A3, ylim=c(-.02, .02) ); lines(A2.h, col="red")
+  plot(B3, ylim=c(-.02, .02) ); lines(B2.h, col="red")
+  plot(abs(A3-A2.h) , ylim=c(0, .02) )
+  plot(abs(B3-B2.h) , ylim=c(0, .02) )
+
+
+  Result1 <- cbind(A3>0, A2.h>0, (A3>0)==(A2.h>0) )
+  Result2 <- cbind(B3>0, B2.h>0, (B3>0)==(B2.h>0) )
+  colMeans(Result1)
+  colMeans(Result2)
+
+  MSE1 <- mean( (A3-A2.h)^2 )/ sd(A3) ; MSE1
+  MSE2 <- mean( (B3-B2.h)^2 )/ sd(B3) ; MSE2
+
+  layout(matrix(1:4, 4, 1))
+  plot( as.numeric(A3) * ((A2.h>0)*2-1) )
+  plot( as.numeric(B3) * ((B2.h>0)*2-1) )
+  plot( cumsum( as.numeric(A3) * ((A2.h>0)*2-1) ) )
+  plot( cumsum( as.numeric(B3) * ((B2.h>0)*2-1) ) )
+
+
+  .04/sum(abs(A3))
+  .14/sum(abs(B3))
+
+
+  #-- How about VARMA(p,0) --
+  Fit6 <- VARMA(cbind(A1,B1), p=1, q=0, include.mean=FALSE)
+  Randomness.tests( Fit6$residuals[,1] )
+  Randomness.tests( Fit6$residuals[,2] )
+  acf(Fit6$residuals)
+
+
+  Fit7 <- VARMA(cbind(A1,B1), p=2, q=0, include.mean=FALSE)
+  Randomness.tests( Fit7$residuals[,1] )
+  Randomness.tests( Fit7$residuals[,2] )
+  acf(Fit7$residuals)
+
+
+
+  #--- prediction with VARMA --
+  VARMApred(Fit6, h=1)
+
+  t(Fit6$coef) %*% cbind(A1,B1)[250,] #- same as pred
+  cbind(A1,B1)[250,] %*% Fit6$coef
+  
+
+
+
+  #--- Rolling prediction with VARMA(1,0) --
+  A2.h <- 0
+  B2.h <- 0
+  for (i in 1:40) {
+
+    print(i)
+
+    A2 <- window(A1, start=2+i-1, end=202+i-1)
+    B2 <- window(B1, start=2+i-1, end=202+i-1)
+
+    Fit3 <- VARMA(cbind(A2,B2), p=1, q=0, include.mean=FALSE)
+
+    A2.h[i] <- VARMApred(Fit3, h=1)$pred[1]
+    B2.h[i] <- VARMApred(Fit3, h=1)$pred[2]
+
+  }
+  
+  A3 <- window(A1, start=203, end=242)
+  A2.h <- ts(A2.h, start=203)
+
+  plot(A3)
+  lines(A2.h, col="red")
+
+  Result1 <- cbind(A3>0, A2.h>0, (A3>0)==(A2.h>0) )
+  colMeans(Result1)
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------
+#--- 7. Back to Lead Sales Data ---
+
+  library(forecast)
+  source("http://gozips.uakron.edu/~nmimoto/689/TS_R-90.txt")
+
+  D  <- read.table("http://gozips.uakron.edu/~nmimoto/pages/datasets/LS2.txt", header=T)
+  X <- ts(D$B, start=c(2000,1), freq=12)  #- sales data
+  B <- ts(D$A, start=c(2000,1), freq=12)  #- index series
+
+  X1 <- window(X, start=c(2000,1), end=c(2010,12))
+  X2 <- window(X, start=c(2011,1), end=c(2011,12))
+  B1 <- window(B, start=c(2000,1), end=c(2010,12))
+  B2 <- window(B, start=c(2011,1), end=c(2011,12))
+
+  
+  plot(X1, type='o')
+  lines(B1*.05, col="red")
+
+
+  layout(matrix(1:2, 2, 1))
+  plot(diff(X1), type='o')
+  plot(diff(B1), col="red")
+  layout(1)
+
+
+  acf( cbind(diff(X1), diff(B1)) )
+
+
+  #-- Pre-whiten them 
+  Fit1 <- auto.arima(X1, d=1); Fit1
+  Fit2 <- auto.arima(B1, d=1); Fit2
+
+  acf( cbind(Fit1$residuals, Fit2$residuals) )
+  
+
+
+  acf( cbind(diff(X1), diff(B1)) )
+
+
+  
+  #-- use vector ARMA --
+  library(MTS)
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=0, q=1, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=0, q=2, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=0, q=3, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=1, q=0, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=2, q=0, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=3, q=0, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=1, q=1, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+
+
+  Fit3 <- VARMA(cbind(diff(X1),diff(B1)), p=2, q=2, include.mean=T)
+  Randomness.tests( Fit3$residuals[,1] )
+  Randomness.tests( Fit3$residuals[,2] )
+  acf(Fit3$residuals)
+
+
+
+  Fit4 <- VARMA(cbind(diff(X1),diff(B1)), p=2, q=1, include.mean=T)
+  Randomness.tests( Fit4$residuals[,1] )
+  Randomness.tests( Fit4$residuals[,2] )
+  acf(Fit4$residuals)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

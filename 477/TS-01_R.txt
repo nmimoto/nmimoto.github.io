@@ -1,0 +1,93 @@
+#--- required for the first time on PC---
+#
+#    install.packages('TSA')
+#
+
+
+
+#--- required every time you restart R ---
+
+  acf1 <- acf    # Keep original acf() function
+  library(TSA)   # load package TSA
+  acf <- acf1    # replace back the new acf with original 
+
+
+
+
+#--- IID sample ---
+  X <- rnorm(100, 0, 1)
+  plot(X)
+  plot(X,type='o')
+
+  hist(X)
+
+
+
+
+#--- LA rainfall data (p2) ---
+  data(larain)   #loads the dataset 
+  plot(larain)
+
+
+  #-- Format the graph --
+  win.graph(width=4.875, height=2.5,pointsize=8)   #set plot size 
+  plot(larain,ylab='Inches',xlab='Year',type='o')
+
+
+  #-- This year vs Last Year ---
+  plot(y=larain,x=zlag(larain),ylab='Inches',xlab='Previous Year Inches')
+
+
+
+
+
+#--- Chemical Process (p3) ---
+  data(color) #loads the dataset 
+  plot(color,ylab='Color Property',xlab='Batch',type='o')
+
+  #-- Plot of color vs previous color ---
+  plot(y=color,x=zlag(color),ylab='Color Property', xlab='Previous Batch Color Property')
+
+
+
+
+
+#--- Abundance of Canadian Hair (p5) ---
+  data(hare)
+  plot(hare,ylab='Abundance',xlab='Year',type='o')
+
+  #-- This year vs Last Year ---
+  plot(y=hare[1:30],x=hare[2:31],ylab='Abundance',xlab='Previous Year Abundance')
+  cor(hare[1:30], hare[2:31])
+
+  #-- This year vs 2 Years ago ---
+  plot(y=hare[1:29],x=hare[3:31],ylab='Abundance',xlab='Abundance 2yrs ago')
+  cor(hare[1:29], hare[3:31])
+
+
+  acf(hare)                      # ACF
+
+  acf(hare, type="covariance")   # ACVF 
+
+  Ga <- acf(hare, type="covariance")   # take numbers from ACVF
+  Ga
+
+
+
+#--- Monthly Oil Filter Sales (p7) ---
+  data(oilfilters)
+  plot(oilfilters,type='o',ylab='Sales')
+
+
+  is.ts(oilfilters)  # is data in TS format?
+  oilfilters         # see the data
+
+  plot(oilfilters,type='l',ylab='Sales')
+  points(y=oilfilters,x=time(oilfilters), pch=as.vector(season(oilfilters)))
+
+  #-- Sales vs Previous Month Sales ---
+  plot(y=oilfilters, x=zlag(oilfilters),ylab='Sales',xlab='Previous Month Sales')
+
+
+
+

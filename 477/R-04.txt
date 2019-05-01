@@ -1,0 +1,121 @@
+
+#--- Theoretical ACF of MA ---
+rho <- ARMAacf(ma=c(.2, -.1), lag.max=20)
+rho
+
+plot(rho)
+
+
+  #--- Another way of plotting ----
+  acf( rnorm(500), col="white", main="")
+  lines(0:20, rho, type="p", col="red")
+  lines(0:20, rho, type="h", col="red")
+
+
+
+
+#--- Theoretical ACF of AR ---
+rho <- ARMAacf(ar=c(.8), lag.max=10)
+rho
+
+plor(rho)
+
+
+
+
+#--- Root of polynomial ----
+#-- root of 1 -.4x -.5x^2 ---
+r <- polyroot(c(1, -.4, -.5))
+r
+Mod(r)  #root is outside of unit circle
+
+
+r <- polyroot(c(1, -.5, -.4, -.4))
+r
+Mod(r)
+
+
+r <- polyroot(c(1, -.5, -.4, .4))
+r
+Mod(r)
+
+
+
+
+#--- Simulate AR series ----
+X <- arima.sim(list(ar=c(.4, .5)), n=100)  #Watch the sign difference from polyroot
+X
+plot(X)
+
+
+X <- arima.sim(list(ar=c(.5, .4, .4)), n=100)
+
+
+X <- arima.sim(list(ar=c(.5, .4, -.4)), n=100)
+X
+plot(X, type='o')
+
+
+
+
+#--- Simulate nonstationary AR(3) by hand ---
+e <- rnorm(200, 0,1)
+Y <- c(1,1,1)
+for (t in 4:200) {
+   Y[t] <- .5*Y[t-1] + .4*Y[t-2] + .4*Y[t-3] + e[t]
+}
+Y <- Y[151:200]  #throw away first 150 (burn-in)
+plot(Y, type='o')
+
+
+
+
+
+#--- Sample ACF and theoretical ACF ---
+X <- arima.sim(list(ar=c(.5, .4, -.4)), n=100)
+X
+plot(X, type='o')
+
+
+acf(X) # sample ACF of simulated AR(3)
+
+rho <- ARMAacf(ar=c(.5, .4, -.4), lag.max=20)
+lines(0:20, rho, type='o', col='red')   #overlay theoretical ACF
+
+
+
+
+
+#--- Repeat above for 100 times (Demonstration of Bartlett's formula) ----
+X <- arima.sim(list(ar=c(.5, .4, -.4)), n=1000)
+acf(X, col='white', lag.max=20)
+
+rho <- ARMAacf(ar=c(.5, .4, -.4), lag.max=20)
+lines(0:20, rho, type='o', col='red', lwd=2)   
+
+
+for (i in 1:10) {
+
+  X <- arima.sim(list(ar=c(.5, .4, -.4)), n=1000)
+  rho_hat <- acf(X, lag.max=20, plot=F)$acf 
+  lines(0:20, rho_hat, type='p')  
+
+}
+rho <- ARMAacf(ar=c(.5, .4, -.4), lag.max=20)
+lines(0:20, rho, type='o', col='red', lwd=2)   #overlay theoretical ACF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

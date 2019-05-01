@@ -1,0 +1,41 @@
+library(TSA)
+
+
+data(co2)
+
+plot(co2,ylab='CO2')
+
+plot(window(co2,start=c(2000,1)),ylab='CO2')
+Month=c('J','F','M','A','M','J','J','A','S','O','N','D')
+points(window(co2,start=c(2000,1)),pch=Month)
+
+
+
+acf(as.vector(co2),lag.max=36)
+
+
+plot(diff(co2),ylab='First Difference of CO2',xlab='Time')
+acf(diff(co2),lag.max=36)
+
+
+plot(diff(co2, 12) )
+acf(diff(co2, 12), lag.max=50)
+
+
+plot( diff(diff(co2, 12)) )
+acf( diff(diff(co2, 12)), lag.max=50)
+
+
+
+
+
+Est = arima(co2, order=c(0,1,1),seasonal=list(order=c(0,1,1),period=12))
+Est
+Randomness.tests(Est$residuals)
+
+
+
+
+Est=arima(co2,order=c(1,1,1),seasonal=list(order=c(1,1,2), period=12))
+Est
+Randomness.tests(Est$residuals)

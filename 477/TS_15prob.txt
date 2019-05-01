@@ -1,0 +1,88 @@
+#
+#  HW 4: Fitting Accident Data with regression line 
+#
+#########################################################
+
+# Use This file as a template for your assignment.
+# code and comments together with (selected) output from R console.
+# submit selected plots.
+
+
+# Your Name: _____________________________
+
+
+
+
+# 1. 
+# -----------------
+# Read in acci.txt file from the course web site.  Plot the time series. 
+# Take difference with lag 12.  
+# Plot the differenced data. Call it D2.   
+
+
+
+
+
+
+
+# 2. 
+# -----------------
+# Fit D2 with linear trend using OLS.
+# Is the slope significant? How did you determine? 
+# Can the output from the screen be trusted? 
+
+
+
+
+
+
+
+# 3. 
+# -----------------
+# Fit residuals from (2) with seasonal ARIMA with d=0, D=0.  
+# (i.e. ARIMA(p,0,q)x(P,0,Q)12)  Is the seasonal part necessary?  
+
+
+
+
+
+
+# 4. 
+# -----------------
+# Using the best model from #3, predict twelve months ahead in D2.  
+
+
+
+
+
+# 5. 
+# -----------------
+# Using the prediction from #4, predict  twelve months ahead in D1 (original TS).  
+
+
+
+
+# 6. 
+# -----------------
+# Using your model from In-class Ex2-#2, (ARIMA(p,1,q)x(P,1,Q)12 model), predict 
+#  twelve months ahead in D1.   
+
+
+
+
+# 7. 
+# -----------------
+# Using your model from In-class Ex2-#3, (ARIMA(p,0,q)x(P,1,Q)12 model), predict 
+#  twelve months ahead in D1.   
+
+
+
+
+# 8. 
+# -----------------
+# Compare your prediction from #5, #6, and #7.  Plot the one-month predictions on 
+# the sampe plot.  Which one do you like the best? 
+
+
+
+

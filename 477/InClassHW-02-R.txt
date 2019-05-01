@@ -1,0 +1,201 @@
+
+
+
+#--- Load difference of temp data ---
+
+  D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/gtemp.txt")
+  D1 <- ts(D, start=c(1880), freq=1)
+  D2 <- diff(D1)
+
+  Plot(D2)
+
+  acf(D2)
+  pacf(D2)
+
+
+#--- Fit best AR(p) by AIC ---
+  
+  Fit1 <- ar(D2)
+
+  Fit1$ar
+  1.96*sqrt( diag(Fit1$asy) )
+
+
+
+
+#--- Look at residual plots ---
+  
+  ehat1 <- Fit1$resid
+
+  plot(ehat1)
+  acf(ehat1, na.action=na.pass)
+  pacf(ehat1, na.action=na.pass)
+
+
+
+
+
+
+#---------------------------------------------------------------
+#--- Additional Analysis ---------------------------------------
+
+
+
+
+
+#--- Look at Theoretical ACF vs Sample ACF of AR(5)
+  
+  library(ltsa)
+
+  ARgam <- tacvfARMA(phi = Fit1$ar, theta= c(0), maxLag=20, sigma2=1)    
+  ARrho <- ARgam/ARgam[1]                      #- get ACF 
+
+
+  layout(matrix(1:2, 1,2))
+
+  acf(D2) 
+  lines(0:20, ARrho, type="p", col="red")
+
+  ARpacf1 <- ARMAacf(ar = Fit1$ar, ma = numeric(), lag.max = 20, pacf = TRUE)
+  pacf(D2) 
+  lines(1:20, ARpacf1, type="p", col="red")
+
+
+
+
+
+
+#--- What if we fit AR(6) ---
+  Fit2 <- ar(D2, aic=FALSE, order.max=6)
+  Fit2
+  Fit2$ar
+  1.96*sqrt( diag(Fit2$asy) )
+
+
+  #--- True PACF vs Sample PACF ---
+
+    ARgam <- tacvfARMA(phi = Fit2$ar, theta= c(0), maxLag=20, sigma2=Fit2$var.pred)    
+    ARrho <- ARgam/ARgam[1]                      #- get ACF 
+    ARrho2 <- ARrho
+  
+    layout(matrix(1:2, 1,2))
+  
+    acf(D2) 
+    lines(0:20, ARrho2, type="p", col="red")
+  
+    ARpacf2 <- ARMAacf(ar = Fit2$ar, ma = numeric(), lag.max = 20, pacf = TRUE)
+    pacf(D2) 
+    lines(1:20, ARpacf2, type="p", col="red")
+
+
+    acf(Fit2$resid, na.action=na.pass)
+
+
+
+
+#--- What if we fit AR(3) ---
+
+  Fit3 <- ar(D2, aic=FALSE, order.max=3)
+  Fit3$ar
+  1.96*sqrt( diag(Fit3$asy) )
+
+
+  #--- True PACF vs Sample PACF ---
+
+    ARgam <- tacvfARMA(phi = Fit3$ar, theta= c(0), maxLag=20, sigma2=Fit3$var.pred)    
+    ARrho <- ARgam/ARgam[1]                      #- get ACF 
+    ARrho3 <- ARrho
+  
+    layout(matrix(1:2, 1,2))
+  
+    acf(D2) 
+    lines(0:20, ARrho3, type="p", col="red")
+  
+    ARpacf3 <- ARMAacf(ar = Fit3$ar, ma = numeric(), lag.max = 20, pacf = TRUE)
+    pacf(D2) 
+    lines(1:20, ARpacf3, type="p", col="red")
+
+    
+    acf(Fit3$resid, na.action=na.pass)
+
+
+
+  layout(1)
+
+
+
+#--- Predicting Temparature 10 step ahead 
+
+  Y <- D2
+
+  Fit1 <- ar(Y, aic=F, order.max=5 )   #- Force to fit AR(5)   (try changing to AR(3))
+  Y.h  <- predict(Fit1, n.ahead=10)
+  Yhat <- Y.h$pred
+  Yhat.CIu <- Yhat+1.96*Y.h$se
+  Yhat.CIl <- Yhat-1.96*Y.h$se
+
+  ts.plot(cbind(Y, Yhat, Yhat.CIu, Yhat.CIl ), type="o", col=c("black","red","blue","blue"))
+  abline(h=0)
+  abline(h=mean(Y), col="blue")
+
+
+
+
+
+
+#--- Rolling 1-step predicton of last 29 years
+
+  Rolling.len = 29
+  Window.size = 100
+
+  p = 5
+
+  Y <- D2  
+
+  Yhat <- Yhat.CIu <- Yhat.CIl <- 0       #- Initialize 
+  for (i in 1:Rolling.len) {
+
+    window.bgn <- i
+    window.end <- i+Window.size-1
+
+    Fit1 <- ar(Y[window.bgn:window.end], aic=FALSE, order.max=p ) #- Force to fit AR(p)
+
+    Y.h <- predict(Fit1, n.ahead=1)
+    Yhat[i] <- Y.h$pred
+    Yhat.CIu[i] <- Yhat[i]+1.96*Y.h$se
+    Yhat.CIl[i] <- Yhat[i]-1.96*Y.h$se
+
+  }
+
+
+  X   <- window(Y, start=time(Y)[1],             end=time(Y)[Window.size])
+  Y2  <- window(Y, start=time(Y)[Window.size+1], end=time(Y)[Window.size+Rolling.len])
+
+  Yhat     <- ts(Yhat,     start=time(Y)[Window.size]+1)
+  Yhat.CIu <- ts(Yhat.CIu, start=time(Y)[Window.size]+1)
+  Yhat.CIl <- ts(Yhat.CIl, start=time(Y)[Window.size]+1)
+
+
+  layout(matrix(c(1,1,1,2,2,3), 2, 3,  byrow=TRUE))
+
+  plot(Y, type="o", col="blue", main="Rolling 1-step prediction with window=100" ) #- Entire dataset
+  lines(X, type="o")
+  lines(Yhat, type="o", col="red")
+  lines(Yhat.CIu, type="l", col="red", lty=2)
+  lines(Yhat.CIl, type="l", col="red", lty=2)
+
+  Pred.error = Y2-Yhat
+  plot(Pred.error, type="o", main="Prediction Error (Blue-Red)")
+  Pred.rMSE = sqrt( mean( (Pred.error)^2 ) ) #- prediction root Mean Squared Error
+  abline(h=c(-1.96, 1.96), col="blue", lty=2)
+  Pred.rMSE
+  mean(Pred.error)
+  acf(Pred.error)
+
+
+ 
+
+
+
+
+

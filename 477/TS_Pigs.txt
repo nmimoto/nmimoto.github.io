@@ -1,0 +1,125 @@
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/Pigs.csv")
+D1 <- ts(D[,2], start=c(1980,1), freq=12)
+D1
+plot(D1, type='o')
+
+
+
+#Copy and paste Randomness.test() from Basic functions file
+Randomness.tests(D1)
+
+
+
+install.packages("tseries") # for adf.test()
+library(tseries)
+
+
+adf.test(D1)
+
+
+plot(diff(D1), type='o')
+Randomness.tests(diff(D1))
+
+
+
+install.packages("forecast") # for arima() and auto.arima()
+library(forecast)
+
+
+
+
+
+#-- fit ARMA directly
+Est <- arima(D1, order=c(2,0,2))
+Est
+Randomness.tests(Est$residuals)
+
+
+
+#-- fit ARIMA 
+Est <- arima(D1, order=c(2,1,2))
+Est
+Randomness.tests(Est$residuals)
+
+
+Est <- arima(D1, order=c(3,1,3))
+Est
+Randomness.tests(Est$residuals)
+
+
+Est <- arima(D1, order=c(4,1,2))
+Est
+Randomness.tests(Est$residuals)
+
+
+
+#-- fit ARIMA(2,1,2)
+Est <- arima(D1, order=c(2,1,2))
+Est
+Randomness.tests(Est$residuals)
+
+
+
+
+#-- Find best by AICc
+Est <- auto.arima(D1, d=1, seasonal=FALSE)
+Est
+Randomness.tests(Est$residuals)
+
+
+
+
+
+#-- Cut the Data 
+D2  <- window(D1, start=c(1982))
+Est <- auto.arima(D2, d=1, seasonal=FALSE)
+Est
+Randomness.tests(Est$residuals)
+
+
+
+D2  <- window(D1, start=c(1982))
+Est <- arima(D2, order=c(2,1,2))
+Est
+Randomness.tests(Est$residuals)
+
+
+
+
+
+#-- 10 step Prediction after c(1995, 8)
+  x.p     <- predict(Est, n.ahead=10, se.fit=TRUE)
+  x.pred  <- ts(x.p$pred,               start=end(D1)+c(0,1), freq=12)
+  x.se1   <- ts(x.p$pred + 1.96*x.p$se, start=end(D1)+c(0,1), freq=12)
+  x.se2   <- ts(x.p$pred - 1.96*x.p$se, start=end(D1)+c(0,1), freq=12)
+
+
+  ts.plot(cbind(D2, x.pred, x.se1, x.se2), type="o",
+          col=c('black','red', 'black', 'black'), lty=c(1,2,2,2) )
+
+
+
+
+
+#-- 1 step Prediction updated 12 times from c(1994, 1)
+
+  x.pred.upd2 <- numeric(0)
+  for (i in 1:10) {
+
+    D2  <- window(D1, start=c(1982), end=c(1993,1)+c(0,i) )
+    Est <- arima(D2, order=c(2,1,2))
+    print(Est)
+
+    x.pred.upd2[i]     <- predict(Est, n.ahead=1, se.fit=F)
+ 
+  }
+
+  x.pred.upd2 <- ts(x.pred.upd2, start=c(1993, 2), freq=12 )
+
+  ts.plot(cbind(D1, x.pred.upd2), type="o",col=c('black','red'), lty=c(1,2), xlim=c(1990,1996))
+
+  
+
+
+
+

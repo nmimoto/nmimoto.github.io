@@ -1,0 +1,265 @@
+
+#
+#    Week 8 Seasonal ARIMA model
+#
+#---------------------------------------------------------
+
+library(forecast)
+
+
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/acci.txt", header=T)
+X  <- ts(D, start=c(1973,1), freq=12)
+
+plot(X, type='o')
+X
+
+
+#--- 1. MA Filter ---
+
+
+
+
+#--- 8-2. Seasonal Average ---
+
+  S <- matrix(as.numeric(X), 6, 12, byrow=T)          #- This makes S not ts class
+
+  X     #-make sure S looks like X
+  S
+
+  seas.mean <- colMeans(S)     #- Take average of each month 
+  plot(seas.mean)
+
+  seas.mean <- ts( colMeans(S), start=c(1973,1),  end=c(1978, 12), freq=12 )
+
+  ts.plot(X, seas.mean, col=c("black", "red"))
+
+  ts.plot(X-seas.mean) 
+
+  acf(X-seas.mean)
+  acf(X-seas.mean)
+
+  Fit1 <- auto.arima(X-seas.mean)
+
+  Randomness.tests(Fit1$residuals)
+  
+
+
+
+#--- 8-3. Seasonal Difference ---
+
+  X2 <- diff(X, 12)   #- take Del_12 = (1-B^12)
+  plot(X2, type="o")
+
+
+  X3 <- diff(X2) 
+  plot(X3, type="o")
+
+
+  Fit2 <- auto.arima(X3, seasonal=FALSE)  #- returns MA(1)
+
+  Randomness.tests(Fit1$residuals)
+
+  #--- This is sARIMA(0,1,1)(0,1,0)_12 model
+
+
+
+
+
+
+
+#--- 8-4 Theoretical ACF of ARMA(p,q)x(P,Q)_s ---
+
+
+
+
+
+
+#--- 8-5 co2 data (no need to load any package for data) ---
+#    monthly CO2 levels at NW territories CANADA from Jan 1959 through Dec 1997.
+
+
+  data(co2)
+
+
+  plot(co2,ylab='CO2')
+  acf(co2,lag.max=36)
+
+
+  #- take Del -
+  layout(matrix(c(1,1,2,3), 2, 2, byrow=T))
+  plot(diff(co2),ylab='First Difference of CO2',xlab='Time')
+  acf(diff(co2))
+  pacf(diff(co2))
+
+
+  #- take Del_12 -
+  layout(matrix(c(1,1,2,3), 2, 2, byrow=T))
+  plot(diff(co2, 12),ylab='First Difference of CO2',xlab='Time')
+  acf(diff(co2, 12))
+  pacf(diff(co2, 12))
+
+
+  #- Take Del and Del_12 -
+  layout(matrix(c(1,1,2,3), 2, 2, byrow=T))
+  plot( diff(diff(co2, 12)) )
+  acf( diff(diff(co2, 12)), lag.max=50)
+  pacf( diff(diff(co2, 12)), lag.max=50)
+
+
+
+  library(forecast)
+
+  Fit1 = arima(co2, order=c(0,1,1), seasonal=list(order=c(0,1,1), period=12))
+  Fit1
+  Randomness.tests(Fit1$residuals)
+
+
+
+  Fit2 = auto.arima(co2)
+  Fit2  
+  Randomness.tests(Est$residuals)
+
+
+  #- Fit2 have some non-significant parameters.  Fit1 is better model.
+
+
+
+
+#--- New co2 data (inside TSA package) ---
+
+  acf1 <- acf
+  library(TSA);  acf <- acf1
+
+  data(co2)
+
+  plot(co2,ylab='CO2')
+  
+
+
+
+
+
+
+
+
+
+#--- Effect of Seasonal Differece on Trend terms ---
+
+  #--- Linear trend
+  X <- 2+3*(1:200); plot(X, type="o")
+  plot(diff(X, 12), type="o")
+
+
+  #--- Quadratic trend
+  X <- 2+3*(1:200)^2; plot(X, type="o")
+  plot(diff(X, 12), type="o")
+  plot(diff(diff(X, 12)), type="o")
+
+
+  #--- RW without drift 
+  X <- cumsum(rnorm(200, 0, 1)); plot(X, type="l")
+  plot(diff(X, 12), type="l")
+
+
+
+
+  #--- RW with drift
+  X <- cumsum(rnorm(200, .3, 1)); plot(X, type="l")
+  plot(diff(X, 12), type="l")
+
+
+
+
+
+
+
+
+
+#--- Forecasting SARIMA ---
+
+
+  #--- Use new co2 data in TSA package ---
+  acf1 <- acf
+  library(TSA);  acf <- acf1
+
+  data(co2)
+
+  X <- co2
+  plot(X,ylab='CO2')
+
+  Fit1 <- auto.arima(X)
+  Fit1   
+
+
+  #-- Relationship between drift and intercept 
+  Arima(X, order=c(1,0,1), seasonal=c(0,1,1))  #- gives error
+
+  
+  Fit11 <- Arima(X, order=c(1,0,1), seasonal=c(0,1,1), include.drift=TRUE)
+  Fit11  #- same as Fit1
+
+
+  X12 <- diff(X,12)
+  Fit2 <- auto.arima(X12)  #- drift is off by default
+  Fit2   
+
+  mean(X12)
+
+  
+
+
+
+#--- In-sample Out-sample methodology ---
+
+  #--- in-sample for 10yrs ---
+  X1 <- window(X, end=c(2003,12))
+  X2 <- window(X, start=c(2004,1))
+
+
+  Fit3 <- auto.arima(X1)
+  Fit3   
+
+  X1.hat <- forecast(Fit3, h=12)
+  plot(X1.hat)
+
+
+  plot(X1.hat, type=c("o","o"), xlim=c(2002,2005))
+  lines(X2, type="o", col="red")
+  MSE <- mean((X1.hat$mean - X2)^2)
+
+
+
+
+  #--- in-sample for 5yrs, out-sample of 1yr---
+
+
+  X1 <- window(X, start=c(1994,1), end=c(1998,12) )
+  X2 <- window(X, start=c(1999,1), end=c(1999,12) )
+
+  Fit4 <- auto.arima(X1)
+  Fit4   
+
+  Fit5 <- Arima(X1, order=c(1,0,1), seasonal=c(0,1,1) )
+
+  Fit5 <- Arima(X1, order=c(1,0,1), seasonal=c(0,1,1), include.drift=TRUE )
+  Fit5   
+
+
+  X1.hat <- forecast(Fit5, h=12)
+  plot(X1.hat)
+
+
+  plot(X1.hat, type="o", xlim=c(1998, 2000))
+  lines(X2, type="o", col="red")
+  MSE <- mean((X1.hat$mean - X2)^2)
+  MSE
+
+
+
+
+  
+
+  #--- 5yr-1yr rolling (take above, put it in loop) ---
+
+
+  readline("Hit enter for next period:")

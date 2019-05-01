@@ -1,0 +1,119 @@
+#--- required for the first time on PC---
+install.packages('TSA')
+
+
+#--- required every time you restart R ---
+acf.orig <- acf    # keep the default acf() function before it is overwritten by TSA package
+library(TSA)
+acf <- acf.orig    # overwrite acf() by TSA package with default acf()
+
+
+
+
+#--- Chemical Process (p3) ---
+  data(color) #loads the dataset 
+  plot(color,ylab='Color Property',xlab='Batch',type='o')
+
+  #-- Plot of color vs previous color ---
+  plot(y=color,x=zlag(color),ylab='Color Property', xlab='Previous Batch Color Property')
+
+  #-- Plot of color vs 2obs ago ---
+  plot(y=color,x=zlag(color, 2),ylab='Color Property', xlab='Previous Batch Color Property')
+
+
+
+
+acf(color)                         #plot ACF
+acf(color, type='covariance')      #plot ACVF
+
+
+a <- acf(color)                    #see numbers in ACF
+a
+
+
+
+#--- LA rainfall data (p2) ---
+  data(larain) #loads the dataset 
+  plot(larain,ylab='Inches',xlab='Year',type='o')
+  acf(larain)
+
+
+
+#--- Abundance of Canadian Hair (p5) ---
+  data(hare)
+  plot(hare,ylab='Abundance',xlab='Year',type='o')
+  acf(hare) 
+
+
+
+#--- Monthly Oil Filter Sales (p7) ---
+  data(oilfilters)
+  plot(oilfilters,type='o',ylab='Sales')
+  acf(oilfilters)
+
+
+
+
+
+#--- IID sequence ---
+X <- rnorm(100, 0, 1)
+plot(X,type='o')
+acf(X)
+
+
+
+
+#--- Moving Average ---
+e <- rnorm(100, 0, 1)
+X <- .5*zlag(e) + e
+
+plot(X, type='o')
+acf(X)  # gives error
+
+X <- X[is.na(X)==0]  # picks X that is not NA
+acf(X)
+
+
+
+
+
+#--- Random Walk ---
+e <- rnorm(100, 0, 1)
+Y <- cumsum(e)
+plot(Y, type='o')
+
+
+
+#--- Overlay many Random Walks ---
+n <- 10
+e <- rnorm(n, 0, 1)
+Y <- cumsum(e)
+plot(Y, type='o', ylim=c(-10,10) )
+
+for (i in 1:100) {
+
+  e <- rnorm(n, 0, 1)
+  Y <- cumsum(e)
+  lines(Y, type='o')
+
+}
+
+
+n <- 100
+e <- rnorm(n, 0, 1)
+Y <- cumsum(e)
+plot(Y, type='o', ylim=c(-50,50) )
+
+for (i in 1:100) {
+
+  e <- rnorm(n, 0, 1)
+  Y <- cumsum(e)
+  lines(Y, type='o')
+
+}
+
+
+t <- seq(1,100)
+lines(t, 1.96*sqrt(t), col='red', lwd=3)
+
+

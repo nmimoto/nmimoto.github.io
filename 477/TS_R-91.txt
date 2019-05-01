@@ -1,0 +1,233 @@
+#
+#
+# ARIMA(p,d,q)
+#
+#
+###############################################
+
+
+#-- If not installed on PC ---
+install.these = FALSE
+
+if (install.these) {
+
+  chooseCRANmirror(F, 82)   # set CRAN mirror to USA(OH)
+  install.packages("tseries")
+  install.packages("forecast")
+  install.packages("FitARMA")
+  install.packages("nlme")
+  install.packages("fGarch")  
+  install.packages('quantmod')  
+
+}
+
+#-- load ---
+  library(tseries)  #adf.test()
+  library(forecast) #auto.arima()
+  library(FitARMA)  #TacvfARMA()
+  library(nlme)     #gls()
+  library(fGarch)   
+  library('quantmod')
+
+
+
+
+
+
+#-------------------------------------------
+#-- Sign Convention of ARMA functions
+#
+#   Cryer's sign convention is (1-phi B) Y_t = (1-theta) e_t.
+#   Brockwell's             is (1-phi B) Y_t = (1+theta) e_t.
+#
+#  For AR(1) (1-.5 B) Y_t = e_t,          ACF should be all positive.
+#            (1+.5 B) Y_t = e_t,          ACF should be alternating in sign.
+#
+#  For MA(1)          Y_t = (1-.5 B) e_t  ACF at lag 1 should be negative 
+#                     Y_t = (1+.5 B) e_t  ACF at lag 1 should be positive
+#
+
+
+
+
+#-- If not installed on PC ---
+chooseCRANmirror(F, 82)       #-  set CRAN mirror at USA(OH)
+
+install.packages("tseries")
+install.packages("forecast")
+install.packages("FitARMA")
+install.packages("nlme")
+install.packages("fGarch")  
+install.packages("TSA")
+install.packages("astsa")  
+
+
+
+
+
+#-- load ---
+library(TSA)      #-  Cryer package
+library(astsa)    #-  Shumway package
+library(tseries)  #-  adf.test()
+library(forecast) #-  auto.arima()
+library(FitARMA)  #-  TacvfARMA()
+library(nlme)     #-  gls()
+library(fGarch)   
+
+
+
+
+
+
+
+
+
+
+#---------------------------------
+#--- ACF, PACF and ACVF
+
+
+#--- Theoretical ACF of ARMA ---
+# sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t   
+
+  rho <- ARMAacf(ar=c(.4, .2), ma=c(.2, -.1), lag.max=20)
+  rho
+
+  plot(rho); lines(rho, type='h')
+  abline(h=0)
+
+
+
+#--- Theoretical PACF of ARMA ---
+  a <- ARMAacf(ar=c(.4, .2), ma=c(.2, -.1), lag.max=20, pacf=T)
+  a
+
+  plot(rho); lines(rho, type='h');  abline(h=0)
+
+
+
+
+#--- Theoretical ACVF of ARMA ---
+# sign of MA parameter is like [Cryer]:  Y_t = (1 - theta B) e_t
+
+  library(FitARMA)
+  Gam <- TacvfARMA(phi=c(1,-.7), theta=c(-.5, .25))
+  Gam
+
+  plot(Gam)
+  lines(Gam, type='h')
+  abline(h=0)
+
+
+
+#--- Sample ACF and PACF of time series X ---
+  acf(X)
+  pacf(X)
+
+
+
+#--- Sample ACVF ------------
+  acf(X, type="covariance" )
+
+
+
+
+
+
+
+#-------------------------------------------
+#-- Simulation and Estimation 
+
+
+  #--- Basic Simulation with ARIMA(p,d,q) ---
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t
+
+  mu <- 5
+  x  <- arima.sim(n = 250, list(ar = c(-0.6, .2), ma = c(0.5) )) + mu
+
+  plot(x, type="o")
+  acf(x)
+
+
+  #-- Estimate parameters
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t
+
+  est <- arima(x, order = c(2, 0, 0))  # fit ARMA(2,1)
+  est
+
+
+  #-- Estimate parameters
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t
+
+  library(forecast)
+  est <- Arima(x, order = c(0, 0, 1))   #- wrapper from forecast package
+  est
+
+
+
+  #-- Prediction
+  x.p     <- predict(est, n.ahead=10, se.fit=TRUE)
+  x.pred  <- ts(x.p$pred, start=n+1)
+  x.se1   <- ts(x.pred + 1.96*x.p$se, start=n+1)
+  x.se2   <- ts(x.pred - 1.96*x.p$se, start=n+1)
+
+
+  #-- Plot with prediction
+  ts.plot(cbind(x, x.pred, x.se1, x.se2), type="o",
+          col=c('black','red', 'black', 'black'), lty=c(1,2,2,2), xlim=c(0,n+10))
+
+
+
+
+
+#---------------------------------------
+#--- Model Selection
+
+  #--- Choose ARIMA model based on AICc, AIC, BIC
+  library(forecast)
+  auto.arima(X)
+  auto.arima(X, d=1, seasonal=FALSE)
+
+
+
+
+#---------------------------------------
+#--- Regression 
+
+
+  #-- OLS --
+  t <- 1:length(X)  
+  Reg <- lm(X ~ t)  # you can do X ~ time(X)  
+  summary(Reg)
+
+
+  #-- GLS --
+  Reg <- gls(X ~ t,  cor=corARMA(c(0.8, -0.24), form = ~ t, p = 1, q = 1))
+  summary(Reg)
+
+
+
+
+#---------------------------------------
+#--- Misc.
+
+
+
+#--- Generate ARIMA with customized errors from outside
+  err5 <- rt(300, 5)
+  x   <- arima.sim(n = 300, list(ar = c(.4, .3)), innov=err5)
+
+
+
+
+#--- Estimation with different methods
+  Est  <- arima(X, order=c(1,0,1))  
+  Est  <- arima(X, order=c(1,0,1), method="CSS")  
+  Est  <- arima(X, order=c(1,0,1), method="ML", init=c(0,0,0) )   #MLE with specified starting points.
+  Est  <- arima(X, order=c(3,0,0), fixed=c(NA, 0, NA, NA) )        #Fit AR(3) with phi2=0.
+
+  Est$coef
+  Est$var.coef
+
+
+

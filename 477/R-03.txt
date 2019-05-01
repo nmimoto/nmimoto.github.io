@@ -1,0 +1,101 @@
+
+
+#--- Is the mean zero? ---
+x <- arima.sim(n = 100, list(ar = c(-.4, .2) ) )
+layout(c(1,2)) 
+plot(x, type='o' ) 
+acf(x)
+
+
+gamma.hat <- acf(x, type='covariance')$acf  #record values of ACVF
+
+nu.hat <- gamma.hat[1] + 2*sum( (1-(1:10)/100)*gamma.hat[2:11] )  
+mean(x)
+nu.hat
+
+
+
+
+#--- MA filter ----
+x <- -3 +.07*(1:100) + arima.sim(n = 100, list(ma = c(.4, .2) ) )
+
+m <- filter(x, rep(1/9, 9))
+res <- x-m
+plot(x, type='o' ) 
+lines(m, type='l', lwd=2, col='red')
+
+layout(c(1,2))
+plot(res, type='o' )
+ acf(res[5:96])
+layout(c(1,1))
+
+
+
+#--- Polynomial Fitting ---
+x <- -3 +.07*(1:100) + arima.sim(n = 100, list(ma = c(-.4, .4) ) )
+m <- lm(x~time(x))
+summary(m)
+res <- x-m
+
+plot(x, type='o' )
+abline(m, col='red')
+
+
+layout(c(1,2))
+plot(res, type='o' )
+acf(res[5:96])
+layout(c(1,1))
+
+
+
+
+#--- Differencing 1 ----
+x <- -3 - .07*(1:100) + arima.sim(n = 100, list(ar = c(.4, .4) ) )
+plot(x, type='o' );
+
+layout(c(1,2)); plot(diff(x), type='o' ); acf(diff(x))
+dev.copy(postscript,'ITS-18.eps',  horizontal=FALSE); dev.off()  #save figures
+       dev.copy(pdf,'ITS-18.pdf'); dev.off();
+
+
+#--- Temparature Data ---
+require('astsa')
+data(gtemp)
+plot(gtemp, type="o", ylab="Global Temperature Deviations")
+m <- lm(gtemp~time(gtemp)); abline(m, col="red")
+
+layout(c(1,2)); plot(resid(m), type="o"); plot(diff(gtemp), type="o")
+layout(c(1,2)); acf(resid(m)); acf(diff(gtemp))
+
+
+
+
+
+#--- AAPL example ---
+install.packages('quantmod')  #install if first time
+
+
+require('quantmod')
+getSymbols("AAPL")            #download Apple past prices from Yahoo!
+X <- as.ts(AAPL$AAPL.Adjusted[400:200])
+plot(X, type="o")
+
+layout(c(1,2)); plot(diff(X), type="o"); acf(diff(X))
+dev.copy(postscript,'ITS-20.eps',  horizontal=F); dev.off()
+       dev.copy(pdf,'ITS-20.pdf'); dev.off();
+
+
+
+
+#--- Accidents ---
+X <- as.ts(read.table(file="deaths.tsm")) # from Brockwell and Davis
+plot(X, type="o")
+
+plot(diff(X,12), type="o")
+
+layout(c(1,2))
+plot(diff(diff(X, 12)), type="o")
+acf(diff(diff(X, 12)))
+
+
+

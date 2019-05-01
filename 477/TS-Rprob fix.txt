@@ -1,0 +1,54 @@
+#
+#
+#  How to fix problem of lab PC not letting you add R packages
+#
+#---------------------------------------------------------------
+
+
+
+1.  Close R.  
+
+
+2.  Create folder called "Rlib" in your C: drive
+
+
+3.  Download Renviron.zip file from class web page.
+
+      Right click, and choose "save link as...".
+
+
+4.  Open downloaded zip folder, and move .Renviron file to your desktop.
+
+
+
+5.  Open R.  You should be good to go.  Try
+
+      install.packages("TSA")
+
+      library(TSA)
+      data(larain)
+      plot(larain) 
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-------------------------------
+
+
+
+5.  - Side note -
+    You can open up .Renviron file in notepad, and edit what is inside.
+    That way you can change location of Rlib folder, or change the name of
+    the Rlib folder.  

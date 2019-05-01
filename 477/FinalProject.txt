@@ -1,0 +1,86 @@
+#
+#
+#  Spring 2018 Final Presentation
+#
+#
+#####################################
+
+
+Order of Presentation
+
+ Monday    May 1: (4) Group 1, 8, 5, 2 
+
+ Wednesday May 3: (3) Group 7, 3, 10
+
+ Friday    May 5: (3) Group 4, 9, 6
+
+
+    - 10-15 min presentation (10-13 slides)
+
+    - Attendance of all 3 dates are mandatory
+
+    - After the presentaion, turn in the following by email:
+    
+        - Data - (must have clear reference of where you found them.)  
+        - Presentation Slides
+        - Entire R code used for analysis
+
+
+
+Presentation:  
+
+    - 10-15 min presentation = 10-12 slides
+
+    1. Introduce the data   (Daily Financial, Mothly Riverflow etc. )
+
+    2. Exploratory Analysis (plots, stationarity, trend etc.)
+
+    3. (BRIEF) Explanation of modeling approach (what was tried, what was not tried)
+
+    4. Final Model (must be interpreted using estimated parameters)
+
+    5. h-step Prediction Based on the Final Model
+
+    6*. h-step Prediction by cutting data short (optional)
+
+    7*. Rolling 1-step prediction (optional)
+
+
+    Omit unnecessary info
+
+    
+
+Groups:
+
+1) Tyler Matthew Victor Jeremiah - 
+
+2) Noah Rebecca Logan  Edward -
+
+3) Joanna Kara Khetam Maha
+
+4) Ashley Abby Jess Jared - Rhine river
+
+5) Ian Ryan Richard Vlad 
+
+6) (was same as group 3!)
+
+7) Ariya Thomas Fiyhan Ahmed 
+
+8) Isaac Nick Will Jimmy
+
+9) Anthony Shane Jillian
+
+10) Morsen Temitope
+
+
+
+
+
+
+
+
+
+
+
+
+

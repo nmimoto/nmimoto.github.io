@@ -1,0 +1,122 @@
+\input{c://Dropbox/mimoto/def_mimoto0.7}
+%------------------------------------------------------------------- 
+
+\begin{center} {\large \bf 489/689  Assignment 3}\\ \end{center}
+
+
+{\large Due: \textcolor{red}{ Tue Oct 8th. }}
+
+%{\large Name: $\underline{ \hs80mm }$ }
+
+\textcolor{red}{ 
+{\large This HW has been revised. Now have two questions. }
+}
+
+\vs5mm 
+
+\noi Notation of this assignment follows that of Cryer. 
+ i.e. ARMA($p,q$) parameters are defiend 
+\ccc
+\Phi(B) Y_t = \Th(B) e_t,
+\ecc
+where 
+$\Th(x) = 1-\th_1x - \th_2 x^2 - \cdots - \th_q x^q.$
+There fore when you use R function, you muse use 
+[$\th_1$ in R] $ = - \th_1$.  
+
+\vs5mm 
+\noi Submit printout of the R code as well as your answer.  
+Class web page has sample code for Monte Carlo Simulation of ARMA. 
+
+\subsection*{Questions:}
+
+%------------------------------------------------------------------- 
+\begin{enumerate}
+
+
+%----- 
+\item 
+Consider an ARMA(1,1) model with $\phi = 0.5$ and \textcolor{red}{ $\th = -0.45$ }, with 
+mean of 3 and iid N(0,1) errors.  
+
+\begin{enumerate} 
+\item For n = 100, evaluate the variances and correlation of the maximum likelihood
+estimators of $\ph$ and $\th$ using Equations (7.4.13) on page 161. 
+
+\item Repeat part (a) but now with n = 300. 
+
+
+\item By Monte Carlo Simulaiton, verify the convergence of variance and correlation of the 
+MLE of $\ph$ and $\th$ to asymptotic values obtained in part (a) and (b) above. 
+
+\vs5mm 
+Monte Carlo Simulation can be performes as following:
+\begin{enumerate} 
+\item Simulate ARMA process with given specification. 
+\item Obtain MLE for simulated series.  Store your $\h \ph$ and $\h \th$ 
+in array. 
+\item Repeat (i) and (ii) many times (say 1000 times).
+\item Look at the distribution of your 1000 realization of $\h \ph$ and 
+$\h \th$.  Compute sample variance and correlation from the 1000 pairs. 
+\end{enumerate}
+
+\item What does above Monte Carlo Simulaiton, indicate about the bias in 
+$\h \ph$ and $\h \th$? 
+
+\item What does your simulation indicate about using asymptotic property of 
+MLE?
+
+\end{enumerate}
+
+
+\clearpage 
+%----- 
+\item 
+Consider an ARMA(1,1) model with $\phi = 0.5$ and \textcolor{red}{ $\th = 0.45$ }, with 
+mean of 3 and iid N(0,1) errors.  
+
+\begin{enumerate} 
+\item For n = 1000, evaluate the variances and correlation of the maximum likelihood
+estimators of $\ph$ and $\th$ using Equations (7.4.13) on page 161. 
+
+\item Repeat part (a) but now with n = 3000. 
+
+
+\item By Monte Carlo Simulaiton, verify the convergence of variance and correlation of the 
+MLE of $\ph$ and $\th$ to asymptotic values obtained in part (a) and (b) above. 
+
+
+\item What does above Monte Carlo Simulaiton, indicate about the bias in 
+$\h \ph$ and $\h \th$? 
+
+\item What does your simulation indicate about using asymptotic property of 
+MLE?
+
+\end{enumerate}
+
+
+\item Plot histgram of $\h \ph$ and $\h \th$ for 
+n=100, 300 from Problem 1, and for n=1000, n=3000 from Problem 2.  
+Use layout() to plot 4 histogram in one page. 
+
+
+\begin{verbatim} 
+---------------------
+X <- rnorm(100)
+
+layout(matrix(1:4, 2,2))
+hist(X)
+hist(X)
+hist(X)
+hist(X)
+layout(matrix(1,1,1))
+\end{verbatim}
+
+
+
+\end{enumerate}
+
+
+\end{document}
+%------------------------------------------------------------------- 
+%------------------------------------------------------------------- 

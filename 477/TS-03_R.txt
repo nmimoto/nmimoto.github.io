@@ -1,0 +1,295 @@
+
+
+
+
+#------------------------------
+# ACVF of AR(1)
+
+  install.packages("ltsa")  #- if not installed before
+
+  library(ltsa)
+
+  #- get ACVF
+  ARgam <- tacvfARMA(phi = c(.8), theta= c(0), maxLag=20, sigma2=1)    
+  ARrho <- ARgam/ARgam[1]                      #- get ACF 
+
+  plot(0:20, ARgam, type="h", col="red");   abline(h=0)
+  plot(0:20, ARrho, type="h", col="red");   abline(h=0)
+
+  #-  you can also use ARMAacf(ma=c(.2,-.1))  for ACF
+
+
+
+
+#------------------------------
+# Simulating of AR(1)
+
+  Y <- arima.sim(list(ar = c(.8 ) ), 100 )
+  plot(Y, type="o")
+
+  acf(Y)    #- sample acf 
+
+  ARgam <- tacvfARMA(phi = c(.8), maxLag=20)  #- need library(ltsa)   
+  ARrho <- ARgam/ARgam[1]                     #- get ACF 
+
+  lines(0:20, ARrho, col="red")      #- overlay theoretical ACF
+
+
+
+
+
+#------------------------------
+# Simulating non-causal AR(1)
+#   Let $\ph=1.2$.  i.e. $\hs5mm \Ph(z) = 1 - 1.2 z$
+
+  Y <- arima.sim(list(ar = c(1.2) ), 100 )      #- gives error
+
+
+  #- Hand written simulation 
+  Y <- 0.5
+  phi <- 1.2
+  e <- rnorm(100)
+  for (t in 2:100){
+    Y[t] = Y[t-1]*phi + e[t]
+  }
+  plot(Y, type="o")
+
+
+
+
+#------------------------------
+#  find root of polynomial 
+
+  z <- polyroot(c(1,-4,.3)) 
+  z
+  Mod(z)
+
+  z <- polyroot(c(1,.7,.6));   z; Mod(z)
+  z <- polyroot(c(1,-.7,-.6)); z; Mod(z)
+
+
+
+
+
+#------------------------------
+# ACVF of AR(2)
+# \Ph(z) = 1 - .7 z - .1 z^2
+# \Ph(z) = 1 + .5 z - .2 z^2
+
+
+  #- install.packages("ltsa")
+
+  library(ltsa)
+
+  plot(0:20, tacvfARMA(phi = c(.7, .1), maxLag=20, sigma2=1), type="h")
+  plot(0:20, tacvfARMA(phi = c(-.5, .2), maxLag=20, sigma2=1), type="h")
+
+
+
+
+
+#------------------------------
+# Yule-Walker Estimator 
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+
+  layout(matrix(c(1,2), 1,2))
+  acf(Y)
+  pacf(Y)
+
+  layout(1)
+
+  Fit1 <- ar(Y, aic=F, order.max=2)                #- fits AR(2) by Y-W(default) 
+  Fit2 <- ar(Y, aic=F, order.max=2, method="mle")  #- fits AR(2) by MLE
+
+
+
+
+#------------------------------
+# Prediction
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+
+  Fit1 <- ar(Y, aic=F, order.max=2   )     #- fits AR(2) by Y-W(default) 
+
+    #- If you believe E(Y) = 0 
+    # Fit1 <- ar(Y, aic=F, order.max=2, demean=FALSE )           
+
+  Y.h  <- predict(Fit1, n.ahead=10)
+
+  ts.plot(cbind(Y,Y.h$pred, Y.h$pred+Y.h$se, Y.h$pred-Y.h$se), 
+                  type="o", col=c("black","red","blue","blue"))
+  abline(h=0)
+  abline(h=mean(Y), col="blue")
+
+
+
+
+#------------------------------
+# Demean vs No-Demean
+
+
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+  
+  Fit1 <- ar(Y, aic=F, order.max=2)       #- demean=TRUE is the default 
+  Fit1
+  
+  Fit1 <- ar(Y, aic=F, order.max=2, demean=T) 
+  Fit1
+  
+  Fit1 <- ar(Y, aic=F, order.max=2, demean=F) 
+  Fit1
+  
+  Fit1 <- ar(Y-mean(Y), aic=F, order.max=2, demean=F) 
+  Fit1
+
+
+
+
+
+#------------------------------
+# Testing parameters of AR for significance
+
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+  Fit1 <- ar(Y, aic=F, order.max=2)       #- fits AR(2) by Y-W(default) 
+  
+  str(Fit1)                               #- see what's inside
+  
+  phi   <- Fit1$ar                        #- phi1 hat and phi2 hat
+  sigSq <- Fit1$var.pred                  #- sig^2 hat
+  phiSE <- sqrt(Fit1$asy.var.coef[1,1])   #- standard error for phi hats 
+  
+  Fit1$asy.var.coef
+  
+  phi                             #- check if phi hats are significant
+  phi1SE                               
+
+
+
+
+#------------------------------
+#- Calculare asy.var.coef by hand 
+
+  A <- acf(Y, type="covariance")$acf
+  
+  G <- matrix(A[c(1,2,2,1)], 2,2)
+  
+  sigSq * solve(G) / 100                  #- compare to asy.var.coef
+
+
+
+
+#------------------------------
+# Predicting AR(2)
+
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+  Fit1 <- ar(Y, aic=F, order.max=2   )     #- fits AR(2) by Y-W(default) 
+  
+  
+  Y.h  <- predict(Fit1, n.ahead=10)
+  
+  ts.plot(cbind(Y,Y.h$pred, Y.h$pred+1.96*Y.h$se, Y.h$pred-1.96*Y.h$se), 
+                    type="o", col=c("black","red","blue","blue"))
+  abline(h=0)
+  abline(h=mean(Y), col="blue")
+
+
+
+
+
+#------------------------------
+# Order Selection Methods
+
+#- 1. ACF and PACF
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+
+  layout(matrix(1:2, 1,2))
+  acf(Y); pacf(Y)
+  layout(1)
+
+
+#- 2. AIC
+  Fit1 <- ar(Y, aic=T, order.max=5   )      #- find best order by AIC
+  Fit1 
+
+
+#- 3. Parameter Significance
+  Fit1 <- ar(Y, aic=F, order.max=3   )      #- fit AR(3) 
+
+  Fit1$ar                          #- phi1 hat and phi2 hat
+  sqrt(Fit1$asy.var.coef)          #- standard error for phi hats 
+
+
+
+
+ 
+
+#------------------------------
+# Simulation: Will AIC choose correct order?
+
+  Result <- 0
+  for (i in 1:1000){ 
+  
+    Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+    Fit1 <- ar(Y, aic=T, order.max=5) 
+  
+    print(c(i, Fit1$order) )     #- print order on screen (optional)
+       
+    Result[i] <- (Fit1$order==2)
+  
+  }
+  Result
+  
+  sum(Result)/1000
+
+
+
+
+
+
+
+
+#------------------------------
+# Example: Getting residuals by hand
+
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+
+  Fit1 <- ar(Y, aic=F, order.max=2, demean=F)
+  Fit1$ar
+
+  Y[100]-Fit1$ar[1]*Y[99]-Fit1$ar[2]*Y[98]
+
+  Fit1$resid
+
+
+
+
+
+
+
+#------------------------------
+# Example: Dow Jones 1972}
+
+  D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/dowj.csv")
+  D1 <- ts(D, start=c(1,1), freq=1)
+  plot(D1, type='o')
+  
+  
+  Y <- diff(D1)
+  plot(Y, type='o')
+  
+  acf(Y)
+  pacf(Y)
+  
+  Fit1 <- ar(Y, order.max=5)
+  
+  Fit1$ar
+  sqrt(Fit1$asy.var.coef)      #- check for parameter significance
+  
+  e.hat <- Fit1$resid
+  plot(e.hat, type="o")        #- plot residuals
+  
+  acf(e.hat)                   #- check for uncorrelation in residuals
+  pacf(e.hat)

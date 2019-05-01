@@ -1,0 +1,31 @@
+
+MLE  <- matrix(0,1000,3)  #matrix to record estimated values
+Vars <- matrix(0,1000,3)  #matrix to record estimated values
+
+
+n=300
+mu = 5
+
+
+#-- Monte Carlo Estimate ---
+for (i in 1:1000) {
+
+  X  <- arima.sim(n = n, list(ar = c(0.5), ma = c(0.3))  ) + mu
+
+  Est      <- arima(X, order=c(1,0,1))
+  MLE[i,]  <- Est$coef
+  Vars[i,] <- c(Est$var.coef[1,1], Est$var.coef[2,2], Est$var.coef[3,3])
+
+}
+
+
+
+
+#--- Plotting Results ----
+layout(matrix(1:4, 2,2)); 
+hist(MLE[,1]) 
+hist(MLE[,2]) 
+hist(MLE[,1]) 
+hist(MLE[,1]) 
+
+

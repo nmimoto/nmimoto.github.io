@@ -1,0 +1,159 @@
+
+
+
+
+
+
+#--- 1-time simulation and MLE estimation ---
+
+
+  mu <- 5
+  X  <- arima.sim(n = 200, list(ar = c(0.7), ma = c(0.4)) ) + mu
+  plot(X, type="o")
+
+  Fit1 <- arima(X, order=c(1,0,1))
+  Fit1
+
+  ?arima
+
+  str(Fit1)
+
+  Fit1$coef         #- phi1.hat, theta1.hat, mu.hat
+
+  Fit1$var.coef     #- covariance matrix of above estimators
+
+  c(Fit1$var.coef[1,1], Fit1$var.coef[2,2], Fit1$var.coef[3,3])  #- extracting the diagnal terms
+
+
+
+
+#--- MLE simulation study from slide w5 p.20 ---
+
+
+#--- 2a. Repeat above for 1000 times, recording Est$coef each time.
+#        Compare the simulated variance and asymptotic variance given by arima() ---
+
+  n=100
+  #n=1000  
+
+  MLE  <- matrix(0,1000,3)  #- matrix to record values
+  Vars <- matrix(0,1000,3)  #- matrix to record values
+
+  for (i in 1:1000) {
+  
+    print(i)
+
+    mu  <- 5
+    X   <- arima.sim(n = n, list(ar = c(0.7), ma = c(0.4))  ) + mu
+    Est <- arima(X, order=c(1,0,1))
+    MLE[i,]  <- Est$coef
+    Vars[i,] <- diag(Est$var.coef)
+
+  }
+
+
+  #--- Result for phi1, theta1, mu ----
+  layout(matrix(1:3, 1,3)); 
+  hist(MLE[,1]); hist(MLE[,2]); hist(MLE[,3])
+
+
+  #- Simulated sample mean, sample SD, and average Screen Output (asymptotic SE)
+  c(mean(MLE[,1]), sd(MLE[,1]), sqrt(mean(Vars[,1])))
+  c(mean(MLE[,2]), sd(MLE[,2]), sqrt(mean(Vars[,2])))
+  c(mean(MLE[,3]), sd(MLE[,3]), sqrt(mean(Vars[,3])))
+
+
+
+
+
+
+#--- 2b. Same as 2a, but now ARMA(3,3) 
+
+  n=100
+  #n=1000  
+
+  MLE  <- matrix(0,1000,7)  #- matrix to record values
+  Vars <- matrix(0,1000,7)  #- matrix to record values
+
+  for (i in 1:1000) {
+  
+    print(i)
+
+    mu <- 5
+    X  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.4, -.3, .2))  ) + mu
+    Est <- arima(X, order=c(3,0,3))
+    
+    MLE[i,]  <- Est$coef
+    Vars[i,] <- diag(Est$var.coef)
+
+  }
+
+
+  #--- Result for phi1, theta1, mu ----
+  layout(matrix(1:6, 2,3)); 
+  hist(MLE[,1]);  hist(MLE[,2]);  hist(MLE[,3])
+  hist(MLE[,4]);  hist(MLE[,5]);  hist(MLE[,6])
+
+
+  #- Simulated sample mean, sample SD, and average Screen SD output
+  c( mean(MLE[,1]), sd(MLE[,1]), sqrt(mean(Vars[,1])) )
+  c( mean(MLE[,2]), sd(MLE[,2]), sqrt(mean(Vars[,2])) )
+  c( mean(MLE[,3]), sd(MLE[,3]), sqrt(mean(Vars[,3])) )
+  c( mean(MLE[,4]), sd(MLE[,4]), sqrt(mean(Vars[,4])) )
+  c( mean(MLE[,5]), sd(MLE[,5]), sqrt(mean(Vars[,5])) )
+  c( mean(MLE[,6]), sd(MLE[,6]), sqrt(mean(Vars[,6])) )
+  c( mean(MLE[,7]), sd(MLE[,7]), sqrt(mean(Vars[,7])) )
+
+
+
+
+
+#---------------------------------------------------------------------
+#--- 3. This time, compare to the case when e_t is not Normal ---------
+
+
+  mu=5
+  n=100
+
+  MLE   <- matrix(0,1000,3)  #matrix to record estimated values
+  MLE2  <- matrix(0,1000,3)  #matrix to record estimated values
+
+
+  for (i in 1:1000) {
+
+    print(i)  
+
+    #-- Normal errors ---
+    X  <- arima.sim(n = n, list(ar = c(0.7), ma = c(0.4))  ) + mu
+    #X  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.4, -.3, .2))  ) + mu
+
+    Est      <- arima(X, order=c(1,0,1))
+    MLE[i,]  <- Est$coef
+    
+
+    #-- non-normal errors ---
+    et <- rt(n, 4)
+    Y  <- arima.sim(n=n, list(ar = c(0.7), ma = c(0.4)), innov=et  ) + mu
+    #Y  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.4, -.3, .2))  ) + mu
+
+    Est2 <- arima(Y, order=c(1,0,1))
+    MLE2[i,]  <- Est2$coef
+
+  }
+
+
+
+#--- Plotting Results ----
+p=1    #1=phi1, 2=theta1, 3=mu
+
+layout(matrix(1:4, 2,2, byrow=T)); 
+hist(MLE[,1],  main="N phi1")
+hist(MLE[,2],  main="N theta1")
+hist(MLE2[,1], main="t(v) phi1") 
+hist(MLE2[,2], main="t(v) theta1") 
+
+rbind(c(mean(MLE[,1]),  sd(MLE[,1]), mean(MLE[,2]),  sd(MLE[,2])),
+      c(mean(MLE2[,1]),  sd(MLE2[,1]), mean(MLE2[,2]),  sd(MLE2[,2]) ))
+
+
+

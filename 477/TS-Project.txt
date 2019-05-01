@@ -1,0 +1,297 @@
+
+
+
+Order of Presentation
+
+ Monday Apr 27:  8 7 5
+
+
+
+ Wednesday Apr 29: 1 6 2
+
+
+ Friday May 1:  4 3
+
+
+
+
+ 10-12min presentation
+
+
+
+
+1. Peter           - Dissolved oxygen content (D.O.) in the Lake Rockwell Spillway
+
+
+2. Kyle and Dunjie - Monthly reported number of cases of mumps, New York city, 1928-1972 
+
+
+3. John, Andrew, Ryan - Cleveland Financial Stress Index - FRED - St. Louis Fed
+
+
+4. Bing, Lina, Chan   - GDP and unemployment rates from 1995 to 2014 
+
+
+5. Faizan, Phill, Ibrahim, Steven  - Daily maximum temperatures in Melbourne, Australia, 1981-1990 
+
+
+6. Kaps, George, Chenfei - Energy Consumption and GDP
+
+
+7. Sieg, Xiao, Manshi - U.S/U.K foreign exchange rate dataset
+
+
+8. Dirk, Jane, Ja Won - Home sales
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#--- 1. Sheep and Barley in England 
+
+
+  #- Annual sheep population (1000s) in England & Wales 1867 – 1939
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/sheep.csv", header=T)
+  head(D)
+  sheep <- ts(D[,2], start=c(1867))
+  plot(sheep)
+
+  #- Annual barley yields per acre in England & Wales 1884 – 1939
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/barley.csv", header=T)
+  head(D)
+  barley <- ts(D[,2], start=c(1884))
+  plot(barley)
+
+
+  sheep2 <- window(sheep, start=c(1884))
+  ts.plot(sheep2, barley*100, col=c("black", "red"))
+
+  acf(cbind(sheep2, barley))
+
+
+  Fit1 <- auto.arima(sheep2)
+  acf(cbind(Fit1$residuals, barley))
+
+
+
+
+
+
+
+
+
+
+
+#--- 2. Lenex Sales
+
+  #- Lenex corporation: shipment of blenders Jan’67-Dec’71
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/blenders.csv", header=T)
+  head(D); dim(D)
+  blender <- ts(D[,2], start=c(1967,1), freq=12)
+  plot(blender)
+
+  #- Lenex corporation: shipment of radios Jan’67-Dec’78 (12F5.0)
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/radios.csv", header=T)
+  head(D); dim(D)
+  radio <- ts(D[,2], start=c(1967,1), freq=12)
+  plot(radio)
+
+  #- Lenex corporation: shipment of can openers Jan’67-Dec’71
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/canop.csv", header=T)
+  head(D); dim(D)
+  canop <- ts(D[,2], start=c(1967,1), freq=12)
+  plot(canop)
+
+
+  radio2 <- window(radio, end=c(1971,12))
+
+  acf( cbind(blender, radio2, canop) )
+
+
+  Fit2 <- auto.arima(radio2, d=0); Fit2
+  Fit3 <- auto.arima(canop,  d=0);  Fit3
+
+  acf( cbind( Fit2$residuals, Fit3$residuals))
+
+
+  Reg1 <- lm(radio2 ~ canop)
+  Stationarity.tests(Reg1$residuals)
+
+
+  ts.plot( blender, radio2, canop, col=c("black", "red", "green")) 
+
+
+  ts.plot( blender, radio2*.05, canop, col=c("black", "red", "green")) 
+
+
+
+
+
+
+
+
+
+
+
+
+#--- 3. 
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/advertising.csv", header=T)
+  head(D); dim(D)
+  ad   <- ts(D[,2], start=c(1), freq=1)
+  sale <- ts(D[,3], start=c(1), freq=1)
+  ts.plot(ad,sale, col=c("red","black"))
+
+  acf( cbind(ad,sale))
+
+  Fit1 <- auto.arima(ad); Fit1
+  Fit2 <- auto.arima(sale); Fit2
+
+
+  acf( cbind(Fit1$residuals, Fit2$residuals) )
+
+
+
+
+  #--- 3.a Univariate Analysis  
+
+  Fit2 <- auto.arima(sale); Fit2  
+  Randomness.tests(Fit2$residuals)
+
+  sale2.hat <- 0
+  sale2.se <- 0
+  for (i in 1:16) {
+
+    sale2 <- window(sale, start=c(1+i-1), end=c(20+i-1) )
+    
+    Fit3 <- Arima(sale2, order=c(0,0,1) )
+
+    sale2.hat[i] <- predict(Fit3, h=1)$pred
+    sale2.se[i] <- predict(Fit3, h=1)$se
+
+  }
+
+  sale3 <- window(sale, start=c(21), end=c(36) )
+
+  ts.plot(sale2.hat, sale3, col=c("red", "black") )
+
+  MSE <- mean( (sale2.hat - sale3)^2 ); MSE
+
+
+
+
+  #--- 3.b Univariate with xreg
+
+
+  Fit4 <- auto.arima(sale, xreg=ad); Fit4
+  Randomness.tests(Fit4$residuals)
+
+
+  Fit5 <- auto.arima(sale, xreg=ad, d=0); Fit5
+  Randomness.tests(Fit5$residuals)
+
+  ts.plot(sale, ad*1.91-18, col=c("black", "red") )
+  ts.plot( sale-(ad*1.91-18) )
+
+  auto.arima( sale-(ad*1.91-18) )
+
+
+
+  Fit6 <- Arima(sale, xreg=ad, order=c(4,1,0)); Fit6
+  Randomness.tests(Fit6$residuals)
+
+
+
+  sale2.hat <- 0
+  sale2.se <- 0
+  for (i in 1:16) {
+
+    sale2 <- window(sale, start=c(1+i-1), end=c(20+i-1) )
+    ad2   <- window(ad, start=c(1+i-1), end=c(20+i-1) )
+    ad3   <- window(ad, start=c(21+i-1), end=c(21+i-1) )
+
+    Fit3 <- Arima(sale2, order=c(3,1,0), xreg=ad2 )
+
+    sale2.hat[i] <- predict(Fit3, h=1, newxreg=ad3)$pred
+    sale2.se[i] <- predict(Fit3, h=1,  newxreg=ad3)$se
+
+  }
+
+  sale3 <- window(sale, start=c(21), end=c(36) )
+  
+
+  ts.plot(sale2.hat, sale3, col=c("red", "black") )
+
+
+  MSE <- mean( (sale2.hat - sale3)^2 ); MSE
+
+
+
+
+
+
+
+
+  #--- 3.c Bivariate
+
+  library(MTS)
+
+  Fit7 <- VARMA( cbind(ad,sale), p=0, q=1, include.mean=T)
+  Randomness.tests( Fit7$residuals[,1] )
+  Randomness.tests( Fit7$residuals[,2] )
+  acf(Fit7$residuals)
+
+
+  Fit8 <- VARMA( cbind(ad,sale), p=0, q=2, include.mean=T)
+  Randomness.tests( Fit8$residuals[,1] )
+  Randomness.tests( Fit8$residuals[,2] )
+  acf(Fit8$residuals)
+
+
+  Fit8 <- VARMA( cbind(ad,sale), p=1, q=0, include.mean=T)
+  Randomness.tests( Fit8$residuals[,1] )
+  Randomness.tests( Fit8$residuals[,2] )
+  acf(Fit8$residuals)
+
+
+  Fit1 <- auto.arima(ad);   Fit1
+  Fit2 <- auto.arima(sale); Fit2
+
+
+  acf( cbind(Fit1$residuals, Fit2$residuals) )
+
+
+  
+  Fit8 <- VARMA( cbind(Fit1$residuals, Fit2$residuals), p=0, q=1, include.mean=T)
+  Randomness.tests( Fit8$residuals[,1] )
+  Randomness.tests( Fit8$residuals[,2] )
+  acf(Fit8$residuals)
+
+
+
+  Fit8 <- VARMA( cbind(Fit1$residuals, Fit2$residuals), p=1, q=0, include.mean=T)
+  Randomness.tests( Fit8$residuals[,1] )
+  Randomness.tests( Fit8$residuals[,2] )
+  acf(Fit8$residuals)
+
+
+
+  plot( as.numeric(Fit1$residuals), as.numeric(Fit2$residuals) , xlim=c(-10,10), ylim=c(-40,40) )
+
+
+
