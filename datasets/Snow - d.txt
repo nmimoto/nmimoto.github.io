@@ -1,0 +1,22 @@
+Annual snowfall in Buffalo, 1910-1972.
+
+
+From Time Series Data Library: http://datamarket.com/data/list/?q=provider:tsdl
+
+
+
+--------------------------------
+R code to load the data directly:
+
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/Snow.csv")
+D1 <- ts(D[,2], start=c(1910,1), freq=1)
+
+plot(D1, type='o')
+
+
+
+
+--------------------------------
+If you download the file, then save it in your working directry and:
+
+D <- read.csv("Snow.csv")

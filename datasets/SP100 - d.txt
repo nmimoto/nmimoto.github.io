@@ -1,0 +1,20 @@
+
+
+SP100.TSM from Brockwell and Davis (2002)
+
+
+
+---------------------------
+R code to load the data directly:
+
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/SP100.txt")
+D1 <- ts(D, start=c(1,1), freq=1)
+
+plot(D1, type='o')
+
+
+
+--------------------------------
+If you download the file, then save it in your working directry and:
+
+D <- read.csv("SP100.txt")

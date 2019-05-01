@@ -1,0 +1,37 @@
+SP500 daily index 
+
+
+
+---------------------------
+R code to load the data directly:
+
+D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/SP500.csv")
+
+D1 <- ts( rev(D$Adj.Close), start=c(1) )  #oldest obs comes first
+
+plot(D1, type='o')
+
+
+
+#--- Log return = ln(X_t) - ln(X_t-1) --------------------
+Y <- log( D1[2:length(D1)] / D1[1:(length(D1)-1)] )
+plot(Y, type="l")
+
+
+
+Y1 <- window(Y, start=1500, end=2500)
+Randomness.tests(Y1)
+
+
+Y1 <- window(Y, start=3500, end=4500)
+Randomness.tests(Y1)
+
+
+
+
+
+
+--------------------------------
+If you download the file, then save it in your working directry and:
+
+D <- read.csv("SP500.csv.txt")

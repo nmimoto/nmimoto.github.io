@@ -1,0 +1,32 @@
+#------------------------------------------
+#
+#  Downloads daily stock prices of SP500  (481 stocks) 
+#      first column is SPY
+#
+#      from 2000-01-04   to 2015-12-31
+#
+#
+
+#   install.packages("quantmod")  #- Install this first 
+
+
+
+library(quantmod)
+
+
+
+#--- Daily adjusted close ---
+D.ad1 <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/SP500.ad.csv", row.names=1)
+ix    <- as.Date(rownames(D.ad1),  "%Y-%m-%d" )
+D.ad  <- xts(D.ad1, order.by=ix)
+
+
+#--- See list of stock tickers
+colnames(D.ad)
+
+plot(D.ad[,1])
+
+plot(D.ad[, "SPY"])
+
+
+
