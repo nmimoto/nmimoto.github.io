@@ -9,18 +9,14 @@
 #
 #    source("https://nmimoto.github.io/R/TS-00.txt")
 #
-#
-
 
 
 library(xts)
 library(forecast)
 
 
-
 #---------------------------------------------
 Randomness.tests <- function( A, plott=TRUE) {
-
 
   if (sum(is.na(A))>0){  A <- A[which(is.na(A)==0)]  }
 
@@ -44,13 +40,12 @@ Randomness.tests <- function( A, plott=TRUE) {
 
     plot(density(A, bw="SJ-ste"), main= "", xlab="KDE")
 
-     acf(A, main="", xlab="ACF")
+    acf( A, main="", xlab="ACF")
     pacf(A, main="", xlab="PACF")
     acf(abs(A), main="", xlab="ACF of abs(A)")
     acf(A^2,    main="", xlab="ACF of A^2")
     qqnorm(A,    main="", xlab="Normal q-q")
-
-  
+ 
     
     plot(c(-1,-1), xlim=c(0,1), ylim=c(0,1), ann=F, axes=F)
 
@@ -117,9 +112,6 @@ Stationarity.tests <- function( A ) {
 
 
 
-
-
-
 #---------------------------------------------
 MV.av <- function(X,m){
 
@@ -169,7 +161,7 @@ KStest <- function(X) {
 
 
 #-- ks.test lacks the sqrt(n) scaling!!
-
-    ks.test(X, "pnorm", 0, 1)$statistic*sqrt(n)
-
+#
+#    ks.test(X, "pnorm", 0, 1)$statistic*sqrt(n)
+#
 
