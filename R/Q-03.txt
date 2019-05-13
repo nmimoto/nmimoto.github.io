@@ -1,16 +1,29 @@
 ###
+###  Q-03.txt
 ###
-###  Download Daily Stock Prices from Yahoo.com
-###
+###  Download Daily Stock Prices from Yahoo.com.  
+###  
+###      Tickers to be downloaded can be specified.  
+###      Uses SPY as reference for trading days, and removes non-SPY days
 ###
 ###---------------------------------------------------------
 
-###  Q-03.txt
+
+##--- Input (You can specify)
+##
+##   srtDate, endDate, TICKERS
+##   
+
+##--- Output 
+##
+##   SPY (1), TRS (156),  ICS (22),  DJI (30),  TICKERS (put together) 
+##   HP_op, HP_cl, HP_hi, HP_lo, HP_ad, HP_vo  
+##   
+
 
 
 ###---------------------------------------------------------
 ###--- 1. Define rate range and download SPY first 
-
 
 # Define Date Range for download
 srtDate <- as.Date("2000-01-01")
@@ -32,18 +45,17 @@ endDate <- as.Date("2019-03-08")    # will be SAVED
     HP_ad <- Ad(SPY);   HP_vo <- Vo(SPY) 
 
 
-
     # Example for just 1 ticker
     # X <- getSymbols("BTC-USD", src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate+1)
     # head(X)
-    
+   
 
 
 
 ###---------------------------------------------------------
 ###--- 2. Ticker List
 
-# Zacks screened stocks 2018-09-09 (156 tickers)
+# Screened stocks 2018-09-09 (156 tickers)
 TRS <- c("AAPL", "ADM",  "AIMC", "AIN",  "AJRD", "ALL",  "ALLY", "ALSN",  "AMED", "ARCB", "ARLP", "AROC",   "ATEYY", "ATH",  "ATHN",   "ATKR", "AVAV", "AVX",  "AZPN", "AZZ",  "BANR", "BEAT", "BJRI", "BMY",   "BPOP", "CAT",  "CATM", "CBPX",   "CE",    "CELG", "CFX",   "CIGI",
          "CLF",  "CLH",  "CMA",  "CNDT", "CONN", "CRM",  "CSX",  "CVLT",  "CY",   "DNOW", "DSW",  "EC",     "ECOL",  "EGRX", "ELY",   "ENVA",  "FCN",  "FIVN", "FIX",  "FLIR", "FOXF", "FSS",  "FTNT", "GELYY", "GES",  "GILD", "GNRC", "GWW",    "HKMPF", "HLX",  "HSNGY", "HUBG",
          "HUN",  "ICFI", "ICUI", "ILMN", "INOV", "IRBT", "ISRG", "JOUT",  "KBR",  "KEM",  "KLAC", "KORS",   "LADR",  "LGND", "LOGI",  "LSTR",  "LULU", "MANT", "MATX", "MDR",  "MED",  "MEDP", "MLNX", "MOH",   "MSTR", "MT",   "MTOR", "MXIM",   "NAVG",  "NGVT", "NINOY", "NMIH",
@@ -152,13 +164,6 @@ cat( sprintf("\n\nThey are Matrix of size %s days x %s stocks\n\n\n\n", dim(HP_o
 
 
 
-
-
-###---------------------------------------------------------
-##
-##   SPY (1), TRS (156),  ICS (22),  DJI (30),  TICKERS (put together) 
-##   HP_op, HP_cl, HP_hi, HP_lo, HP_ad, HP_vo  
-##   
 ###  End of File
 
 
