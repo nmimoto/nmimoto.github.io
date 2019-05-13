@@ -7,7 +7,7 @@
 
 #-- To load this page --
 #
-#    source("http://gozips.uakron.edu/~nmimoto/R/TS.txt")
+#    source("https://nmimoto.github.io/R/TS-00.txt")
 #
 #
 
