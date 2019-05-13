@@ -18,7 +18,7 @@ endDate <- as.Date("2019-03-08")    # will be SAVED
 
 
     library(quantmod)
-    source("http://gozips.uakron.edu/~nmimoto/477/TS_R-90.txt")
+    source("https://nmimoto.github.io/R/TS-00.txt")
 
     # Download Historical SPY Prices for reference of trading days
     SPY <- getSymbols("SPY", src = "yahoo", auto.assign = F, 
