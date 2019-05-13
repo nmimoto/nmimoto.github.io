@@ -1,32 +1,260 @@
 ###
+###  Q-02.txt
 ###
-###  Download Daily Stock Prices from Yahoo.com and store as CSV
+###  Downloads Major US and Forein Indices, and writes xts into CSV file. 
 ###
+###      Then loads back in from CSV, turns back to xts, calculates log-diff and Fri-Fri diff.
 ###
 ###---------------------------------------------------------
 
 
 
+###---------------------------------------------------------
+###--- 1. Tickers to be kept up-to-date in .csv (last 2018-06-14)
 
-# Define Date Range for download
-srtDate <- as.Date("2000-01-01")
-endDate <- as.Date("2019-03-08")    # will be SAVED
+Ticker_Indices <- c("SPY",        "SP500_index",
+                    "^VIX",       "VIX_index",
+                    "VXX",        "VXX Broken 2019-01-20"
+                    "^TNX",       "10-Year Treasury Bond Rate",              
+                    "^DJI",       "Dow Jones"
+                    "^IXIC",      "NASDAQ"
+                    "^RUT",       "Russel 2000"
+                    "JPY=X",      "Japanese Yen for 1 USD",
+                    "GBP=X",      "GB pound for 1USD",
+                    "EUR=X",      "Euro  for 1 USD",
+                    "CNY=X",      "Yuan  for 1 USD",
+                    "DX-Y.NYB"    "US Dollar index", 
+                    "^FCHI",      "CAC 40   index France",
+                    "^N225",      "Nikkei 225 index Japan",
+                    "^HSI",       "Hang Seng index  Hong-Kong",
+                    "^FTSE",      "GB index" ,
+                    "000001.SS",  "Shanghai  index ",
+                    "^GDAXIP",    "DAXK German index no-dividend",
+                    "USO",        "US Oil ETF          ** Starts Apr 2006",
+                    "UNG",        "US Natural Gas ETF  ** Starts Apr 2007",
+                    "GLD",        "Gold ETF            ** Starts Apr 2004",
+                    "SLV",        "Silver ETF          ** Starts Apr 2006",
+                    "PPLT",       "Platinum ETF        ** Starts Apr 2010")
+
 
 
 library(quantmod)
-source("https://www.uakron.edu/statistics/faculty/nmimoto/R/TS-90.txt")
 
 
-#-- Download Historical SPY Prices for reference of trading days
-SPY <- getSymbols("SPY", src = "yahoo", auto.assign=F, 
-                  return.class="xts", from = srtDate, to = endDate+1)
+srtDate <- as.Date("1990-01-01")
+endDate <- as.Date("2018-05-31")
 
 
-print(head(SPY))
-print(tail(SPY))
+
+ThisColNames <- c("Open","High","Low","Close","Volume","Adjusted","Wday")
+    
+
+SPY    <- getSymbols("SPY",   src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1993-01-29
+A      <-       data.frame(SPY)
+A$Wday <- as.POSIXlt(index(SPY))$wday;   colnames(A)  <- ThisColNames
+write.csv(A,         file="SPY_1993to2018-05.csv")
 
 
-print(SPY)
+# US Index---------------------------
+VIX    <- getSymbols("^VIX",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990-01-02
+A      <-       data.frame(VIX)
+A$Wday <- as.POSIXlt(index(VIX))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="VIX_1990to2018-05.csv")
+
+
+VXX    <- getSymbols("VXX",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2009-01-30
+A      <-       data.frame(VXX)
+A$Wday <- as.POSIXlt(index(VXX))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="VXX_2009to2018-05.csv")
+
+
+TNX <- getSymbols("^TNX",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(TNX)
+A$Wday <- as.POSIXlt(index(TNX))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="TNX_1990to2018-05.csv")
+
+
+DJI <- getSymbols("^DJI",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(DJI)
+A$Wday <- as.POSIXlt(index(DJI))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="DJI_1990to2018-05.csv")
+
+
+NDQ<- getSymbols("^IXIC",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(NDQ)
+A$Wday <- as.POSIXlt(index(NDQ))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="NDQ_1990to2018-05.csv")
+
+
+RUT<- getSymbols("^RUT",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(RUT)
+A$Wday <- as.POSIXlt(index(RUT))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="RUT_1990to2018-05.csv")
+
+
+
+
+# Forein Index---------------------------
+CAC <- getSymbols("^FCHI",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990-03-01
+A      <-       data.frame(CAC)
+A$Wday <- as.POSIXlt(index(CAC))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="CAC_1990to2018-05.csv")
+
+NIK <- getSymbols("^N225",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(NIK)
+A$Wday <- as.POSIXlt(index(NIK))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="NIK_1990to2018-05.csv")
+
+HSI <- getSymbols("^HSI",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(HSI)
+A$Wday <- as.POSIXlt(index(HSI))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="HSI_1990to2018-05.csv")
+
+FTS <- getSymbols("^FTSE",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990
+A      <-       data.frame(FTS)
+A$Wday <- as.POSIXlt(index(FTS))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="FTS_1990to2018-05.csv")
+
+SHI <- getSymbols("000001.SS", src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1990-12-19
+A      <-       data.frame(SHI)
+A$Wday <- as.POSIXlt(index(SHI))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="SHI_1990to2018-05.csv")
+
+DAX <- getSymbols("^GDAXIP",   src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2013-03-15
+A      <-       data.frame(DAX)
+A$Wday <- as.POSIXlt(index(DAX))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="DAX_2013to2018-05.csv")
+
+
+
+
+
+# Currency---------------------------
+JPY <- getSymbols("JPY=X",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #1996-10-30
+A      <-       data.frame(JPY)
+A$Wday <- as.POSIXlt(index(JPY))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="JPY_1996to2018-05.csv")
+
+GBP <- getSymbols("GBP=X",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2003-12-01
+A      <-       data.frame(GBP)
+A$Wday <- as.POSIXlt(index(GBP))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="GBP_2003to2018-05.csv")
+
+EUR <- getSymbols("EUR=X",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2003-12-01
+A      <-       data.frame(EUR)
+A$Wday <- as.POSIXlt(index(EUR))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="EUR_2003to2018-05.csv")
+
+CNY <- getSymbols("CNY=X",     src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2001-05-30
+A      <-       data.frame(CNY)
+A$Wday <- as.POSIXlt(index(CNY))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="CNY_2001to2018-05.csv")
+
+DXY <- getSymbols("DX-Y.NYB",  src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2007-03-16
+A      <-       data.frame(DXY)
+A$Wday <- as.POSIXlt(index(DXY))$wday;   colnames(A) <- ThisColNames
+write.csv(A,         file="DXY_2007to2018-05.csv")
+
+
+
+
+# Commodity---------------------------
+USO <- getSymbols("USO",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2006-04-10
+UNG <- getSymbols("UNG",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2007-04-18
+GLD <- getSymbols("GLD",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2004-11-18
+SLV <- getSymbols("SLV",       src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2006-04-28
+PLT <- getSymbols("PPLT",      src = "yahoo", auto.assign = F, return.class="xts", from = srtDate, to = endDate)  #2010-01-15
+
+Saved to Indeces2007-2017.Rdata in Algo/DataFolder
+
+
+
+
+
+
+
+
+
+
+
+
+###----------------------------------------------------------
+###--- 2. (Obsolete?) Fri-Fri on SPY (read .csv as xts obj)
+# Friday to Friday
+SPYFri.DF <- SPY.DF[which(SPY.DF$Wday==5), ]
+SPYFri.ad <- xts(SPYFri.DF$Adjusted, order.by=as.Date(SPYFri.DF$X))
+SPYFri.ld <- diff(log(SPYFri.ad))[-1]
+plot(SPYFri.ld)
+plot(SPYFri.ld['2017::2018'])
+Randomness.tests(SPYFri.ld)           # GARCH effect is there. 
+Randomness.tests(SPYFri.ld['2009/'])  # GARCH effect is there. 
+
+
+# Fit GARCH(1,1) as a whole
+library(fGarch)
+Y <- SPYFri.ld
+out1  <-  garchFit(~ garch(1,1), data=Y, cond.dist="norm",  include.mean = FALSE, trace = FALSE)
+estim <- out1@fit$par     #-- estimated parameters
+res1  <- Y/out1@sigma.t   #-- this is the residuals
+Randomness.tests(res1)
+predict(out1, h=1)*1.65  # 5% one-side. 10% two-side interval 
+
+
+*** 3. Daily to Fri-Fri conversion LOCAL (2018-11-09) 
+# Reads in SPY, VXX, VIX daily from .csv and extract Fri-Fri.  
+# Then output to Fridays.temp.csv
+#
+library(quantmod)
+source("http://gozips.uakron.edu/~nmimoto/477/TS_R-90.txt")
+
+
+
+
+##----- A. Daily Data in from .csv 
+# --- Daily Data in ---
+SPY.DF <- read.csv(file="SPY_1993to2018-05.csv", header=T)
+VXX.DF <- read.csv(file="VXX_2009to2018-05.csv", header=T)
+VIX.DF <- read.csv(file="VIX_1990to2018-05.csv", header=T)
+# make daily adj into xts obj
+SPY.ad <- xts(SPY.DF$Adjusted, order.by=as.Date(SPY.DF$X))
+VXX.ad <- xts(VXX.DF$Adjusted, order.by=as.Date(VXX.DF$X))
+VIX.ad <- xts(VIX.DF$Adjusted, order.by=as.Date(VIX.DF$X))
+# get daily log-returns (they are xts, compared to PREVIOUS day)
+SPY.ld <- diff(log(SPY.ad))[-1]
+VXX.ld <- diff(log(VXX.ad))[-1]
+VIX.ld <- diff(log(VIX.ad))[-1]
+# get daily future-og-returns (they are xts, compared to NEXT day)
+SPY.fld <- as.numeric(log(SPY.ad)[-1]) - log(SPY.ad)[-length(SPY.ad)] 
+VXX.fld <- as.numeric(log(VXX.ad)[-1]) - log(VXX.ad)[-length(VXX.ad)] 
+VIX.fld <- as.numeric(log(VIX.ad)[-1]) - log(VIX.ad)[-length(VIX.ad)] 
+
+
+
+
+###-----------------------------
+**** B. Convert to Fri-Fri
+# Convert SPY to Fri-Fri 
+# cbind( SPY.DF$Wday, c(diff(SPY.DF$Wday),0) ) # adjust for end of week that's not Fri
+SPYFF.DF <- SPY.DF[which( c(diff(SPY.DF$Wday),0) < 0), ]
+SPYFF.ad <- xts(SPYFF.DF$Adjusted, order.by=as.Date(SPYFF.DF$X))
+SPYFF.ld <- diff(log(SPYFF.ad))[-1]                                     
+SPYFF.fld<- as.numeric(log(SPYFF.ad)[-1]) - log(SPYFF.ad)[-length(SPYFF.ad)] 
+# ld is log-diff compared to PREVIOUS day, 
+# fld is future-log-diff compared to NEXT day.
+
+
+# Convert VXX to Fri-Fri
+# cbind( VXX.DF$Wday, c(diff(VXX.DF$Wday),0) ) # adjust for end of week that's not Fri
+VXXFF.DF <- VXX.DF[which( c(diff(VXX.DF$Wday),0) < 0), ]
+VXXFF.ad <- xts(VXXFF.DF$Adjusted, order.by=as.Date(VXXFF.DF$X))
+VXXFF.ld <- diff(log(VXXFF.ad))[-1]
+VXXFF.fld<- as.numeric(log(VXXFF.ad)[-1]) - log(VXXFF.ad)[-length(VXXFF.ad)] 
+
+# Convert VIX to Fri-Fri
+VIXFF.DF <- VIX.DF[which( c(diff(VIX.DF$Wday),0) < 0), ]
+VIXFF.ad <- xts(VIXFF.DF$Adjusted, order.by=as.Date(VIXFF.DF$X))
+VIXFF.ld <- diff(log(VIXFF.ad))[-1]
+VIXFF.fld<- as.numeric(log(VIXFF.ad)[-1]) - log(VIXFF.ad)[-length(VIXFF.ad)] 
 
 
 
