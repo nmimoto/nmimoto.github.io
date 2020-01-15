@@ -1,0 +1,136 @@
+###
+###
+###  TS-01 Lec01 - R code only
+###
+###
+####################################
+
+
+
+#----- 1. Random Sample
+
+  X <- rnorm(100, 0, 1)                # generate RS of size 100 from N(mean=0,SD=1)
+  plot(X)                              # scatter plot with dots
+  plot(X,type='o', ylim=c(-3.5, 3.5))  # plot with dots and lines with Y-axis from -3.5 to 3.5
+  hist(X)                              # histogram of X
+
+  #-- Inference for Random Sample
+
+  #- compute CI
+  upper.CI = mean(X) + 1.96 * sd(X) * sqrt(1/100)   
+  lower.CI = mean(X) - 1.96 * sd(X) * sqrt(1/100)
+
+  #- compute PI 
+  upper.PI = mean(X) + 1.96 * sd(X) * sqrt(1/100 + 1)    
+  lower.PI = mean(X) - 1.96 * sd(X) * sqrt(1/100 + 1)
+
+  plot(X,type='o', ylim=c(-3.5, 3.5))           # same plot as before
+  abline(h=upper.CI, col="red", lty=2)          # add red dashed lines for CI 
+  abline(h=lower.CI, col="red", lty=2)
+ 
+  abline(h=upper.PI, col="blue", lty=2)         # add blue dashed lines for PI
+  abline(h=lower.PI, col="blue", lty=2) 
+
+
+
+#----- 2. Example of Time Series
+
+  #--- required only the first time you use the package ---
+  install.packages("TSA")    # if asked to choose CRAN mirror, choose MI or OH site
+ 
+
+  #--- required every time you restart R ---
+  acf1 <- acf        # Keep original acf() function
+  library(TSA)       # load package TSA
+  acf <- acf1        # replace back the new acf with original 
+
+
+  #- LA rainfall (p2)        
+  data(larain)       # load dataset called larain that is in TSA package
+  is.ts(larain)      # is larain TS object?
+  larain             # see what's inside larain
+  plot(larain,  ylab='Inches', xlab='Year', type='o')  # plot the data with labels
+
+        
+  #- Chemical Process (p3)        
+  data(color)    # load dataset called color that is in TSA package 
+  plot(color,  ylab='Color Property',xlab='Batch',type='o')   
+
+
+  #- Abundance of Canadian Hare (p5)
+  data(hare)    # load dataset 
+  plot(hare,ylab='Abundance',xlab='Year',type='o')
+
+
+  #- Monthly Oil Filter Sales (p7)
+  data(oilfilters)    # load dataset 
+  plot(oilfilters,type='o',ylab='Sales')
+
+  is.ts(oilfilters)      # is data in TS format?
+  oilfilters             # see what's inside oilfilters
+
+  #-- Plot with month's initial letter 
+  plot(oilfilters,type='l',ylab='Sales')
+  points(y=oilfilters,x=time(oilfilters), pch=as.vector(season(oilfilters)))
+
+
+
+
+#----- 3. Difference Between RS and TS
+        
+  #--- Back to Hare Data
+  plot(hare,ylab='Abundance',xlab='Year',type='o')
+  length(hare)   # see how long is the hare data
+  hare           # show what's inside hare
+  
+  #-- This year vs Last Year ---
+  plot(x=hare[2:31], y=hare[1:30], ylab="Last Year's Abundance", xlab="This Year's Abundance")
+  
+  #-- This year vs 2 Years ago ---
+  plot(x=hare[3:31], y=hare[1:29], ylab="Abundance 2yrs Ago", xlab="This Year's Abundance")
+
+
+  #-- Chemical Process (p3)        
+  data(color)       # load the dataset 
+  plot(color,ylab='Color Property',xlab='Batch',type='o')
+
+  #-- Plot of color vs previous color ---
+  plot(x=color[2:35], y=color[1:34], xlab='Color Property', ylab='Previous Batch')
+
+
+  #-- Back Random Sample X
+  plot(X, type='o')
+
+  #-- Plot value of X agains previous value of X
+  plot(X[2:100], X[1:99], ylab='value of X', xlab='previous value of X')
+
+
+
+
+#----- 4. Autocorrelation
+
+  #-- Hare data This year vs Last Year ---
+  plot(x=hare[2:31], y=hare[1:30], ylab="Last Year's Abundance", xlab="This Year's Abundance")
+  cor(hare[2:31], hare[1:30])    # Autocorrelation of Lag 1
+
+  #-- Hare data This year vs 2 Years ago ---
+  plot(x=hare[3:31], y=hare[1:29], ylab="Abundance 2yrs Ago", xlab="This Year's Abundance")
+  cor(hare[3:31], hare[1:29])    # Autocorrelation of Lag 2      
+
+  #-- Color data Plot of color vs previous color ---
+  plot(x=color[2:35], y=color[1:34], xlab='Color Property', ylab='Previous Batch')
+  cor(color[2:35], color[1:34])  # Autocorrelation of Lag 1
+
+  #-- Random Sample X:  Plot value of X agains previous value of X
+  plot(X[2:100], X[1:99], ylab='value of X', xlab='previous value of X')
+  cor(X[2:100], X[1:99])         # Auto correlation of Lag 1
+
+
+  #--  Autocorrelation Function (ACF)
+  acf(hare)          # Autocorrelation Function of hare data
+  acf(color)         # Autocorrelation Function of color data
+  acf(X)             # Autocorrelation Functoin of RS X
+
+ 
+
+

@@ -1,0 +1,465 @@
+---
+title: "Testing Mean"
+author: "[Nao Mimoto](http://gozips.uakron.edu/~nmimoto/) - 
+        [Dept. of Statistics](http://www.uakron.edu/stat/) :
+        [The University of Akron](http://www.uakron.edu)"
+date: 
+output: html_document
+background-color: black
+---
+
+<br><hr>        
+<!--------------------------------------------------------------------->        
+<!--
+  library(rmarkdown)
+  render("TS-01_Lec03.Rmd", html_document(toc=TRUE, toc_float=FALSE, toc_depth=3, theme="readable", highlight="kate" ))
+-->
+
+[Class Web Page](http://gozips.uakron.edu/~nmimoto/477/index.html) -- [R resource page](http://gozips.uakron.edu/~nmimoto/R/index.html)                     
+
+
+
+<br><br><hr>
+<!--------------------------------------------------------------------->        
+## 1. Is the ture mean 0? 
+
+<br>
+
+Suppose we have a random sample
+
+```{r, fig.width=5, fig.height=4}
+  set.seed(235)                    # set seed for RS generation (you don't need to do this)
+  mu = sample(c(0,2,1),1)          # mu is randomly drawn from 0, 1, or 2
+  Y  = mu + rnorm(100,0,5)         # Y is mu + random noise 
+
+  mean(Y)                          # Calculate sample mean 
+
+  plot(Y, type="o")                      # type="o" means both line and point
+  abline(h=0)                            # add horizontal line at 0
+  abline(h=mean(Y), col="blue", lty=2)   # add blue dashed line at sample mean
+```
+
+Question is if our ture mean $\mu$ in this plot is $0$ or not.  
+
+We know the sample mean $\bar Y$ is not $0$.  But is this a random fluctuation?
+or is this an evidence that we have non-zero true mean?
+
+
+<br>
+
+<!--------->
+### Model the data
+
+We can say that above random sample comes from model like this:
+$$
+  Y_t = \mu + X_t \hspace15mm 
+  \left\{   
+  \begin{array}{ll}
+  \mu : &\mbox{ Constant Trend (deterministic) }\\
+  X_t : &\mbox{ Normal iid noise with mean 0, variance $\sigma$}\\
+  \end{array} \right.
+$$
+
+$\mu$ and $\sigma$ are unknown.
+
+<br>
+
+* This is equivalent to saying $Y_i$ is iid random sample from $N(0,\sigma)$
+  distribution. 
+
+* We will use $\bar Y$ to estimate $\mu$.
+
+<br><br> 
+
+<!--------->
+### CI for mean $\mu$
+
+<br> 
+
+* We know how 'well' $\bar Y$ estimates $\mu$. 
+  $$
+  \bar Y \sim N\Big(\mu,  \frac{\sigma}{\sqrt n}\Big)
+  $$
+
+* That gives us 95% CI for $\mu$ 
+  $$
+  \bar Y \pm 1.96 \frac{S}{\sqrt n}
+  $$
+  Since $\sigma$ is unkown, it is replaced by the sample standard deviation $S$.
+
+
+* If $0$ is outside of the CI, then we reject $H_0: \mu=0$ with 5% confidence level.  
+
+<br><br> 
+
+
+```{r, fig.width=5, fig.height=4}
+  mean(Y)                      # sample mean of Y
+  sd(Y)                        # sample SD of Y
+
+  ME = 1.96*sd(Y)/sqrt(100)    # margin of error (width of CI)
+  ME
+  
+  CI.upper = mean(Y) + ME
+  CI.lower = mean(Y) - ME
+  c(CI.lower, mean(Y), CI.upper)     # show 3 numbers as vector
+
+
+  plot(Y, type="o")                                  # plot Y
+  abline(h=0)                                        # draw horizontal line at 0
+  abline(h=mean(Y), col="blue", lty=2)               # blue dash line at mean(Y)
+  abline(h=c(CI.upper, CI.lower), col="red", lty=2)  # two red dash line at CI.upper and CI.lower
+```
+
+<br>
+
+**Since $0$ is outside of the 95% CI for $\mu$, with 95% confidence,
+  we conclude that the true mean $\mu$ is not $0$.**
+
+<br><br> 
+
+
+<br><br><br><hr>
+
+<!----------------------------------------------------->
+## 2. Time Series Case 
+
+<br>
+
+We want to do the same when the data shows autocorrelation.  
+
+<!--------->
+### Model
+
+Suppose we observe $Y_t$, and model it as:
+  $$
+  Y_t = \mu + X_t  \hspace10mm 
+    \left\{   
+  \begin{array}{ll}
+  \mu : &\mbox{ Constant Trend (deterministic) }\\
+  X_t : &\mbox{ Stationary Time Series }
+  \end{array} \right.
+  $$
+  We assume that $E X_t=0$ and $V(X_t) = \sigma^2$. 
+
+<br>
+
+* Note that if $X_t$ has autocorrelation, then $Y_t$ is also autocorrelated. 
+
+* We will use $\bar Y$ to estimate $\mu$, as usual.  
+
+
+
+<br><br>
+
+<!--------->
+### Expectation of Sample Mean 
+
+<br> 
+
+* Does property of $\bar Y$ changes?  Expectation is 
+  $$
+  E (\bar Y) \hspace3mm = \hspace3mm
+  E \Big(\frac{1}{n} \sum_{t=1}^n Y_t\Big)  
+  \hspace3mm = \hspace3mm  \frac{1}{n} \sum_{t=1}^n E (Y_t) 
+  $$
+
+* For the mean of one $Y$, we have 
+  $$
+  E(Y_t)
+  \hspace3mm = \hspace3mm  E(\mu + X_t)
+  \hspace3mm = \hspace3mm  \mu + E(X_t)
+  \hspace3mm = \hspace3mm  \mu + 0
+  \hspace3mm = \hspace3mm  \mu 
+  $$
+
+* So we do have $E(\bar Y) = \mu$ and that's same as the RS case. 
+  
+* i.e. $\bar Y$ is still unbiased estimator of $\mu$. 
+
+
+
+<br><br>
+
+<!--------->
+### Variance of Sample Mean
+
+How about the variance of $\bar Y$?  
+
+* Since adding a constant does not change the variance, 
+$$
+\begin{aligned}
+  V(\bar Y)
+  \hspace3mm = \hspace3mm  V(\bar Y - \mu )
+  \hspace3mm = \hspace3mm
+  V \Big( \frac{1}{n} \sum_{i=1}^n (Y_i - \mu) \Big)
+  \hspace3mm = \hspace3mm  V \Big( \frac{1}{n} \sum_{i=1}^n X_i \Big)
+  \hspace3mm = \hspace3mm V ( \bar X )
+  \end{aligned}
+$$
+
+* Now the variance of $\bar X$ can be written as, 
+$$
+  V (\bar X) 
+  \hspace3mm = \hspace3mm  V \Big( \frac{1}{n} \sum_{i=1}^n X_i \Big)
+  \hspace3mm = \hspace3mm 
+  \frac{1}{n^2} \, \mbox{Cov}\Big(\sum_{i=1}^n X_i, \, \sum_{j=1}^n X_j \Big) 
+  \hspace3mm = \hspace3mm
+  \frac{1}{n^2} \Big[\mbox{ sum of Cov of all pairs }(X_i, X_j) \Big]
+$$
+
+* $\Big[\mbox{ Sum of Cov of all pairs }(X_i, X_j) \Big]$ means, 
+$$
+  \hspace3mm = \hspace3mm
+  \mbox{ Sum of Cov of pairs }
+  \left[ \begin{array}{c|cccc}
+      & X_1 & X_2 & \cdots & X_n \\
+      \hline
+      X_1 & \ddots &  & \cdots &  \\
+      X_2 &  & \ddots  & \cdots &  \\
+      \vdots & \vdots & \vdots & \ddots & \vdots \\
+      X_n &  &  & \cdots &  \\
+    \end{array} \right]
+  \hspace5mm = \hspace5mm
+  \mbox{ Sum of }
+  \left[ \begin{array}{cccc}
+      \gamma(0) & \gamma(1) &  \cdots & \gamma(n-1) \\
+      \gamma(-1) & \gamma(0)  & \cdots & \gamma(n-2) \\
+      \vdots & \vdots &\ddots & \vdots \\
+      \gamma(n-1) & \gamma(n-2) &  \cdots &  \gamma(0) \\
+    \end{array} \right]\\
+$$
+where $\gamma(h)$ is ACVF at lag $h$. 
+
+
+* Conbining, we get
+$$
+V(\bar Y)
+\hspace3mm = \hspace3mm  V(\bar X)
+\hspace3mm = \hspace3mm  \frac{1}{n^2} \sum_{h=-n}^n (n-|h|) \gamma(h)
+  \hspace3mm = \hspace3mm
+  \frac{1}{n^2} \sum_{h=-n}^n (n-|h|) \gamma(h)
+  \hspace3mm = \hspace3mm
+  \frac{1}{n} \sum_{h=-n}^n \Big(1 -\frac{|h|}{n}\Big) \gamma(h).
+$$
+
+<br>
+
+**The variance of sample mean is different under the presence of autocorrelation.** 
+
+<br><br> 
+
+
+* Note that if $X_t$ were iid as in the first section,
+  then $\gamma(0)=1$, and $\gamma(h)=0$ for all $h \ne 0$.
+  Above formula reduces to 
+$$
+  V (\bar X) 
+  = \frac{1}{n} \Big(1 -\frac{|0|}{n}\Big) \gamma(0)
+  \hspace3mm = \hspace3mm \frac{\sigma^2}{n} 
+$$
+
+
+
+
+
+
+<br><br>
+
+<!--------->
+### CI for $\mu$ When $Y_t$ is TS
+
+
+So we have
+$$
+  V (\bar Y) = \frac{\nu^2}{n} \hspace5mm 
+  \mbox{ where } \hspace5mm \nu^2 = \sum_{h=-n}^n \Big(1 -\frac{|h|}{n}\Big) \gamma(h).
+$$
+That means approximately, 
+$$
+  \bar Y \sim  N\Big(\mu , \frac{\nu}{\sqrt n} \Big).
+$$
+Then the confidence interval for $\mu$ is
+$$
+  \bar Y \pm 1.96 \sqrt{\frac{ \nu^2 }{n}}
+$$
+
+<br> 
+
+* In practice, we don't know the true value of $\gamma(h)$, so we need to use 
+  the sample version $\hat \gamma(h)$. (sample ACVF instead of theoretical ACVF)  
+  $$
+  \hat \nu^2 = \sum_{h=-\sqrt n}^{\sqrt n} \Big(1 -\frac{|h|}{n}\Big) \hat \gamma(h).
+  $$
+  
+* Also, we can't really use $\hat \gamma(h)$ with $h$ close to $n$.
+  So sum goes from $-\sqrt{n}$ to $\sqrt{n}$ instead.  
+
+* Finally, modify the sum to:
+  $$
+  \hat \nu^2 = \sum_{h=-\sqrt n}^{\sqrt n} \Big(1 -\frac{|h|}{n}\Big) \hat \gamma(h) 
+  \hspace3mm = \hspace3mm
+  \gamma(0) + 2 \sum_{h=1}^{\sqrt n} \Big(1 -\frac{|h|}{n}\Big) \hat \gamma(h).
+  $$
+
+
+
+
+<br><br>
+
+<!--------->
+### Example: AR(1) data
+
+```{r, fig.width=9, fig.height=4}
+
+  set.seed(1352)
+  mu = sample(c(0,1,2), 1)
+  X  = arima.sim(n=70, list(ar = c(.7) ), sd=5 )     # 
+  Y  = mu + X
+
+  layout(matrix(1:2, 1, 2))             # plot side by side
+  plot(Y, type="o")                     # plot Y
+  abline(h=0)                           # draw at 0
+  abline(h=mean(Y), col="blue")         # draw blue line at sample mean 
+  acf(Y)                                # plot acf as 2nd plot     
+```
+
+Because of the presence of significant ACF at lag 1, we need to use the
+new formula for CI.  
+
+
+```{r, fig.width=5, fig.height=4}
+  #--- CI for ture mean using ACVF ---
+  n = length(Y)  # This is n 
+  n              # see what's inside 
+
+  Ga <- acf(Y, type="covariance", plot=FALSE)   # calculate ACVF values without plotting
+  str(Ga)                                       # See the structure inside Ga 
+  Ga.hat = Ga$acf                               # extract only "acf" part (it's actually ACVF)
+
+  sum.limit = floor( sqrt(n) )                  # make sqrt(n) into integer (for later use) 
+  nu.sq <- Ga.hat[1] + 2*sum( (1-(1:sum.limit)/n) * Ga.hat[2:(sum.limit+1)] )
+                                                #- Ga.hat[1] is ACVF at lag 0
+  mean(Y)                   
+  sqrt(nu.sq/n)        # Margin of Error accounting for ACVF
+  sqrt(var(Y)/n)       # Margin of Error if we treat Y as Rand Sam (Wrong)
+
+  CI.u <- mean(Y) + 1.96*sqrt(nu.sq/n)
+  CI.l <- mean(Y) - 1.96*sqrt(nu.sq/n)
+  c(CI.l, mean(Y), CI.u)                       # show CI.l, mean(Y), CI.u as vector
+
+  plot(Y, type="o")
+  abline(h=0)                                  # add black line at 0
+  abline(h=mean(Y), col="blue")                # add blue horizontal line at mean(Y)
+  abline(h=c(CI.u, CI.l), col="red", lty=2)    # add red dash lines at CI
+
+```
+
+**Because 95% CI includes $0$, we can not reject the null hypothesis that
+the true mean of $Y$ is $0$.**
+
+Note that if we used the RS version of the formula, we would have rejected.
+
+
+
+
+
+<br><br>
+
+<!--------->
+### Example: Color data
+
+```{r, fig.width=9, fig.height=4}
+  data(color) 
+
+  layout(matrix(1:2, 1, 2))             # plot side by side
+  plot(color, type="o")                 # plot 
+  abline(h=0)                           # draw at 0
+  abline(h=mean(color), col="blue")     # draw blue line at sample mean 
+  acf(color)  
+```
+
+This time, let's just get CI for the ture mean without
+testing to see if it is different from 0. 
+
+Note that I'm using the exact copy of the code used in the last section.
+
+```{r, fig.width=5, fig.height=4}
+  Y = color                             # So that I can reuse the above code without changing each Y
+
+  #--- CI for ture mean using ACVF ---
+  n = length(Y)  # This is n 
+  n              # see what's inside 
+
+  Ga <- acf(Y, type="covariance", plot=FALSE)   # calculate ACVF values without plotting
+  str(Ga)                                       # See the structure inside Ga 
+  Ga.hat = Ga$acf                               # extract only "acf" part (it's actually ACVF)
+
+  sum.limit = floor( sqrt(n) )                  # make sqrt(n) into integer (for later use) 
+  nu.sq <- Ga.hat[1] + 2*sum( (1-(1:sum.limit)/n) * Ga.hat[2:(sum.limit+1)] )
+                                                #- Ga.hat[1] is ACVF at lag 0
+  mean(Y)                   
+  sqrt(nu.sq/n)        # Margin of Error accounting for ACVF
+  sqrt(var(Y)/n)       # Margin of Error if we treat Y as Rand Sam (Wrong)
+
+  CI.u <- mean(Y) + 1.96*sqrt(nu.sq/n)
+  CI.l <- mean(Y) - 1.96*sqrt(nu.sq/n)
+  c(CI.l, mean(Y), CI.u)                       # show CI.l, mean(Y), CI.u as vector
+
+  plot(Y, type="o")
+  abline(h=0)                                  # add black line at 0
+  abline(h=mean(Y), col="blue")                # add blue horizontal line at mean(Y)
+  abline(h=c(CI.u, CI.l), col="red", lty=2)    # add red dash lines at CI
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br><hr>
+<!----------------------------------------------------->
+## 3. Summary
+ 
+* To test if the true mean is $0$ or not, we must construct CI for $\mu$,
+and see if $0$ is inside the CI or not.
+
+* For autocorrelated data, variance of the sample mean is bigger than the
+random sample case.  We must estimate the sample mean variance by summing
+up sample ACVF.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+<br><br><br><br><br>
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
