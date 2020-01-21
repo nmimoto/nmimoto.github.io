@@ -1,6 +1,6 @@
 ###
 ###
-###  ACVF, ACF and Stationarity - R code only
+###  ACVF, and ACF - R code only
 ###
 ###
 ####################################
@@ -81,30 +81,6 @@
 
 
 
-#----- 3. Stationarity Assumption
-
-  layout(matrix(1:2, 1, 2))       # make two plots side by side (1row 2col) 
-  plot(hare, type="o")  
-  plot( hare[2:31], hare[1:30], ylab="This Year", xlab="Lat Year" ) 
-  cor(  hare[2:31], hare[1:30] )   #- lag 1
-
- 
-  ### 3.1 Weak Stationarity
-  plot(hare,type="o")
-
-  data(color)
-  plot(color,type="o")
-
-  data(larain)
-  plot(larain,type="o")
-
-  data(oilfilters)
-  plot(oilfilters,type="o",ylab="Sales")
-
-
-  ### 3.2 Warning
-  plot(hare,type="o")
-  plot(hare,type="o", xlim=c(1917,1922))    # zoom in 
 
 
  
