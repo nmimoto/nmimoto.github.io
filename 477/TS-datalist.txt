@@ -20,7 +20,7 @@
 
   D <- read.csv("https://nmimoto.github.io/datasets/SPY.csv", header=T)
   head(D)
-  X <- ts(D[,7], start=1)
+  X <- ts(D[,8], start=1)
   plot(X)
 
 
@@ -71,12 +71,20 @@
 #- From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Trade.csv")
+    D1 <- ts(D[,2:5], start=1960, freq=1)
+    plot(D1, type='o')
 
-#[interest]-----------------------------------------------------------------------
+
+
+
+#[interest**]-----------------------------------------------------------------------
 #- Monthly interest rates Government Bond Yield 2-year securities,
 #- Reserve Bank of Australia. Jan 1969 – Sep 1994
 
     D <- read.csv("https://nmimoto.github.io/datasets/interest.csv", header=T)
+    D1 <- ts(D[,5], start=1960, freq=1)
+    plot(D1, type='o')
+
 
 
 #[acci]-----------------------------------------------------------------------
@@ -103,9 +111,6 @@
     D  <- read.csv("https://nmimoto.github.io/datasets/concentration.csv")
     D1 <- ts(D[,2], start=c(1,1), freq=1)
     plot(D1, type='o')
-
-
-
 
 
 #[unemployment]-----------------------------------------------------------------------
@@ -162,6 +167,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #- Monthly basic iron production in Australia: thousand tonnes. Jan 1956 – Aug 1995
     
     D <- read.csv("https://nmimoto.github.io/datasets/iron.csv", header=T)
+    D1 <- ts(D[,2], start=c(1956,1), freq=12)
+    plot(D1, type='o')
 
 
 #[Steel]-----------------------------------------------------------------------
@@ -177,6 +184,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #- Monthly demand repair parts large/heavy equip. Iowa 1972 – 1979
 
     D <- read.csv("https://nmimoto.github.io/datasets/repair.csv", header=T)
+    D1 <- ts(D[,2], start=c(1972,1), freq=12)
+    plot(D1, type='o')
 
 
 #[Gas]-----------------------------------------------------------------------
@@ -195,12 +204,16 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #  percent of output gas. Sampling interval 9 seconds
 
     D <- read.csv("https://nmimoto.github.io/datasets/methane.csv", header=T)
+    D1 <- ts(D[,2], start=c(1, 1), freq=12)
+    plot(D1, type='o')
 
 
 #[gas2]-----------------------------------------------------------------------
 #- Montly av. residential gas usage Iowa (cubic feet)*100 ’71 – ’79
 
     D <- read.csv("https://nmimoto.github.io/datasets/gas2.csv", header=T)
+    D1 <- ts(D[,2], start=c(1, 1), freq=12)
+    plot(D1, type='o')
 
 
 #[sheep]-----------------------------------------------------------------------
@@ -216,13 +229,14 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #- Annual Canadian Lynx Trappings   1821 - 1934
 #- lynx.TSM from Brockwell and Davis (2002)
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/lynx.txt")
-    D1 <- ts(D, start=c(1,1), freq=1)
+    D  <- read.csv("https://nmimoto.github.io/datasets/lynx.csv")
+    D1 <- ts(D, start=c(1821), freq=1)
     plot(D1, type='o')
 
 
 #[barley]-----------------------------------------------------------------------
 #- Annual barley yields per acre in England & Wales 1884 – 1939
+
     D <- read.csv("https://nmimoto.github.io/datasets/barley.csv", header=T)
     head(D)
     barley <- ts(D[,2], start=c(1884))
@@ -233,6 +247,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #- Monthly milk production: pounds per cow. Jan 62 – Dec 75
 
     D <- read.csv("https://nmimoto.github.io/datasets/milk.csv", header=T)
+    D1 <- ts(D[,2], start=c(1962,1), freq=12)
+    plot(D1, type='o')
 
 
 #[Pigs]-----------------------------------------------------------------------
@@ -240,7 +256,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #- From Time Series Data Library
 
     D  <- read.csv("https://nmimoto.github.io/datasets/Pigs.csv")
-    D1 <- ts(D, start=c(1980, 8), freq=12)
+    D1 <- ts(D[,2], start=c(1980, 8), freq=12)
     plot(D1, type='o')
 
 
@@ -248,7 +264,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 
-
+### Below needs review
 
 
 
