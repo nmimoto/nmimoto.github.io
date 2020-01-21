@@ -8,9 +8,6 @@
 
 
 
-
-
-
 #----- 1. Is the ture mean 0? 
 
   set.seed(235)                    # set seed for RS generation (you don't need to do this)
@@ -96,7 +93,9 @@
 
 
   Y = color                         # So that I can reuse the above code without changing each Y
-  #--- CI for ture mean using ACVF ---
+
+
+#--- CI for ture mean using ACVF ---
   n = length(Y)  # This is n 
   n              # see what's inside 
 
@@ -106,7 +105,7 @@
 
   sum.limit = floor( sqrt(n) )                  # make sqrt(n) into integer (for later use) 
   nu.sq <- Ga.hat[1] + 2*sum( (1-(1:sum.limit)/n) * Ga.hat[2:(sum.limit+1)] )
-                                                #- Ga.hat[1] is ACVF at lag 0
+                                                # Ga.hat[1] is ACVF at lag 0
   mean(Y)                   
   sqrt(nu.sq/n)        # Margin of Error accounting for ACVF
   sqrt(var(Y)/n)       # Margin of Error if we treat Y as Rand Sam (Wrong)
