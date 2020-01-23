@@ -119,7 +119,7 @@
     D  <- read.table("https://nmimoto.github.io/datasets/djao2.csv", header=T)
     D2 <- ts(D$DJ, start=c(1,1), freq=1)
 
-    plot(A, type='o')
+    plot(D2, type='o')
 
 
 

@@ -1,0 +1,292 @@
+---
+title: "Trends"
+author: ""
+date: 
+output: html_document
+background-color: black
+---
+
+<hr>        
+<!--------------------------------------------------------------------->        
+<!--
+  library(rmarkdown)
+  render("TS-Lec06.Rmd", html_document(toc=TRUE, toc_float=FALSE, toc_depth=3, theme="readable", highlight="kate" ))
+#-->
+
+[Class Web Page](http://gozips.uakron.edu/~nmimoto/477/index.html) -- [R resource page](http://gozips.uakron.edu/~nmimoto/R/index.html)                     
+
+
+
+
+<br><br><hr>
+<!--------------------------------------------------------------------->        
+## 1. Classical Decomposition
+
+<br>
+
+* Additive Model
+$$
+  X_t = T_t + Y_t
+$$
+
+* The trend $T_t$ may be determinisitc, or random.
+
+* $Y_t$ is stationary time series.
+
+* Multiplicative Model
+$$
+  X_t = T_t \cdot Y_t
+$$
+
+* If you take log of multiplicative model, it becomes additive model. 
+
+
+
+
+<br><br><br><hr> 
+<!--------------------------------------------------------------------->        
+## 2. Using Filter to Expose Trend
+
+<br>
+
+Below are some example of exposing trend.  
+
+
+<br><br> 
+<!---------->        
+
+### 2.1 Moving Average Filter
+
+* for your choice of $m$, 
+$$
+  M_t = \frac{1}{2q+1} \sum_{i=-q}^q X_{t+i} 
+$$
+
+* This will filter the noise out, exposing overall trend. 
+
+* It could also be
+$$
+  M_t = \frac{1}{q} \sum_{i=0}^q X_{t-i} 
+$$
+
+
+
+```{r, fig.width=5, fig.height=4}
+  set.seed(235)                         # set seed for RS generation (you don't need to do this)
+  X <- abs(round(rnorm(100)*10, 0))
+
+  library(forecast)                     # install.packages("forecast")
+  M <- ma(X, 3)                         # This order=3 goes from t-1 to t+1
+  head(cbind(X,M))
+  
+  plot(X, type="o")                      
+  lines(M, col="red")                   
+
+
+  plot(X, type="o")                      
+  lines(ma(X, 5), col="red")
+
+```
+
+
+
+
+<br><br> 
+<!---------->        
+
+### 2.2 Exponential Smoothing 
+
+* For your choice of $\alpha$, $(0<\alpha<1)$, let $S_0=X_0$ and 
+$$
+  S_t = \alpha X_t + (1-\alpha) S_{t-1} \hspace{10mm} \mbox{ for } t>0.
+$$
+
+* This can be a one step forecast:
+$$
+  \hat X_{t+1} = S_t
+$$
+
+
+```{r, fig.width=5, fig.height=4}
+  set.seed(235)                         # set seed for RS generation (you don't need to do this)
+  X <- abs(round(rnorm(100)*10, 0))
+
+  library(forecast)                         # install.packages("forecast")
+
+  S <- ses(X, h=10, alpha=0.2, initial='simple')
+  head(cbind(X, S$fitted))
+
+  plot(X, type="o")
+  lines(S$fitted, col="red")
+```
+
+
+
+
+
+
+
+
+<br><br><br><hr> 
+<!--------------------------------------------------------------------->        
+## 3. Deterministic Trend vs Random Trend 
+
+<br>
+
+
+* Trend can be deterministic or random.  
+
+
+<br><br>
+
+<!---------->        
+
+### 3.1 Regression Methods
+
+
+
+
+```{r, fig.width=5, fig.height=4}
+  # Montly av. residential gas usage Iowa (cubic feet)*100 ’71 – ’79
+  D <- read.csv("https://nmimoto.github.io/datasets/gas2.csv", header=T)
+  Gas2 <- ts(D[,2], start=c(1, 1), freq=12)
+  plot(Gas2, type='o')
+```
+
+
+```{r, fig.width=5, fig.height=4}
+  Y = Gas2
+
+  t = 1:length(Y)
+  Fit01 <- lm(Y ~ t)
+  summary(Fit01)
+
+  plot(Gas2, type='o')          
+  abline(Fit01, col="red")       # overlay fitted line
+```
+
+
+
+<br><br>  
+
+### 3.2 Random Trend
+
+* We try to model the random trend with Random Walk.      
+    
+
+
+
+
+
+
+
+
+<br><br><br><hr> 
+<!--------------------------------------------------------------------->        
+## 4. Random Walk
+
+<br>
+
+Is a leading candidate to model random trend.
+Let $\epsilon_t \sim_{i.i.d.} N(\mu, \sigma)$.
+Then
+$$
+  X_t = \sum_{i=1}^t \epsilon_{i}
+$$
+is called Random Walk.
+
+
+
+```{r, fig.width=5, fig.height=4}
+  set.seed(135)                    # set seed 
+  ep = rnorm(100,0,1)              # RS from N(0,1) 
+  X  = cumsum(ep)                  # Y is mu + random noise 
+
+  plot(X, type="o")                          
+```
+
+
+
+What is the mean and variance of Random Walk?
+
+* Mean
+
+$$
+E(X_t) = E \Big( \sum_{i=1}^t \epsilon_i\Big) = \sum_{i=1}^t E(\epsilon_i) = \sum_{i=1}^n 0 = 0 
+$$
+
+* Variance
+
+$$
+V(X_t) = V \Big( \sum_{i=1}^t \epsilon_i \Big) = \sum_{i=1}^t V(\epsilon_i) = \sum_{i=1}^t 1 = t
+$$
+
+* Variance of RW grows liniarly with time
+
+* SD of Random Walk grows as $\sqrt t$
+
+* Therefore Random Walk is non-stationary
+
+```{r, fig.width=5, fig.height=4}
+  set.seed(5523)
+  ep = rnorm(100,0,1)                # RS from N(0,1) 
+  X = cumsum(ep)                     # X is Random Walk
+  plot(X, type="l", ylim=c(-34, 34))
+
+  for (i in 1:200){
+    ep = rnorm(100,0,1)              
+    X = cumsum(ep)                   
+    lines(X) 
+  }
+```
+
+* What is mean and SD of $X_{80}$?
+
+
+### Example - Dow Jones
+
+```{r, fig.width=5, fig.height=4}
+#  The Dow Jones Utilities Index, Aug. 28–Dec. 18, 1972; 
+#  DOWJ.TSM from Brockwell and Davis (2002)
+
+   D  <- read.csv("https://nmimoto.github.io/datasets/dowj.csv")
+   D1 <- ts(D, start=c(1,1), freq=1)
+
+   plot(D1, type='o')
+```
+
+
+```{r, fig.width=5, fig.height=4}
+#[djao2]-----------------------------------------------------------------------
+#  Closing values of the DowJones Index of stocks on the New York Stock Exchange 
+#  251 successive trading days  Sep 10, 1993 to Aug 26, 1994
+#                                    djao2.tsm From Brockwell and Davis (2002) 
+
+    D  <- read.table("https://nmimoto.github.io/datasets/djao2.csv", header=T)
+    D2 <- ts(D$DJ, start=c(1,1), freq=1)
+
+    plot(D2, type='o')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br><br><br><br>
+
+
+  
+
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
