@@ -1,9 +1,135 @@
 ###
 ###
-###  - R code only
+###  Fitting AR(P) Model - R code only
 ###
 ###
 ####################################
+
+
+
+## 1. Example: Fit Dow Jones 1972 with AR(3)
+
+  # read in daily Dow Jones data from my website
+  D  <- read.csv("https://nmimoto.github.io/datasets/dowj.csv")  
+  head(D)                             # see only first 6 lines
+  plot(D)
+  is.ts(D)                            # is it TS object  -> no
+  D1 <- ts(D, start=c(1,1), freq=1)   # turn the data into TS object
+  head(D)
+  is.ts(D1)                           # D1 is TS object
+  plot(D1)
+
+
+  Y1 <- diff(log(D1))                  # Take log-difference log(X_{t}) - log(X_{t-1})
+  head(Y1)                             # see first 6 lines
+  Y <- Y1[-1]                          # remove the first observation because it's NA
+  head(Y)
+
+  plot(Y, type='o', main="Log-diff of DOWJ")  
+  layout(matrix(1:2, 1, 2))           # make next two plot side by side (you don't have to do this)
+  acf(Y)                              # Sample ACF 
+  pacf(Y)                             # Sample Partial ACF (see below)
+  layout(1)                           # turn it back to 1 plot layout
+
+  Fit1 <- ar(Y, aic=FALSE, order.max=3)  # fit AR(3) to Y
+  Fit1                                   # see the result of fit
+
+  str(Fit1)  # see what else is in Fit1
+    
+  e.hat <- Fit1$resid                      # extract residuals after the fit
+  is.ts(e.hat)
+  
+  head(e.hat)                               
+  plot(e.hat, type="o", main="residuals from Fit1")  # plot residuals
+
+
+
+
+
+## 2. Parameter Estimation in AR(p) - Yule-Walker 
+
+### Example: Y-W Estimator with Simulated Data
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+
+  plot(Y, type="o")
+
+  layout(matrix(1:2, 1,2))  # 2 plots side by side
+  acf(Y)
+  pacf(Y)
+  layout(1)                 # reset the layout
+    
+  Fit2 <- ar(Y, aic=FALSE, order.max=3)             # fits AR(3) by Y-W method(default)
+  #Fit2 <- ar(Y, aic=F, order.max=2, method="mle")  # fits AR(2) by MLE
+  ?ar                                               # opens help page of function ar()
+
+
+### Example: Testing AR parameters for significance
+
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) # Simulate AR(2)
+  Fit2 <- ar(Y, aic=FALSE, order.max=3)          # fit AR(3) by Y-W(default) 
+  Fit2
+
+  str(Fit2)                               # see what's inside
+  
+  phi.hat    <- Fit2$ar                   # phi-hats 
+  sigSq.hat  <- Fit2$var.pred             # sig^2 hat
+  Fit2$asy.var.coef                       # Variance of phi-hats
+  phiSE <- sqrt(Fit2$asy.var.coef)        # take sqrt() element wise.  just look at the diagnal elements
+  
+  phi.hat                                 # check if phi hats are significant
+  phiSE                               
+
+
+  #- If you want to calculare asy.var.coef by hand - 
+  A <- acf(Y, type="covariance")$acf
+  G <- matrix(A[c(1,2,2,1)], 2,2)
+  sigSq.hat * solve(G) / 100                  #- compare to asy.var.coef
+
+
+ 
+## 3. Partial ACF
+
+### Example: ACF and PACF of AR(p)
+
+  X <- arima.sim(list(ar = c(.6, .3) ), 100 ) # Simulate AR(2)
+
+  plot(X)
+  layout(matrix(1:2, 1, 2))   # 2 plot side by side
+  acf(X)
+  pacf(X)
+
+
+### Example: PACF of Dowj log-difference 
+
+  # read in daily Dow Jones data from my website
+  D  <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/dowj.csv")  
+  D1 <- ts(D, start=c(1,1), freq=1)   # turn the data into TS object  
+  Y1 <- diff(log(D1))                 # Take log-difference log(X_{t}) - log(X_{t-1})
+    Y <- Y1[-1]                         # remove the first observation because it's NA
+  head(Y)
+
+  plot(Y, type='o', main="Log-diff of DOWJ")  
+  layout(matrix(1:2, 1, 2))           # make next two plot side by side (you don't have to do this)
+  acf(Y)                              # Sample ACF 
+  pacf(Y)                             # Sample Partial ACF (see below)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
