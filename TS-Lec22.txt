@@ -1,0 +1,78 @@
+###
+###
+###  AR(p) Model - R code only
+###
+###
+####################################
+
+
+
+## 1. Causal Representation of AR(1)
+
+### Simulating non-causal AR(1)
+
+  Y <- arima.sim(list(ar = c(1.2) ), 100 )      #- gives error because of phi=1.2
+
+  #- Hand written simulation 
+  Y <- 0.5
+  phi <- 1.2
+  e <- rnorm(100)
+  for (t in 2:100){
+    Y[t] = Y[t-1]*phi + e[t]
+  }
+  plot(Y, type="o")
+
+
+
+
+
+## 2. AR(p) processes
+
+### Example: Checking Causality 2
+
+  z <- polyroot(c(1,.7,.6))   # find root of 1+.7z+.6z^2 
+  z                           #- see the root 
+  Mod(z)                      #- Distance from origin
+
+
+### Example: Checking Causality 3
+
+  z <- polyroot(c(1,-.7,-.6)) 
+  z 
+  Mod(z)
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+<br><br><br><br><br>
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
