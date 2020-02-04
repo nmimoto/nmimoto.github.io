@@ -1,9 +1,147 @@
 ###
 ###
-###  - R code only
+###  Fitting AR(p) 2 - R code only
 ###
 ###
 ####################################
+
+
+
+# 1. De-mean or Not
+
+## Example: De-mean or not
+
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5
+  plot(Y, type="o")
+  mean(Y)
+
+  Fit3 <- ar(Y, aic=F, order.max=2)               # demean=TRUE is the default 
+  Fit4 <- ar(Y, aic=F, order.max=2, demean=TRUE)  # same as above  
+  Fit3
+  Fit4
+    
+  Fit5 <- ar(Y, aic=F, order.max=2, demean=FALSE) # if you don't take the mean out
+  Fit5                                            # you get different estimates 
+    
+  Fit6 <- ar(Y-mean(Y), aic=F, order.max=2, demean=FALSE)  # same as demean=TRUE
+  Fit6
+
+
+# 2. Order Selection of AR(p)
+
+## a. ACF and PACF
+
+  set.seed(345)     
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5
+  plot(Y, type="o")
+
+  layout(matrix(1:2, 1, 2))  # two plots side by side
+  acf(Y)                     # plot sample ACF of Y
+  pacf(Y)                    # plot sample PACF of Y
+  layout(1)                  # return to 1 plot layout
+
+
+## Example: order selection
+
+
+  set.seed(4772)                        # you don't need to do this  
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) + 8.5     # simulate AR(2)
+
+  #- 1. ACF and PACF
+  layout(matrix(1:2, 1, 2))             # two plots side by side
+  acf(Y)                                # plot sample ACF of Y
+  pacf(Y)                               # plot sample PACF of Y
+  layout(1)                             # return to 1 plot layout
+  
+  #- 2. AIC
+  Fit8 <- ar(Y)                         # Fit AR(p). Find best p by AIC
+  Fit8 
+  Fit8$aic                              # Lists AIC for each p (difference from the min value)
+
+  #- 3. Parameter Significance
+  Fit8 <- ar(Y, aic=F, order.max=3 )    # fit AR(p). force p=3. 
+    
+  Fit8$ar                               #- phi1 hat and phi2 hat
+  1.96*sqrt(Fit8$asy.var.coef)          #- standard error for phi hats 
+
+
+## Example:  AIC Simulation Study 
+
+  #- Simulation Study of choosing p by AIC
+  Result <- 0
+  for (i in 1:1000){
+    Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+    Fit7 <- ar(Y)                         # find AR(p) by AIC
+    # print(c(i, Fit7$order) )            # print order on screen (optional)
+    Result[i] <- Fit7$order               # save value of p chosen
+  }
+  head(Result, 100)                       # first 100 p     
+  mean(Result==2)                         # propotion of times p=2 
+
+
+# 3. Residual Analysis of AR(p)
+
+## Example: Residual Analysis
+
+  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
+  Fit9 <- ar(Y, aic=F, order.max=2, demean=F)    # force p=2
+  Fit9$ar
+  e.hat <- Fit9$resid                            # extract the residuals
+  e.hat
+
+  Y[3]-Fit9$ar[1]*Y[2] - Fit9$ar[2]*Y[1]       
+
+
+
+# Example: Dow Jones 1972
+
+  # read in daily Dow Jones data from my website
+  D  <- read.csv("https://nmimoto.github.io/datasets/dowj.csv")  
+  D1 <- ts(D, start=c(1,1), freq=1)   # turn the data into TS object
+  plot(D1)
+  
+  Y <- diff(log(D1))                  # Take log-difference 
+  plot(Y, type='o')
+  layout(matrix(1:2, 1,2))            # 2 plots side by side
+  acf(Y)
+  pacf(Y)
+  layout(1)                           # reset the layout 
+    
+  Fit11 <- ar(Y)      # Fit AR(p) default use Y-W for estimator, 
+                      # and AIC to look for best p. demean=TRUE is also default
+  Fit12 <- ar(Y, aic=TRUE,  order.max=20)    # best p is chosen by aic (same as above)
+  
+  Fit11                                      # see the summary of fit
+  sqrt( Fit11$asy.var.coef )                 # SE of the estimator 
+
+  
+  Fit13 <- ar(Y, aic=FALSE,  order.max=2)    # force fit AR(2)
+  Fit13
+  sqrt( Fit13$asy.var.coef )                 # SE of the estimator 
+
+  e.hat <- Fit11$resid                       # extract residuals from the 1st fit 
+  plot(e.hat, type="o")                      # plot residuals
+  layout(matrix(1:2, 1,2))                   # 2 plots side by side
+  acf(e.hat, na.action=na.pass)              # check for autocorrelation in residuals
+  pacf(e.hat, na.action=na.pass)
+  layout(1)                                  # reset the layout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
