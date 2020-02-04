@@ -94,7 +94,7 @@
 
 
 
-## 4. Simulating of AR(1)
+## 4. Simulation of AR(1)
 
 
   Y <- arima.sim(list(ar = c(.8 ) ), 100 )         # Simulate AR(1) with phi=.8

@@ -25,7 +25,6 @@
 
 
 
-
 ## 2. AR(p) processes
 
 ### Example: Checking Causality 2
