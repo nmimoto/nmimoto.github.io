@@ -7,44 +7,80 @@
 
 
 
+#-----------------------------------------------------
 # 1. De-mean or Not
 
 ## Example: De-mean or not
 
+  set.seed(3563)
   Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5
   plot(Y, type="o")
   mean(Y)
 
-  Fit3 <- ar(Y, aic=F, order.max=2)               # demean=TRUE is the default 
-  Fit4 <- ar(Y, aic=F, order.max=2, demean=TRUE)  # same as above  
-  Fit3
-  Fit4
-    
-  Fit5 <- ar(Y, aic=F, order.max=2, demean=FALSE) # if you don't take the mean out
-  Fit5                                            # you get different estimates 
-    
-  Fit6 <- ar(Y-mean(Y), aic=F, order.max=2, demean=FALSE)  # same as demean=TRUE
-  Fit6
+  library(forecast)              # install.packages("forecast") if you haven't 
+
+  Fit01 <- Arima(Y, order=c(2,0,0))                             # fit AR(2) to Y
+
+  Fit02 <- Arima(Y, order=c(2,0,0), include.mean=FALSE)         # don't de-mean
+
+  Fit03 <- Arima(Y-mean(Y), order=c(2,0,0), include.mean=FALSE) # de-mean by hand
 
 
+
+
+#-----------------------------------------------------
 # 2. Order Selection of AR(p)
+
 
 ## a. ACF and PACF
 
-  set.seed(345)     
-  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5
   plot(Y, type="o")
 
   layout(matrix(1:2, 1, 2))  # two plots side by side
-  acf(Y)                     # plot sample ACF of Y
-  pacf(Y)                    # plot sample PACF of Y
+  acf(Y)                     # plot sample ACF 
+  pacf(Y)                    # plot sample PACF 
   layout(1)                  # return to 1 plot layout
 
 
-## Example: order selection
+## b. AIC
+
+## Example:  AIC Simulation Study 
+
+  #- Simulation Study of choosing p by AIC
+  Result <- 0
+  for (i in 1:1000){
+    Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5  
+    Fit7 <- auto.arima(Y, d=0, max.q=0)        # find AR(p) by AIC
+    Result[i] <- length(Fit7$model$phi)        # save value of p chosen
+  }
+  head(Result, 100)                       # first 100 p     
+  mean(Result==2)                         # propotion of times p=2 
 
 
-  set.seed(4772)                        # you don't need to do this  
+## c. Parameter Significance
+
+## Example:  When AIC fails 
+
+  #- Choosing p by AIC, stop if p > 2
+  Result <- 0
+  for (i in 1:1000){
+    Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  + 8.5 
+    Fit7 <- auto.arima(Y, d=0, max.q=0)        # find AR(p) by AIC
+    Result[i] <- length(Fit7$model$phi)        # save value of p chosen
+    if (Result[i] > 2){
+      print( length(Fit7$model$phi) ) 
+      break
+    }
+  }
+  
+  arima(Y, order=c(3,0,0))      # fit AR(3) 
+  arima(Y, order=c(2,0,0))      # fit AR(2) 
+
+
+
+## Example: order selection a-b-c
+
+  set.seed(4772)                        
   Y    <- arima.sim(list(ar = c(.6, .3) ), 100 ) + 8.5     # simulate AR(2)
 
   #- 1. ACF and PACF
@@ -54,46 +90,51 @@
   layout(1)                             # return to 1 plot layout
   
   #- 2. AIC
-  Fit8 <- ar(Y)                         # Fit AR(p). Find best p by AIC
+  Fit8 <- auto.arima(Y)                 # Fit AR(p). Find best p by AIC
   Fit8 
-  Fit8$aic                              # Lists AIC for each p (difference from the min value)
+  Fit8$aic                              # AIC for the chosen model
 
   #- 3. Parameter Significance
-  Fit8 <- ar(Y, aic=F, order.max=3 )    # fit AR(p). force p=3. 
-    
-  Fit8$ar                               #- phi1 hat and phi2 hat
-  1.96*sqrt(Fit8$asy.var.coef)          #- standard error for phi hats 
+  Fit9 <- Arima(Y, order=c(2,0,0) )     # fit AR(2)
+  Fit9
+
+  Fit9$model$phi                        # phi1 hat and phi2 hat
+  sqrt(diag(Fit9$var.coef))             # SE for phi (same as output)
 
 
-## Example:  AIC Simulation Study 
-
-  #- Simulation Study of choosing p by AIC
-  Result <- 0
-  for (i in 1:1000){
-    Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
-    Fit7 <- ar(Y)                         # find AR(p) by AIC
-    # print(c(i, Fit7$order) )            # print order on screen (optional)
-    Result[i] <- Fit7$order               # save value of p chosen
-  }
-  head(Result, 100)                       # first 100 p     
-  mean(Result==2)                         # propotion of times p=2 
 
 
+#-----------------------------------------------------
 # 3. Residual Analysis of AR(p)
 
 ## Example: Residual Analysis
 
-  Y <- arima.sim(list(ar = c(.6, .3) ), 100 ) 
-  Fit9 <- ar(Y, aic=F, order.max=2, demean=F)    # force p=2
-  Fit9$ar
-  e.hat <- Fit9$resid                            # extract the residuals
-  e.hat
+  set.seed(3563)
+  Y    <- arima.sim(list(ar = c(.6, .3) ), 100 )  
+  plot(Y, type="o")
 
-  Y[3]-Fit9$ar[1]*Y[2] - Fit9$ar[2]*Y[1]       
+  Fit09 <- Arima(Y, order=c(2,0,0), include.mean=FALSE)          # fit AR(2)
+  Fit09
+  res   <- Fit09$resid                       # extract the residuals
+  res  
+
+  Y[3]-Fit09$model$phi[1]*Y[2] - Fit09$model$phi[2]*Y[1]       
+  Y[4]-Fit09$model$phi[1]*Y[3] - Fit09$model$phi[2]*Y[2]
+  Y[5]-Fit09$model$phi[1]*Y[4] - Fit09$model$phi[2]*Y[3]
+
+  plot(res)           
+
+  # Check acf + pacf of residuals
+  layout(matrix(1:2, 1,2))                   # 2 plots side by side
+  acf(res)
+  pacf(res)
+  layout(1)  
 
 
 
-# Example: Dow Jones 1972
+#-----------------------------------------------------
+# 4. Example: Dow Jones 1972
+
 
   # read in daily Dow Jones data from my website
   D  <- read.csv("https://nmimoto.github.io/datasets/dowj.csv")  
@@ -106,32 +147,30 @@
   acf(Y)
   pacf(Y)
   layout(1)                           # reset the layout 
-    
-  Fit11 <- ar(Y)      # Fit AR(p) default use Y-W for estimator, 
-                      # and AIC to look for best p. demean=TRUE is also default
-  Fit12 <- ar(Y, aic=TRUE,  order.max=20)    # best p is chosen by aic (same as above)
-  
-  Fit11                                      # see the summary of fit
-  sqrt( Fit11$asy.var.coef )                 # SE of the estimator 
+
+
+  Fit11 <- auto.arima(Y, d=0, max.q=0)      # Fit AR(p). Uses AIC to look for best p
+  Fit11                                     # see the summary of fit
+  sqrt( Fit11$asy.var.coef )                # SE of the estimator 
 
   
-  Fit13 <- ar(Y, aic=FALSE,  order.max=2)    # force fit AR(2)
+  Fit12 <- Arima(Y, order=c(2,0,0))         # force fit AR(2)
+  Fit12
+  Fit13 <- Arima(Y, order=c(2,0,0), include.mean=FALSE)  
   Fit13
-  sqrt( Fit13$asy.var.coef )                 # SE of the estimator 
+  Fit13 <- Arima(Y, order=c(1,0,0), include.mean=FALSE)  
+  Fit13
+  
 
-  e.hat <- Fit11$resid                       # extract residuals from the 1st fit 
-  plot(e.hat, type="o")                      # plot residuals
-  layout(matrix(1:2, 1,2))                   # 2 plots side by side
-  acf(e.hat, na.action=na.pass)              # check for autocorrelation in residuals
-  pacf(e.hat, na.action=na.pass)
-  layout(1)                                  # reset the layout
+  res <- Fit11$resid                        # extract residuals from the 1st fit 
+  plot(res, type="o")                       # plot residuals
+  
+  layout(matrix(1:2, 1,2))                  # 2 plots side by side
+  acf(res)                                  # check for autocorrelation in residuals
+  pacf(res)
+  layout(1)                                 # reset the layout
 
-
-
-
-
-
-
+ 
 
 
 
@@ -145,3 +184,5 @@
 
 
 
+
+ 
