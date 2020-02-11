@@ -1,9 +1,130 @@
 ###
 ###
-###  - R code only
+###  Residual Analysis - R code only
 ###
 ###
 ####################################
+
+
+
+# 2. Test for Randomness
+
+
+## Example: L-B test
+
+  D  <- read.csv("https://nmimoto.github.io/datasets/gtemp.csv")
+  D1 <- ts(D, start=c(1880), freq=1)
+  D2 <- diff(D1)
+
+  plot(D2)
+
+  library(forecast)
+
+  Fit1 <- Arima(D2, order=c(2,0,0), include.mean=FALSE)
+
+  res <- Fit1$resid
+
+  Box.test(res,   lag = 15, type = "Ljung-Box")
+  Box.test(res,   lag = 20, type = "Ljung-Box")
+  Box.test(res,   lag = 25, type = "Ljung-Box")
+
+ 
+
+## Example: Null Distribution of L-B test
+
+  X <- rnorm(100, 2, 4)
+
+  Box.test(res, lag=15, type="Ljung-Box")
+
+  n=100
+  sam.acf <- acf(X)$acf
+  Q <- n*(n+2)*sum( sam.acf[2:16]^2/(n-(1:15)) )
+
+  Q <- 0
+  for (i in 1:1000) {
+    X <- rnorm(100, 2, 4)
+    sam.acf <- acf(X, plot=FALSE)$acf
+    Q[i] <- n*(n+2)*sum( sam.acf[2:16]^2/(n-(1:15)) )
+  }
+
+  hist(Q, freq=FALSE)
+  t <- seq(0, 50, .1)
+  lines(t, dchisq(t, 15), col="red")
+
+ 
+
+
+# 3. Test for Heteroscedasticity 
+
+
+
+## Example: McLeod-Li test
+
+  A <- Fit1$resid
+
+  layout(matrix(1:2, 1, 2))
+  plot(A)
+  plot(A^2)
+
+  acf(A)
+  acf(A^2)
+  layout(1,1,1)
+
+  Box.test(A^2, lag = 15, type = "Ljung-Box")
+  Box.test(A^2, lag = 20, type = "Ljung-Box")
+
+ 
+
+
+
+# 4. Test for Normality
+
+## qq-normal plot
+
+  X <- rnorm(100, 2, 5)
+  qqnorm(X)
+
+ 
+## Example: Testing Normality
+
+  library(tseries)  # load tseries package   ( install.packge("tseries") if first time)
+
+  # acf(res)
+  # acf(res, na.action=na.pass)
+
+
+  res <- Fit1$resid
+  res <- res[ which(is.na(Res)==0) ]    # remove NA from Ress
+
+  jarque.bera.test(res)
+
+ 
+
+# 5. Custom Functions
+
+
+## Making Your Own Function in R
+
+  x <- 5
+  f <- exp(5+4)
+  f
+
+  f <- function(x){
+    exp(x+4)
+  }
+  f(5)
+
+
+ 
+  #--- This line copy and paste Basic Functions on class web page
+  source("https://nmimoto.github.io/R/TS-00.txt")
+
+  #- Use the function as below
+  res <- Fit1$resid
+  
+  Randomness.tests(res)
+
+
 
 
 
