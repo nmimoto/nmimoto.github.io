@@ -73,7 +73,25 @@
   Box.test(A^2, lag = 15, type = "Ljung-Box")
   Box.test(A^2, lag = 20, type = "Ljung-Box")
 
- 
+
+## Example: Conditional Heteroscedasticity 
+
+  library(quantmod)       # install.packages("quantmod")
+
+  getSymbols("AAPL")
+  plot(AAPL)
+  head(AAPL)
+
+  A = AAPL$AAPL.Adjusted
+  A1 = A["2015::2020"]
+  plot(A1)
+  
+  A2 = diff(log(A1))
+  plot(A2)
+
+  acf(A2)
+
+
 
 
 
@@ -94,7 +112,7 @@
 
 
   res <- Fit1$resid
-  res <- res[ which(is.na(Res)==0) ]    # remove NA from Ress
+  res <- res[ which(is.na(res)==0) ]    # remove NA from Res
 
   jarque.bera.test(res)
 
