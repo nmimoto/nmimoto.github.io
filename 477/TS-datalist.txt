@@ -75,8 +75,6 @@
     plot(D1, type='o')
 
 
-
-
 #[interest**]-----------------------------------------------------------------------
 #- Monthly interest rates Government Bond Yield 2-year securities,
 #- Reserve Bank of Australia. Jan 1969 – Sep 1994
@@ -86,7 +84,6 @@
     plot(D1, type='o')
 
 
-
 #[acci]-----------------------------------------------------------------------
 #- Accidental death in US
 #- deaths.TSM from Brockwell and Davis (2002)
@@ -94,7 +91,6 @@
     D  <- read.csv("https://nmimoto.github.io/datasets/acci.csv")
     D1 <- ts(D, start=c(1,1), freq=12)
     plot(D1, type='o')
-
 
 
 #[copper]---------------------------------------------------------------------
@@ -154,9 +150,6 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 
-
-
-
 #
 #  Industrial
 #
@@ -204,8 +197,9 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 #  percent of output gas. Sampling interval 9 seconds
 
     D <- read.csv("https://nmimoto.github.io/datasets/methane.csv", header=T)
-    D1 <- ts(D[,2], start=c(1, 1), freq=12)
-    plot(D1, type='o')
+    CO2 <- ts(D[,2], start=c(1, 1), freq=1)
+    Met <- ts(D[,3], start=c(1, 1), freq=1)
+    plot(Met, type='o')
 
 
 #[gas2]-----------------------------------------------------------------------
