@@ -48,13 +48,15 @@
 
   set.seed(77224)                                             # set seed
   X  <- arima.sim(list(ar = c(.6, .3)),  n=180, sd=1  )       # simulate the dataset
+  X  <- ts(X, start=c(432, 1), freq=7)
+  X1 <- window(X, end=time(X)[100], freq=7)              # cut TS to 1st 100
+  X2 <- window(X, start=time(X)[100], freq=7)            # last 29
 
-  plot(X, type="o", col="red")          # Entire dataset.
-  
-  X1    <- X[1:100]                     # X is the first 100 obs.
-  lines(X1, type="o")                       # Pretend that black is all you have. 
-  
-  Fit3 <- auto.arima(X1, d=0, max.q=0)      # Find best AR(p) by AIC 
+  plot(X, type="o", col="red")                 # Entire dataset.
+  lines(X1, type="o")                    # Pretend that black is all you have. 
+
+  library(forecast)
+  Fit3 <- auto.arima(X1, d=0, max.q=0)   # Find best AR(p) by AIC 
   Fit3
 
   #--- Suppose you are happy with AR(2).  Perform rolling 1-step prediction with widnow of 100 obs.
@@ -79,32 +81,33 @@
       Yhat.CIl[i] <- Yhat[i]-1.96*Y.h$se
     }
   # Yhat starts at window.size+1 up to length(Y)
-  Yhat     = ts(Yhat, start=time(Y)[window.size+1], freq=1)
-  Yhat.CIu = ts(Yhat, start=time(Y)[window.size+1], freq=1)
-  Yhat.CIl = ts(Yhat, start=time(Y)[window.size+1], freq=1)
-  Y1 = window(Y, start=time(Y)[1], end=time(Y)[window.size])
+  Yhat     = ts(Yhat,     start=time(Y)[window.size+1], freq=frequency(Y))
+  Yhat.CIu = ts(Yhat.CIu, start=time(Y)[window.size+1], freq=frequency(Y))
+  Yhat.CIl = ts(Yhat.CIl, start=time(Y)[window.size+1], freq=frequency(Y))
+  Y1 = window(Y, end=time(Y)[window.size],     freq=frequency(Y))
+  Y2 = window(Y, start=time(Y)[window.size+1], freq=frequency(Y))
 
   #- Calculate prediction performance
-  Pred.error = Y[(window.size+1):length(Y)] - Yhat
+  Pred.error = Y2 - Yhat
   Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
   c( mean(Pred.error), Pred.rMSE )                 # Av Pred Error, and pred rMSE
   
 
-  #- Plot the prediction result with original data 
-  plot(Y, type="o", col="red",
-    main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)" )  
-  lines( Y1,       type="o")
+
+  #- Plot the prediction result with original data
+  layout(matrix(c(1,1,1,1,1,1,2,3,4), 3, 3, byrow=TRUE))    # 3 plots at once
+
+  plot(  Y,  type="n")
+  lines( Y1, type="o", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)" )  
+  lines( Y2,       type="o", col="red")
   lines( Yhat,     type="o", col="blue")
   lines( Yhat.CIu, type="l", col="gray30", lty=2)
   lines( Yhat.CIl, type="l", col="gray30", lty=2)
 
 
-
-
   # - Plot the prediction error
-  layout(matrix(1:2, 1, 2))    # two plots side by side
   plot( (window.size+1):length(Y), Pred.error, type="o", main="Prediction Error (Red-Blue)" ) 
-  abline(h=c(-1.96, 1.96), col="blue", lty=2)
+  abline(h=0, lty=2)
   acf(Pred.error)
   layout(1)                    # reset the layout
 
