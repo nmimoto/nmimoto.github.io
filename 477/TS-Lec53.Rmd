@@ -1,0 +1,305 @@
+---
+title: "Finite Sample Property of MLE"
+author: "[Nao Mimoto](https://nmimoto.github.io/) - 
+        [Dept. of Statistics](http://www.uakron.edu/stat/) :
+        [The University of Akron](http://www.uakron.edu)"
+date: 
+output: html_document
+background-color: black
+---
+
+<br><hr>        
+<!--------------------------------------------------------------------->        
+<!--
+  library(rmarkdown)
+  render("TS-Lec53.Rmd", html_document(toc=TRUE, toc_float=FALSE, toc_depth=2, theme="readable", highlight="tango" ))
+
+
+  ### THIS FILE TAKES ABOUT 1min to RUN BECAUSE OF SIMULATION ###
+
+
+--->
+
+
+[TS Class Web Page](https://nmimoto.github.io/477/) -- [R resource page](https://nmimoto.github.io/R/)                     
+
+
+
+
+
+
+
+
+<br><br><hr> 
+
+<!----------------------------------------------------->
+# 1. Finite Sample Property of MLE
+
+<br>
+
+<!--------->
+## a. 1-time simulation and MLE
+ 
+```{r, fig.width=9, fig.height=4}
+  mu <- 5
+  X  <- arima.sim(n = 200, list(ar = c(0.7), ma = c(0.4)) ) + mu
+  plot(X, type="o")
+
+  Fit1 <- arima(X, order=c(1,0,1))
+  Fit1
+
+  str(Fit1)          # see what's inside
+  Fit1$coef          # parameter estimates (MLE)
+  Fit1$var.coef      # variance of MLE using asymptotic formula
+
+  c(Fit1$var.coef[1,1], Fit1$var.coef[2,2], Fit1$var.coef[3,3])
+```
+
+
+
+
+<br><br>
+
+<!--------->
+## b. Put above in a loop of 1000. 
+ 
+
+```{r, fig.width=9, fig.height=4, include=FALSE}
+
+  #-Repeat above for 1000 times, recording Est$coef each time.
+  #       Compare the simulated variance and theoretical asympt variance ---
+
+  n=100
+
+  MLE  <- matrix(0,1000,7)  #matrix to record estimated values
+  Vars <- matrix(0,1000,7)  #matrix to record estimated values
+
+  set.seed(23373)
+  for (i in 1:900) {
+    mu <- 5
+    # X  <- arima.sim(n = n,  list(ar = c(0.7), ma = c(0.4))  ) + mu                    # Case 1
+    X  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.6, -.4, .2))  ) + mu    # Case 2
+
+    Est      <- arima(X, order=c(3,0,3))
+    MLE[i,]  <- Est$coef
+    Vars[i,] <- diag(Est$var.coef)
+  }
+
+```
+
+
+```{r, eval=FALSE, fig.width=9, fig.height=4}
+
+  #-Repeat above for 1000 times, recording Est$coef each time.
+  #       Compare the simulated variance and theoretical asympt variance ---
+
+  n=100
+
+  MLE  <- matrix(0,1000,7)  #matrix to record estimated values
+  Vars <- matrix(0,1000,7)  #matrix to record estimated values
+
+  set.seed(23373)
+  for (i in 1:900) {
+    mu <- 5
+    # X  <- arima.sim(n = n,  list(ar = c(0.7), ma = c(0.4))  ) + mu                    # Case 1
+    X  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.6, -.4, .2))  ) + mu    # Case 2
+
+    Est      <- arima(X, order=c(3,0,3))
+    MLE[i,]  <- Est$coef
+    Vars[i,] <- diag(Est$var.coef)
+  }
+
+```
+
+
+
+ 
+```{r, fig.width=9, fig.height=7}
+ 
+  #--- Result for phi1, theta1, mu ----
+  layout(matrix(1:6, 2,3, byrow=TRUE)); 
+  hist(MLE[,1], main="phi1 (.7)");     abline(v= .7, col="blue")
+  hist(MLE[,2], main="phi2 (.2)");     abline(v= .2, col="blue")
+  hist(MLE[,3], main="phi3 (.3)");     abline(v=-.3, col="blue")
+  hist(MLE[,4], main="theta1 (.6)");   abline(v= .6, col="blue")
+  hist(MLE[,5], main="theta2 (.4)");   abline(v=-.4, col="blue")
+  hist(MLE[,6], main="theta3 (.2)");   abline(v= .2, col="blue")
+  
+  Result <- cbind( apply(MLE, 2, mean), apply(MLE, 2, sd), sqrt(apply(Vars, 2, mean)) )
+  colnames(Result) <- c("Mean","SE by Sim",  "SE from Output")
+  Result
+
+```
+
+
+<br><br>
+
+<!--------->
+## c. When errors are not Normal
+ 
+
+```{r, fig.width=9, fig.height=7}
+  n=100
+  MLE  <- MLE2 <- Vars <- Vars2 <- matrix(0,1000,3)  #matrix to record estimated values
+  
+  for (i in 1:1000) {
+
+    #-- Normal errors ---
+    X   <- arima.sim(n = n, list(ar = c(0.7), ma = c(0.4))  ) + mu
+    #X   <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.4, -.3, .2))  ) + mu
+
+    Est      <- arima(X, order=c(1,0,1))
+    MLE[i,]  <- Est$coef
+    Vars[i,] <- c(Est$var.coef[1,1], Est$var.coef[2,2], Est$var.coef[3,3])
+
+    #-- non-normal errors ---
+    et <- rt(n, 4)                          # t-distribution with df=4.
+    Y  <- arima.sim(n=n, list(ar = c(0.7), ma = c(0.4)), innov=et  ) + mu
+    #Y  <- arima.sim(n = n, list(ar = c(0.7, .2, -.3), ma = c(0.4, -.3, .2))  ) + mu
+
+    Est2 <- arima(Y, order=c(1,0,1))
+    MLE2[i,]  <- Est2$coef
+    Vars2[i,] <- c(Est2$var.coef[1,1], Est2$var.coef[2,2], Est2$var.coef[3,3])
+  }
+
+  # Plotting Results 
+  p=1    # chose p: 1=phi1, 2=theta1, 3=mu
+
+  layout(matrix(1:4, 2,2, byrow=FALSE)); 
+  hist(MLE[,1],  main="e ~ Norm: phi1 (.7)"  );  abline(v= .7, col="blue") 
+  hist(MLE[,2],  main="e ~ Norm: theta1 (.4)");  abline(v= .4, col="blue") 
+  hist(MLE2[,1], main="e ~ t(v): phi1 (.7)"  );  abline(v= .7, col="blue") 
+  hist(MLE2[,2], main="e ~ t(v:) theta1 (.4)");  abline(v= .4, col="blue") 
+
+  Result2 <- rbind(c(mean(MLE[,1]),   sd(MLE[,1]),  mean(MLE[,2]),   sd(MLE[,2] ) ),
+        c(mean(MLE2[,1]),  sd(MLE2[,1]), mean(MLE2[,2]),  sd(MLE2[,2]) ) )
+
+  colnames(Result2) <- c("Mean phi1 (N)",   "SE phi1 (N)", "Mean th1 (t)", "SE th1 (t)")
+  Result2 
+```
+ 
+
+
+
+
+
+
+
+
+<br><br><hr>
+
+<!----------------------------------------------------->
+# Summary
+
+### \hspace{10mm} $\cdot$ Output for s.e of parameter estimation is calculated by using large-sample formula.  It is not always accurate.  
+
+### \hspace{10mm} $\cdot$ MLE is derived assuming that $e_t$ is Normally distributed, but when that is violated, performance of MLE is not significantly affected.  
+
+
+
+
+
+        
+
+
+
+<br><br><br><br><br>
+
+[TS Class Web Page](https://nmimoto.github.io/477/) -- [R resource page](https://nmimoto.github.io/R/)                     
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
+
+
+
+
+<!------------------------------------------------
+
+
+Australian Electricity Production (Regression)
+
+
+* From Cowpartwait Ch6.5 
+
+
+
+```{r, fig.width=9, fig.height=4}
+ 
+  CBE <- read.csv("https://nmimoto.github.io/datasets/cbe.csv", header=T) 
+  Elec <- ts(CBE[, 3], start = 1958, freq = 12)
+
+  Time  <- 1:length(Elec)
+  Ntime <- time(Elec)     # 1958-
+  Nmth  <- cycle(Elec)    # Number for month
+  Reg.fit1 <- lm(log(Elec) ~ Ntime + I(Ntime^2) + factor(Nmth))  # Regression
+  summary(Reg.fit1)       # Residuals from the regression
+
+
+  Reg.Res  <- Reg.fit1$residuals                 # Residuals from Regression
+  Reg.Res1 <- ts(Reg.Res, start=1958, freq=12)   # Turn it into TS object
+
+  Reg.Fit  <- Reg.fit1$fitted                    # Fitted model from the regression
+  Reg.Fit1 <- ts(Reg.Fit, start=1958, freq=12)   # Turn it into TS object for plotting
+  
+  ts.plot(log(Elec), Reg.Fit1, col=c("black", "red"))
+  ts.plot(log(Elec), Reg.Fit1, col=c("black", "red"), xlim=c(1970, 1980))
+
+  plot(Reg.Res1)   # plot the Residuals from the regression
+
+  library(forecast)                                            # load forecast package
+  source('https://nmimoto.github.io/R/TS-00.txt')              # load Randomness.tests
+  
+
+  Fit1 <- auto.arima(Reg.Res1, d=0, stepwise=FALSE)
+  Fit2 <- Arima(Reg.Res1, order=c(3,0,7))
+
+  Randomness.tests(Fit1$resid)
+```
+
+
+
+
+
+-------------------------------------------------
+Lake HURON
+
+
+```{r, eval=FALSE, fig.width=5, fig.height=4}
+ 
+#--- Analysis 1: direct fit
+
+  library(forecast)
+  source("http://gozips.uakron.edu/~nmimoto/477/TS_R-90.txt")
+  
+  X1 <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/lake.txt")
+  X  <- ts(X1, start=1875, freq=1)
+  
+  plot(X, type="o")
+  
+  layout(matrix(c(1,2), 1, 2)
+  acf(X);  pacf(X); layout(1)
+  
+  Fit1 <- auto.arima(X, d=0);   Fit1    # find best ARMA(p,q) by AICc
+  
+  plot(Fit1$residuals)
+  
+  layout(matrix(c(1,2), 1, 2))
+  acf(Fit1$residuals);  pacf(Fit1$residuals); layout(1)
+  
+  Randomness.tests(Fit1$residuals)
+
+```
+
+
+Analysis 1 (direct fit)
+
+* auto.arima() chooses AR(2) with min AICC. 
+
+* AR(2) with constant mean was fit directly to data.
+  $$
+  Y_t \hspace3mm = \hspace3mm \mu + X_t \\\\
+  X_t \hspace3mm = \hspace3mm \phi_1 X_{t-1} + \phi_2 X_{t-2} + e_t 
+  $$
+
+--------------------------------------------->
