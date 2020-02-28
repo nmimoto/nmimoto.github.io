@@ -61,7 +61,7 @@ MLE  = matrix(0, itt, 4)  #matrix to record estimated values
 
 i=1
 while (i < itt) {
-  X  <- arima.sim(n, list( ar=c(1.5051,  -0.7517,  -0.4294,  0.4672)))
+  X  <- arima.sim(n = 250, list(ar = c(1.5051,  -0.7517,  -0.4294,  0.4672), ma = c(0) )) 
   Est <- tryCatch(
     Arima(X, order=c(4,0,0)),
     error = function(ss){return(NA)}  
