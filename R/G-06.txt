@@ -50,3 +50,26 @@ T
 mean(T)                           #Loop finishes, and still can't do this b/c of NA, but....
 mean(  T[which(is.na(T)==0)]  )   #now we can do this
 
+
+
+
+
+#--- While loop using tryCatch()  -------------------------------
+n   = 100
+itt = 250
+MLE  = matrix(0, itt, 4)  #matrix to record estimated values
+
+i=1
+while (i < itt) {
+  X  <- arima.sim(n, list( ar=c(1.5051,  -0.7517,  -0.4294,  0.4672)))
+  Est <- tryCatch(
+    Arima(X, order=c(4,0,0)),
+    error = function(ss){return(NA)}  
+  )  
+  if ( length(is.na(Est))>1) {
+    MLE[i,]  <- Est$coef
+    i=i+1
+  }
+}
+
+
