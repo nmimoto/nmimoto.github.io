@@ -56,22 +56,33 @@ mean(  T[which(is.na(T)==0)]  )   #now we can do this
 
 #--- While loop using tryCatch()  -------------------------------
 n   = 100
-itt = 250
-MLE  = matrix(0, itt, 4)  #matrix to record estimated values
+itt = 50
+MLE  = matrix(0, itt, 9)  
+Vars = matrix(0, itt, 9)  
 
 i=1
-while (i < itt) {
-  X  <- arima.sim(n = 250, list(ar = c(1.5051,  -0.7517,  -0.4294,  0.4672), ma = c(0) )) 
+j=1
+while (i <= itt) {
+  X  <- arima.sim(n=n, 
+                  list(ar = c(1.5051,  -0.7517,  -0.4294,  0.4672), 
+                       ma = c(-2.6066,  2.8921,  -1.6503,  0.4296)  ) ) + 8
   Est <- tryCatch(
-    Arima(X, order=c(4,0,0)),
+    Arima(X, order=c(4,0,4)),
     error = function(ss){return(NA)}  
   )  
   if ( length(is.na(Est))>1) {
     MLE[i,]  <- Est$coef
+    Vars[i,] <- diag(Est$var.coef)
     i=i+1
   } else {
-    print(i)
+    j=j+1
   }
 }
+
+Result <- cbind( apply(MLE, 2, mean),
+                 apply(MLE, 2, sd),
+                 sqrt(apply(Vars, 2, mean)))
+colnames(Result) <- c("Mean",  "SE by Sim",  "SE from Output")
+Result
 
 
