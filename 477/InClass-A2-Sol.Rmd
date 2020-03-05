@@ -26,7 +26,7 @@ The preview shows you a rendered HTML copy of the contents of the editor. Conseq
 
 ## You can keep your note and Math formula with Latex, for example,
 
-* Central Limt Theorem says, when $X_1, \ldots, X_n$ are i.i.d. random variable
+* Central Limit Theorem says, when $X_1, \ldots, X_n$ are i.i.d. random variable
 from a distribution $F(x)$ with mean $E(X)=\mu$ and variance $V(X)=\sigma^2$,
 the sample mean is approximately normally distributed:
 
@@ -45,7 +45,7 @@ $$
 <br> 
 
 ```{r, fig.width=5, fig.height=4}
-  #- Simulate White Noise (Click "play" bottun on your right in R studio)
+  #- Simulate White Noise (Click "play" button on your right in R studio)
   e <- rnorm(100, 0, 1)        # generate 100 N(0,1) error 
   plot(e, type="o")
 ```
@@ -140,7 +140,7 @@ sd(D2)
 ```
 
 Estimate of the conditional standard deviation $\sigma$ is 0.097224, and
-unconditonal standard deviation $SD(Y_t)$ is estimated as 0.1097.
+unconditional standard deviation $SD(Y_t)$ is estimated as 0.1097.
 
 
 
@@ -225,7 +225,7 @@ When rolling 1-step prediction is performed on the last 29 observations using a 
 prediction rMSE came out to be .11734.  This is higher than $\hat \sigma=$.097224, which is what
 the prediction rMSE should be if the data actually came from AR(3) model.
 
-Prediction rMSE of .11734 is actually higher than unconditional SD of 0.1097.  The model is not offerting anything better than the prediction using unconditional SD.  This does not mean that the model is wrong or not fitting, since residual check went well.
+Prediction rMSE of .11734 is actually higher than unconditional SD of 0.1097.  The model is not offering anything better than the prediction using unconditional SD.  This does not mean that the model is wrong or not fitting, since residual check went well.
 Rather, the model has such a high $\sigma$ compared to the unconditional SD, it is not useful in forecasting.  
 
 
