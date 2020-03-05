@@ -1,0 +1,295 @@
+---
+title: "In-Class Assignment 2 - Sample Solution"
+author: "[Nao Mimoto](https://nmimoto.github.io/)"
+date: 
+output: html_notebook
+---
+
+
+
+<!------------------------------------------------------>
+# 1. This output is made by R markdown (R notebook)
+
+<br> 
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+You can execute the R code chunk by clicking the *Run* button on your right or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+
+## You can keep your note and Math formula with Latex, for example,
+
+* Central Limt Theorem says, when $X_1, \ldots, X_n$ are i.i.d. random variable
+from a distribution $F(x)$ with mean $E(X)=\mu$ and variance $V(X)=\sigma^2$,
+the sample mean is approximately normally distributed:
+
+$$
+  \overline X \sim N\left(\mu, \frac{\sigma^2}{n}\right).
+$$
+
+
+
+<br><br>
+
+
+<!--------->
+### And you can keep the R code, and output at the same time.
+
+<br> 
+
+```{r, fig.width=5, fig.height=4}
+  #- Simulate White Noise (Click "play" bottun on your right in R studio)
+  e <- rnorm(100, 0, 1)        # generate 100 N(0,1) error 
+  plot(e, type="o")
+```
+
+
+
+
+
+<br><br><br><br><hr>
+
+
+<!------------------------------------------------------>
+# 2. Analysis of Global Temp data
+
+<br><br>  
+
+## Load the data from web
+
+```{r, fig.width=5, fig.height=4}
+D  <- read.csv("https://nmimoto.github.io/datasets/gtemp.csv")
+D1 <- ts(D, start=c(1), freq=1)    # turn D into time series object
+D2 <- diff(D1)                        # Take monthly difference  
+
+plot(D1)
+plot(D2)
+```
+
+
+<br><br>  
+
+
+<!--------->
+#### 1. Does “D2” look like White Noise, or does it look like AR(p)?  Examine plots of ACF and PACF and explain your thoughts briefly.  
+
+```{r, fig.width=5, fig.height=4}
+acf(D2)
+pacf(D2)
+```
+
+ACF and PACF does not look like those of WN, especially PACF.
+If we take the plot of ACF to be going down, and PACF cutting off after lag3,
+then it is a sign of AR(3).  
+
+
+<br><br><br> 
+
+<!--------->
+#### 2. Use auto.arima() function in forecast package to fit AR(p) model using AICc as a best fit criteria (auto.arima() uses AICc as default criteria.  AICc is a slightly improved version of AIC).   What is the suggested model? 
+
+```{r, fig.width=5, fig.height=4}
+library(forecast)  
+source('https://nmimoto.github.io/R/TS-00.txt') 
+
+auto.arima(D2, d=0, max.q=0)     # Fit AR(p) model
+```
+
+AR(3) with mean is suggested.  However, the mean is not significant, and should be removed.  
+
+
+<br><br><br> 
+
+<!--------->
+#### 3.  From AR(p) model suggested in part 2, investigate AR(p-1) and AR(p+1).  Remove any parameters that has non-significant parameter estimate.  What is your final AR model?  
+
+```{r, fig.width=5, fig.height=4}
+Arima(D2, order=c(2,0,0))
+Arima(D2, order=c(4,0,0))
+Arima(D2, order=c(2,0,0), include.mean=FALSE)
+Arima(D2, order=c(4,0,0), include.mean=FALSE)
+Arima(D2, order=c(3,0,0), include.mean=FALSE)
+```
+
+In all AR(2), AR(3), and AR(4) model mean is not significant whenever it is included.
+
+Without the mean, AR(4) has non-significant $\phi_4$.  Therefore, AR(3) without mean is the best model.  
+
+
+<br><br><br> 
+
+
+<!--------->
+#### 4.  In your final AR model, what is the estimate for the standard deviation of the error term? What is the estimate of unconditional standard deviation?  
+
+
+```{r, fig.width=7, fig.height=4}
+Fit01 <- Arima(D2, order=c(3,0,0), include.mean=FALSE)
+Fit01
+
+sqrt(Fit01$sigma2)
+
+sd(D2)
+```
+
+Estimate of the conditional standard deviation $\sigma$ is 0.097224, and
+unconditonal standard deviation $SD(Y_t)$ is estimated as 0.1097.
+
+
+
+<br><br><br> 
+
+<!--------->
+#### 5.  Perform the residual analysis using Randomness.tests() provided on the class web site.  Is model fit adequate?  Comment on the quality of your residuals.  
+
+```{r, fig.width=7, fig.height=4}
+source("https://nmimoto.github.io/R/TS-00.txt")
+
+Randomness.tests(Fit01$residuals)
+```
+ 
+P-values are high in all 3 Ljung-Box tests and 2 McLeod-Li test,
+indicating that the residuals are uncorrelated.  Therefore the model is fitting adequately.
+
+P-value is high for J-B test, indicating that the residuals looks normally distributed. 
+
+
+
+
+<br><br><br> 
+
+<!--------->
+#### 6.  There are 129 observations in D2.  Perform 1-month rolling forecast of the data with model found in part 3.  Use window size of 100, and predict the last 29 observation 1-month at a time in retrospective.  What is the prediction root mean square?  Is the prediction satisfactory?  Is the prediction rMSE (from the last 29 out-of-sample comparison) close to what it was suggested by your model (this is what #7 is asking)?  
+
+
+```{r, fig.width=7, fig.height=4}
+#---------------------------------------
+#--- Rolling 1-period forecast with AR(4)
+
+  Y <- D2                 # Entire data
+  window.size <- 100       # Window size for estimation
+  order.in <- c(3,0,0)     # model order
+
+
+    Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
+    for (i in 1:(length(Y)-window.size)) {
+      # Force to fit AR(2) each time on last 100 obs.
+      Fit00 <- Arima( Y[i:(i+window.size-1)], order=order.in, include.mean=FALSE)     # <--- no mean
+  
+      Y.h  <- predict(Fit00, n.ahead=1)       # one step prediction
+      Yhat[i]     <- Y.h$pred
+      Yhat.CIu[i] <- Yhat[i]+1.96*Y.h$se
+      Yhat.CIl[i] <- Yhat[i]-1.96*Y.h$se
+    }
+  # Yhat starts at window.size+1 up to length(Y)
+  Yhat     = ts(Yhat, start=time(Y)[window.size+1], freq=1)
+  Yhat.CIu = ts(Yhat, start=time(Y)[window.size+1], freq=1)
+  Yhat.CIl = ts(Yhat, start=time(Y)[window.size+1], freq=1)
+  Y1 = window(Y, start=time(Y)[1], end=time(Y)[window.size])
+
+  #- Calculate prediction performance
+  Pred.error = Y[(window.size+1):length(Y)] - Yhat
+  Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
+  c( mean(Pred.error), Pred.rMSE )                 # Av Pred Error, and pred rMSE
+  
+
+  #- Plot the prediction result with original data 
+  plot(Y, type="o", col="red",
+    main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)" )  
+  lines( Y1,       type="o")
+  lines( Yhat,     type="o", col="blue")
+  lines( Yhat.CIu, type="l", col="gray30", lty=2)
+  lines( Yhat.CIl, type="l", col="gray30", lty=2)
+
+
+
+
+  # - Plot the prediction error
+  layout(matrix(1:2, 1, 2))    # two plots side by side
+  plot( (window.size+1):length(Y), Pred.error, type="o", main="Prediction Error (Red-Blue)" ) 
+  abline(h=c(-1.96, 1.96), col="blue", lty=2)
+  acf(Pred.error)
+  layout(1)                    # reset the layout
+
+
+```
+
+When rolling 1-step prediction is performed on the last 29 observations using a window size of 100 observations,
+prediction rMSE came out to be .11734.  This is higher than $\hat \sigma=$.097224, which is what
+the prediction rMSE should be if the data actually came from AR(3) model.
+
+Prediction rMSE of .11734 is actually higher than unconditional SD of 0.1097.  The model is not offerting anything better than the prediction using unconditional SD.  This does not mean that the model is wrong or not fitting, since residual check went well.
+Rather, the model has such a high $\sigma$ compared to the unconditional SD, it is not useful in forecasting.  
+
+
+
+
+<br><br><br> 
+
+<!--------->
+#### 7.  If you perform 1-month prediction on the future observation (obs 130).  What is the estimate of the theoretical prediction rMSE? What is the 95% CI for 1-month prediction for the next monthly difference (obs 130)?  
+
+```{r, fig.width=5, fig.height=4}
+time(D2)
+
+#--- 10-period forecast 
+forecast(Fit01)
+```
+
+The forecast for the nest observation is -0.019364.
+95% confidence interval is (-0.2099215 0.1711924). 
+
+(129 observations in D2 was labeled 2.... 130, so the 130th observation forecasted has label 131.)
+
+
+<br><br><br> 
+
+<!--------->
+#### 8.  Using all 129 observations, perform 12-month forecast.  Plot the graph.  What is the line that h-step forecast is approaching?  
+
+```{r, fig.width=5, fig.height=4}
+#--- 12-period forecast 
+plot( forecast(Fit01), 12)
+```
+
+The h-step forecast of AR(3) approaches 0, since the mode does not include mean term.  
+
+If the model has a mean term, then h-step forecast will approach the mean.  
+
+<br><br><br> 
+
+<!--------->
+#### 9.  Write down mathematical formula for your final AR model.  Don’t forget parameters for your error term.       
+
+```{r, fig.width=5, fig.height=4}
+Fit01
+```
+
+
+My model is AR(3) without mean.  So denoting the observation with $Y_t$,
+
+$$
+Y_t = X_t
+$$
+and $X_t$ is AR(3) without mean.
+
+$$
+X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \phi_3 X_{t-3} + e_t
+$$
+where $e_t \sim WN(0, \sigma^2)$.
+
+Using the estimates from \# 3,
+$$
+X_t = (-0.4488) X_{t-1} + (-0.3750) X_{t-2} + (-0.3009) X_{t-3} + e_t
+$$
+where $e_t \sim WN(0, (.097224)^2)$.
+
+
+</body>
