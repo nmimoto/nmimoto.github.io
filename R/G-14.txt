@@ -1,20 +1,35 @@
 
 
 #---------------------------------------------------------
-# In the loop, use the function and assign it to automatically named variables
+# Automatically create variables and assign values (not to vectors)  
 
 
+#- Custom Function 
 A <- function(n) {
   b <-  n*10-5
   return(b)
 }
 
 
-
-
 for (i in 10:15){
-
    assign(paste("Year_", i, sep=""),  A(i*2)  )
-
 }
 
+c(Year_10, Year_11) 
+
+
+
+
+
+#---------------------------------------------------------
+# Pass in string as a argument to a function   
+
+X <- rnorm(10)
+
+foo1 <- mean(X, trim=0, na.rm=FALSE)
+
+myoptions <- "trim=0, na.rm=FALSE"
+foo2 <- eval(  parse(text = paste("mean(X, ", myoptions, ")"))  )
+
+foo1
+foo2
