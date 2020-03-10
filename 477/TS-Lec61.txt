@@ -1,9 +1,178 @@
 ###
 ###
-###  - R code only
+###  (6-1) MODEL NON-STATINARY TS - R code only
 ###
 ###
 ####################################
+
+
+
+# 1. Non-stationary time series
+
+## Daily Price of Dow Jones 
+
+  D <- read.csv("https://nmimoto.github.io/datasets/dowj.csv", header=TRUE)
+  Dowj  <- ts(D, start=1, freq=1)    # turn D into TS object
+  plot(Dowj, type="o")               # plot with both line and circle
+
+## Lake Huron Data
+
+  D <- read.csv("http://gozips.uakron.edu/~nmimoto/pages/datasets/lake.csv", header=TRUE)
+  Lake  <- ts(D, start=1875,, freq=1)  # turn it into TS object startng year 1875
+  plot(Lake, type="o")
+
+
+
+
+## Global Temperature Data
+
+ 
+  library(astsa)     # do install.packages("astsa") if not installed yet
+  data(gtemp)        # load data that is inside astsa package
+  plot(gtemp, type="o", ylab="Global Temp Deviations")
+
+
+
+
+# 2. Tests for Stationarity
+
+ #- same file as Randomness.tests()  
+ source("https://nmimoto.github.io/477/TS_R-90.txt")  
+                         # load Stationarity.tests() from class web page.
+                         
+
+ 
+
+## Ex: Use it on above datasets
+
+  source("https://nmimoto.github.io/477/TS_R-90.txt")  
+                          # Load Stationarity.tests() from Course Webpage
+
+  #--- Test it on random sample ---
+  X <- rnorm(100)
+  plot(X, type="o")
+  Stationarity.tests(X)  
+
+
+  #--- Lake Huron Data ---
+  plot(Lake, type="o") 
+  Stationarity.tests(Lake)
+
+ 
+  #--- Global Temp Data ---
+  plot(gtemp, type="o", ylab="Global Temperature Deviations")
+  Stationarity.tests(gtemp)
+
+
+
+## Ex: Australian Steel Data 
+
+  D  <- read.csv("https://nmimoto.github.io/datasets/Steel.csv")
+  D1 <- ts(D[,2], start=c(1956,1), freq=12)
+  D2 <- window(D1, start=c(1969, 12))
+
+  plot(D1, type="o")
+  Stationarity.tests(D1)
+
+  plot(D2, type="o")
+  Stationarity.tests(D2)
+
+  D4 <- window(D2, end=c(1981,  12))    # Dec 1969 to Dec 1981
+  D5 <- window(D2, start=c(1984, 1))    # Feb 1984 to Nov 1993
+
+  Stationarity.tests(D4)
+  Stationarity.tests(D5)
+
+ 
+
+# 3. Modeling Lake HURON data 4 different ways
+
+
+## a) Direct ARMA fit
+
+
+  library(forecast)
+  source('https://nmimoto.github.io/R/TS-00.txt') 
+  
+  D <- read.csv("https://nmimoto.github.io/datasets/lake.csv")
+  Lake  <- ts(D, start=1875, freq=1)
+  
+  plot(Lake, type="o")
+  
+  layout(matrix(c(1,2), 1, 2))
+  acf(Lake)
+  pacf(Lake)
+  layout(1)
+
+  Stationarity.tests(Lake)
+
+  # find best ARMA(p,q) by AICc
+  Fit1 <- auto.arima(Lake, d=0, stepwise=FALSE, approximation=FALSE)  
+              
+  Fit1    
+  
+  Randomness.tests(Fit1$residuals)
+
+
+
+## b) Forcing Linear Trend
+
+  Reg2 <- lm(Lake~time(Lake))
+  summary(Reg2)
+  
+  plot(Lake, type="o")                     
+  abline(Reg2, col="red")         # overlay regression line in red
+
+  plot(Reg2$residuals, type="o")            # plot of the residuals from regression
+  
+  # fit the residuals with ARMA(p,q)
+  Fit2 <- auto.arima(Reg2$residuals, d=0, stepwise=FALSE, approximation=FALSE)   
+  Fit2
+  
+  Randomness.tests(Fit2$resid)
+  
+
+
+## c) Box-Cox Differencing (ARIMA modeling)
+
+  diff.Y <- diff(Lake)      # takes difference between the observations
+  plot(diff.Y, type='o')
+
+  layout(matrix(1:2, 1, 2))
+  acf(diff.Y)
+  pacf(diff.Y)
+  layout(1)
+
+  Stationarity.tests(diff.Y)       # See if diff(Y) is stationary  
+
+  # Fit the difference of Lake with ARMA 
+  Fit3 <- auto.arima(diff.Y, d=0, stepwise=FALSE, approximation=FALSE)    
+  Fit3
+
+  Randomness.tests(Fit3$residuals)
+
+
+  #-- Exactly same as above 
+  Fit3b <- Arima(Lake, order=c(1,1,2), include.mean=FALSE)    
+  Fit3b
+
+  Randomness.tests(Fit3b$residuals)
+
+
+
+## d) Box-Cox Differencing (ARIMA modeling)
+
+```{r, fig.width=9, fig.height=4}
+
+  diff.Y <- diff(Lake)      # takes difference between the observations
+  plot(diff.Y, type='o')
+
+  Randomness.tests(diff(Lake))
+
+  #-- Exactly same as above 
+  Fit4 <- Arima(Lake, order=c(0,1,0), include.mean=FALSE)    
+  Fit4
+
 
 
 

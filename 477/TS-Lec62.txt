@@ -1,9 +1,166 @@
 ###
 ###
-###  - R code only
+###  (6-2) B-J DIFFERENCING - R code only
 ###
 ###
 ####################################
+
+# 1. Box-Jenkins Differencing Method
+
+  set.seed(42352)
+  t   <- 1:100
+  Y   <- 3 - 10*t + arima.sim(n=100, list(ar = c(.7,.2)), sd=100)
+    
+  Y2 <- diff(Y)              # take the difference 
+
+  layout(matrix(1:2,1,2))
+  plot(Y,type="o")           # Y is simulated data
+  plot(Y2, type="o" )
+
+  mean(Y2)
+
+
+## c) Differencing Quadratic Trend
+
+  t   <- 1:100
+  tsq <- t^2
+  Y   <- 3 - .5*t + .1*tsq + arima.sim(n=100, list(ar = c(.7,.2)))*10
+
+  layout(matrix(1:2, 1, 2))
+  plot(Y,type="o")
+  plot(diff(Y),type="o")
+  
+  plot(diff(diff(Y)),type="o")  
+
+
+
+
+
+
+
+# 2. Difference on Random Trends
+ 
+### Example: Simulate RW
+
+  #- RW without drift
+  e = rnorm(100)      #- 100 random number from N(0,1) 
+  M = cumsum(e) 
+  plot(M,type="o")
+
+  #- repeat this 50 times
+  plot(M,type="l", ylim=c(-40,40), main="50 random walks")
+  for (i in 1:50) {
+    e = rnorm(100)      #- copy and paste these 3 lines many times
+    M = cumsum(e) 
+    lines(M)
+  }
+
+ 
+
+
+
+## b) Differencing Random Walk 
+
+###  Example: Random Walk
+
+  e = rnorm(100)      #- 100 random number from N(0,1) 
+  M = cumsum(e) 
+  
+  layout(matrix(1:2, 1, 2))
+  plot(M,type="o", main="Random Walk")
+  plot(diff(M), type="o", main="difference of RW");
+  acf(diff(M), main="ACF of the RW difference")
+  hist(diff(M))
+
+
+
+## c) Random Walk with Drift
+
+  layout(matrix(1:2, 1, 2))
+  
+  #- RW with drift (delta = .3)
+  e = rnorm(100, .3, 1)      #- 100 random number from N(1,1) 
+  M = cumsum(e) 
+  
+  #- repeat this 50 times
+  plot(M,type="l", ylim=c(-40,40), main="50 RW with drift .3")
+  for (i in 1:50) {
+    e = rnorm(100, .3, 1)      
+    M = cumsum(e) 
+    lines(M)
+  }
+
+
+  #- RW without drift
+  e = rnorm(100)      #- 100 random number from N(0,1) 
+  M = cumsum(e) 
+
+  #- repeat this 50 times
+  plot(M,type="l", ylim=c(-40,40), main="50 RW w/o drift")
+  for (i in 1:50) {
+    e = rnorm(100)      #- copy and paste these 3 lines many times
+    M = cumsum(e) 
+    lines(M)
+  }
+
+
+
+
+
+## d) Testing Random Walk for Drift
+
+  set.seed(87656)
+
+  e = rnorm(100, .3, 1)   
+  M = cumsum(e)
+
+  plot(M,type="o")
+   
+  plot(diff(M), type="o", main="difference of RW")
+  c(mean(diff(M)), sd(diff(M)), 1.96*sd(diff(M))/sqrt(100) )
+
+
+
+
+## Ex1: Temperature Data
+
+  library(astsa)
+  data(gtemp)
+    
+  plot(gtemp, type="o", ylab="Global Temperature Deviations")
+    
+  plot(diff(gtemp), type="o")
+  acf(diff(gtemp))
+
+
+
+
+## Ex2: AAPL
+
+  library(quantmod)      # Do install.packages("quantmod")  if not installed 
+    
+  getSymbols("AAPL")     #- download from Yahoo!
+        
+  X <- as.ts(AAPL$AAPL.Adjusted[400:200])
+  plot(X, type="o")
+    
+  layout(matrix(1:2, 1, 2))
+  plot(diff(X), type="o")
+  acf(diff(X))
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
