@@ -185,16 +185,8 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
       # Use Arima() with given options
 
       # Model Estimation 
-      if (is.null(xreg)){
-          #- When Linear Trend is Not Present
-          Fit00 <- Arima( Y[i:(i+window.size-1)],
-                          order=Arima.order,
-                          include.mean = include.mean,
-                          include.drift = include.drift,
-                          lambda = lambda,
-                          seasonal = seasonal)
-      } else {
-          # When Linear Trend is Present
+      if (xreg){
+          #- When Linear Trend is Present
           Fit00 <- Arima( Y[i:(i+window.size-1)],
                           order=Arima.order,
                           include.mean = include.mean,
@@ -202,6 +194,14 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                           lambda = lambda,
                           seasonal = seasonal,
                           xreg=time(Y[i:(i+window.size-1)]))
+      } else {
+          #- When Linear Trend is Not Present
+          Fit00 <- Arima( Y[i:(i+window.size-1)],
+                          order=Arima.order,
+                          include.mean = include.mean,
+                          include.drift = include.drift,
+                          lambda = lambda,
+                          seasonal = seasonal)
       }
 
       Y.h  <- forecast(Fit00, 1)       # one step prediction
