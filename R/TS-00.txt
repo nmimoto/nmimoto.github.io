@@ -172,7 +172,7 @@ KStest <- function(X) {
 
 
 #--- Rolling 1-step forecast with Arima() ---------------------------
-Rolling1step.forecast <- function((Y, window.size, Arima.order, pred.plot, 
+Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                         include.mean, include.drift, lambda, xreg, seasonal){
 
     library(forecast)
@@ -206,6 +206,7 @@ Rolling1step.forecast <- function((Y, window.size, Arima.order, pred.plot,
       Yhat.CIu[i] <- Yhat[i]+1.96*Y.h$se
       Yhat.CIl[i] <- Yhat[i]-1.96*Y.h$se
     }
+    
     # Yhat starts at window.size+1 up to length(Y)
     Yhat     = ts(Yhat,     start=time(Y)[window.size+1], freq=frequency(Y))
     Yhat.CIu = ts(Yhat.CIu, start=time(Y)[window.size+1], freq=frequency(Y))
@@ -216,9 +217,9 @@ Rolling1step.forecast <- function((Y, window.size, Arima.order, pred.plot,
     #- Calculate prediction performance
     Pred.error = Y2 - Yhat
     Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
-    cat(paste("Last ", (length(Y)-window.size), " obs fit retrospectively\n    with Rolling 1-step prediction"))
-    cat(paste("  Average prediction error: ", round(mean(Pred.error), 4)))
-    cat(paste("  root Mean Squared Error: ", round(Pred.rMSE, 4)))
+    cat(paste("\nLast ", (length(Y)-window.size), " obs fit retrospectively\n    with Rolling 1-step prediction"))
+    cat(paste("\n  Average prediction error: ", round(mean(Pred.error), 4)))
+    cat(paste("\n  root Mean Squared Error:  ", round(Pred.rMSE, 4)), "\n\n\n")
 
   if (pred.plot) {
     #- Plot the prediction result with original data
