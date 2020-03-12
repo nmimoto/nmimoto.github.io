@@ -216,11 +216,9 @@ Rolling1step.forecast <- function((Y, window.size, Arima.order, pred.plot,
     #- Calculate prediction performance
     Pred.error = Y2 - Yhat
     Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
-    print(paste("Last ", (length(Y)-window.size), " obs fit retrospectively"))
-    print(paste("    with Rolling 1-step prediction"))
-    print(paste("  Average prediction error ", round(mean(Pred.error), 4)))
-    print(paste("  root Mean Squared Error", round(Pred.rMSE, 4)))
-  
+    cat(paste("Last ", (length(Y)-window.size), " obs fit retrospectively\n    with Rolling 1-step prediction"))
+    cat(paste("  Average prediction error: ", round(mean(Pred.error), 4)))
+    cat(paste("  root Mean Squared Error: ", round(Pred.rMSE, 4)))
 
   if (pred.plot) {
     #- Plot the prediction result with original data
@@ -239,6 +237,12 @@ Rolling1step.forecast <- function((Y, window.size, Arima.order, pred.plot,
     acf(Pred.error)
     layout(1)                    # reset the layout
   }
+  
+  P <- matrix(c(round(mean(Pred.error), 4), round(Pred.rMSE, 4)), 1, 2)
+  colnames(P) <- c("mean pred error","rMSE") 
+  return(P)
+
+}
 
 
 
