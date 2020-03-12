@@ -118,8 +118,7 @@ Stationarity.tests <- function( A ) {
 
 #---------------------------------------------
 MV.av <- function(X,m){
-
-  # Moving avegrate of past m observations.  Only takes xts object.
+  # Moving avegrate that uses past m observations.  Only takes xts object.
   # Output $mean and $sd, and they are also xts.
   # If m=20, 1st $mean is mean(X[1:20]), which is indexed at 21st day.
   
@@ -164,7 +163,7 @@ KStest <- function(X) {
 }
 
 
-#-- ks.test lacks the sqrt(n) scaling!!
+#-- built-in ks.test() lacks the sqrt(n) scaling!!
 #
 #    ks.test(X, "pnorm", 0, 1)$statistic*sqrt(n)
 #
