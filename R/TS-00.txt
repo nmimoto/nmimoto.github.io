@@ -204,10 +204,10 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                           xreg=time(Y[i:(i+window.size-1)]))
       }
 
-      Y.h  <- predict(Fit00, n.ahead=1)       # one step prediction
-      Yhat[i]     <- Y.h$pred
-      Yhat.CIu[i] <- Yhat[i]+1.96*Y.h$se
-      Yhat.CIl[i] <- Yhat[i]-1.96*Y.h$se
+      Y.h  <- forecast(Fit00, 1)       # one step prediction
+      Yhat[i]     <- Y.h$mean
+      Yhat.CIu[i] <- Y.h$lower[2]
+      Yhat.CIl[i] <- Y.h$upper[2]     
     }
     
     # Yhat starts at window.size+1 up to length(Y)
