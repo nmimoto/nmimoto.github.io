@@ -194,6 +194,8 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                           lambda = lambda,
                           seasonal = seasonal,
                           xreg=time(Y[i:(i+window.size-1)]))
+          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))       # one step prediction
+          
       } else {
           #- When Linear Trend is Not Present
           Fit00 <- Arima( Y[i:(i+window.size-1)],
@@ -202,12 +204,13 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                           include.drift = include.drift,
                           lambda = lambda,
                           seasonal = seasonal)
+      
+          Y.h  <- forecast(Fit00, 1)       # one step prediction
       }
-
-      Y.h  <- forecast(Fit00, 1)       # one step prediction
       Yhat[i]     <- Y.h$mean
       Yhat.CIu[i] <- Y.h$lower[2]
       Yhat.CIl[i] <- Y.h$upper[2]     
+
     }
     
     # Yhat starts at window.size+1 up to length(Y)
