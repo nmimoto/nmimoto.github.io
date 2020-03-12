@@ -9,6 +9,10 @@
 #
 #    source("https://nmimoto.github.io/R/TS-00.txt")
 #
+#  Above source() automatically installs:
+#    Randomness.tests()
+#    Stationarity.tests()
+#    Rolling1step.forecast()
 
 
 library(xts)
