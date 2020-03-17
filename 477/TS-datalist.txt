@@ -1,9 +1,9 @@
-#
-#
-#  Time Series Data List
-#
-#      - Copy and paste below code in R to load the data
-#
+###
+###
+###  Time Series Data List
+###
+###      - Copy and paste below code in R to load the data
+###
 ###############################################
 
 
@@ -16,7 +16,7 @@
 
 
 #[SPY]-----------------------------------------------------------------------
-#- Daily Price of S&P500 ETF (SPY) from Jan 02 2000 to Dec 31 2014
+#  Daily Price of S&P500 ETF (SPY) from Jan 02 2000 to Dec 31 2014
 
   D <- read.csv("https://nmimoto.github.io/datasets/SPY.csv", header=T)
   head(D)
@@ -25,8 +25,8 @@
 
 
 #[dowj]-----------------------------------------------------------------------
-#   1. The Dow Jones Utilities Index, Aug. 28–Dec. 18, 1972; 
-#     DOWJ.TSM from Brockwell and Davis (2002)
+#   The Dow Jones Utilities Index, Aug. 28–Dec. 18, 1972; 
+#   DOWJ.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/dowj.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
@@ -35,9 +35,9 @@
 
 
 #[djao2]-----------------------------------------------------------------------
-#- Closing values of the DowJones Index of stocks on the New York Stock Exchange 
-#-   and the closing values of the Australian All Ordinaries Index of Share Prices, 
-#-   recorded at the termination of trading.  251 successive trading days  Sep 10, 1993 to Aug 26, 1994
+#  Closing values of the DowJones Index of stocks on the New York Stock Exchange 
+#  and the closing values of the Australian All Ordinaries Index of Share Prices, 
+#  recorded at the termination of trading.  251 successive trading days  Sep 10, 1993 to Aug 26, 1994
 #
 #
 #  (Because of the time difference between Sydney and New York, 
@@ -58,7 +58,7 @@
 
 
 #[SP100]-----------------------------------------------------------------------
-#- SP100.TSM from Brockwell and Davis (2002)
+#  SP100.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/SP100.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
@@ -66,9 +66,9 @@
 
 
 #[Trade]-----------------------------------------------------------------------
-#- US Trade in Goods and Services Balance of Payments (BOP) Basis. 
-#- Value in millions of 2000 dollars 1960-2005
-#- From Time Series Data Library
+#  US Trade in Goods and Services Balance of Payments (BOP) Basis. 
+#  Value in millions of 2000 dollars 1960-2005
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Trade.csv")
     D1 <- ts(D[,2:5], start=1960, freq=1)
@@ -76,8 +76,8 @@
 
 
 #[interest**]-----------------------------------------------------------------------
-#- Monthly interest rates Government Bond Yield 2-year securities,
-#- Reserve Bank of Australia. Jan 1969 – Sep 1994
+#  Monthly interest rates Government Bond Yield 2-year securities,
+#  Reserve Bank of Australia. Jan 1969 – Sep 1994
 
     D <- read.csv("https://nmimoto.github.io/datasets/interest.csv", header=T)
     D1 <- ts(D[,5], start=1960, freq=1)
@@ -85,8 +85,8 @@
 
 
 #[acci]-----------------------------------------------------------------------
-#- Accidental death in US
-#- deaths.TSM from Brockwell and Davis (2002)
+#  Accidental death in US
+#  deaths.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/acci.csv")
     D1 <- ts(D, start=c(1,1), freq=12)
@@ -102,7 +102,7 @@
 
 
 #[concentration]-----------------------------------------------------------------------
-#Chemical concentration readings
+#  Chemical concentration readings
 
     D  <- read.csv("https://nmimoto.github.io/datasets/concentration.csv")
     D1 <- ts(D[,2], start=c(1,1), freq=1)
@@ -110,7 +110,7 @@
 
 
 #[unemployment]-----------------------------------------------------------------------
-Annual unemployment, U.S., 1890 to 1970
+#  Annual unemployment, U.S., 1890 to 1970
 
     D  <- read.csv("https://nmimoto.github.io/datasets/unemployment.csv")
     D1 <- ts(D[,2], start=c(1890,1), freq=1)
@@ -118,7 +118,7 @@ Annual unemployment, U.S., 1890 to 1970
 
 
 #[water]-----------------------------------------------------------------------
-Baltmore city annual water use, liters per capita per day, 1885-1968
+#  Baltmore city annual water use, liters per capita per day, 1885-1968
 
     D  <- read.csv("https://nmimoto.github.io/datasets/water.csv")
     D1 <- ts(D[,2], start=c(1885,1), freq=1)
@@ -137,8 +137,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[polio]-----------------------------------------------------------------------
-#- Newly recorded cases of poliomyelitis in the U.S. for the years 1970–1983
-#- Example 8.8.3 in Brockwell and Davis (2002) 
+#  Newly recorded cases of poliomyelitis in the U.S. for the years 1970–1983
+#  Example 8.8.3 in Brockwell and Davis (2002) 
 
     D  <- read.csv("https://nmimoto.github.io/datasets/polio.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
@@ -157,7 +157,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[iron]-----------------------------------------------------------------------
-#- Monthly basic iron production in Australia: thousand tonnes. Jan 1956 – Aug 1995
+#  Monthly basic iron production in Australia: thousand tonnes. Jan 1956 – Aug 1995
     
     D <- read.csv("https://nmimoto.github.io/datasets/iron.csv", header=T)
     D1 <- ts(D[,2], start=c(1956,1), freq=12)
@@ -165,8 +165,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[Steel]-----------------------------------------------------------------------
-#- Monthly production of raw steel in Australia: thousand tonnes. Jan 1956 to Nov 1993
-#- From Time Series Data Library
+#  Monthly production of raw steel in Australia: thousand tonnes. Jan 1956 to Nov 1993
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Steel.csv")
     D1 <- ts(D[,2], start=c(1956,1), freq=12)
@@ -174,7 +174,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[repair]-----------------------------------------------------------------------
-#- Monthly demand repair parts large/heavy equip. Iowa 1972 – 1979
+#  Monthly demand repair parts large/heavy equip. Iowa 1972 – 1979
 
     D <- read.csv("https://nmimoto.github.io/datasets/repair.csv", header=T)
     D1 <- ts(D[,2], start=c(1972,1), freq=12)
@@ -182,9 +182,9 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[Gas]-----------------------------------------------------------------------
-#- Monthly production of Gas in Australia: 
-#- million megajoules. Includes natural gas from July 1989. Jan 1956 - Aug 1995
-#- From Time Series Data Library
+#  Monthly production of Gas in Australia: 
+#  million megajoules. Includes natural gas from July 1989. Jan 1956 - Aug 1995
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Gas.csv")
     D1 <- ts(D[,2], start=c(1956, 1), freq=12)
@@ -192,7 +192,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[methane]-----------------------------------------------------------------------
-#- Methane input into gas furnace: cu. ft/min.
+#  Methane input into gas furnace: cu. ft/min.
 #  Sampling interval 9 seconds. Carbon dioxide output from gas furnace: 
 #  percent of output gas. Sampling interval 9 seconds
 
@@ -203,7 +203,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[gas2]-----------------------------------------------------------------------
-#- Montly av. residential gas usage Iowa (cubic feet)*100 ’71 – ’79
+#  Montly av. residential gas usage Iowa (cubic feet)*100 ’71 – ’79
 
     D <- read.csv("https://nmimoto.github.io/datasets/gas2.csv", header=T)
     D1 <- ts(D[,2], start=c(1, 1), freq=12)
@@ -211,7 +211,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[sheep]-----------------------------------------------------------------------
-#- Annual sheep population (1000s) in England & Wales 1867 – 1939
+#  Annual sheep population (1000s) in England & Wales 1867 – 1939
 
     D <- read.csv("https://nmimoto.github.io/datasets/sheep.csv", header=T)
     head(D)
@@ -220,8 +220,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[lynx]-----------------------------------------------------------------------
-#- Annual Canadian Lynx Trappings   1821 - 1934
-#- lynx.TSM from Brockwell and Davis (2002)
+#  Annual Canadian Lynx Trappings   1821 - 1934
+#  lynx.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/lynx.csv")
     D1 <- ts(D, start=c(1821), freq=1)
@@ -229,7 +229,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[barley]-----------------------------------------------------------------------
-#- Annual barley yields per acre in England & Wales 1884 – 1939
+#  Annual barley yields per acre in England & Wales 1884 – 1939
 
     D <- read.csv("https://nmimoto.github.io/datasets/barley.csv", header=T)
     head(D)
@@ -238,7 +238,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[milk]-----------------------------------------------------------------------
-#- Monthly milk production: pounds per cow. Jan 62 – Dec 75
+#  Monthly milk production: pounds per cow. Jan 62 – Dec 75
 
     D <- read.csv("https://nmimoto.github.io/datasets/milk.csv", header=T)
     D1 <- ts(D[,2], start=c(1962,1), freq=12)
@@ -246,8 +246,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[Pigs]-----------------------------------------------------------------------
-#- Monthly total number of pigs slaughtered in Victoria. Jan 1980 – August 1995
-#- From Time Series Data Library
+#  Monthly total number of pigs slaughtered in Victoria. Jan 1980 – August 1995
+#  From Time Series Data Library
 
     D  <- read.csv("https://nmimoto.github.io/datasets/Pigs.csv")
     D1 <- ts(D[,2], start=c(1980, 8), freq=12)
@@ -269,8 +269,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[LS2]-----------------------------------------------------------------------
-#- Daily Sales data with leading indicator given by Box and Jenkins (1976), p. 537.
-#- LS2.tsm from Brockwell and Davis (2002)
+#  Daily Sales data with leading indicator given by Box and Jenkins (1976), p. 537.
+#  LS2.tsm from Brockwell and Davis (2002)
 
     D  <- read.table("https://nmimoto.github.io/datasets/LS2.csv", header=T)
     A <- ts(D$A, start=c(1,1), freq=1)
@@ -282,7 +282,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
     
 
 #[wine]-----------------------------------------------------------------------
-#- Monthly Wine sales in Australia wine.TSM from Brockwell and Davis (2002)
+#  Monthly Wine sales in Australia wine.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/wine.csv")
     D1 <- ts(D, start=c(1980,1), freq=12)
@@ -290,7 +290,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[engines]-----------------------------------------------------------------------
-#- Motor vehicles engines and parts/CPI, Canada, 1976-1991
+#  Motor vehicles engines and parts/CPI, Canada, 1976-1991
 
     D <- read.csv("https://nmimoto.github.io/datasets/engines.csv", header=T)
     D1 <- ts(D[,2], start=c(1976,1), freq=12)
@@ -298,7 +298,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[scott]-----------------------------------------------------------------------
-#- scott tissue sales 
+#  scott tissue sales 
   
     D <- read.csv("https://nmimoto.github.io/datasets/scott.csv", header=T)
     D1 <- ts(D, start=c(1,1), freq=7)
@@ -306,7 +306,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[blenders]-----------------------------------------------------------------------
-#- Lenex corporation: shipment of blenders Jan’67-Dec’71
+#  Lenex corporation: shipment of blenders Jan’67-Dec’71
   
     D <- read.csv("https://nmimoto.github.io/datasets/blenders.csv", header=T)
     head(D); dim(D)
@@ -315,7 +315,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[radios]-----------------------------------------------------------------------
-#- Lenex corporation: shipment of radios Jan’67-Dec’78 (12F5.0)
+#  Lenex corporation: shipment of radios Jan’67-Dec’78 (12F5.0)
 
     D <- read.csv("https://nmimoto.github.io/datasets/radios.csv", header=T)
     head(D); dim(D)
@@ -324,7 +324,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[canop]-----------------------------------------------------------------------
-#- Lenex corporation: shipment of can openers Jan’67-Dec’71
+#  Lenex corporation: shipment of can openers Jan’67-Dec’71
 
     D <- read.csv("https://nmimoto.github.io/datasets/canop.csv", header=T)
     head(D); dim(D)
@@ -333,7 +333,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[shampoo]-----------------------------------------------------------------------
-#- Sales of shampoo over a three year period
+#  Sales of shampoo over a three year period
 
     D  <- read.csv("https://nmimoto.github.io/datasets/shampoo.csv", header=T)
     D1 <- ts(D[,2], start=c(1,1), freq=12)
@@ -341,7 +341,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[companyx]-----------------------------------------------------------------------
-#- Sales of company X, Jan. 1965 to May 1971
+#  Sales of company X, Jan. 1965 to May 1971
 
     D <- read.csv("https://nmimoto.github.io/datasets/companyx.csv", header=T)
     D1 <- ts(D[,2], start=c(1965,1), freq=12)
@@ -349,7 +349,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[houses]-----------------------------------------------------------------------
-#- Sales of new one-family houses, USA, from Jan 1987 through Nov 1995
+#  Sales of new one-family houses, USA, from Jan 1987 through Nov 1995
 
     D <- read.csv("https://nmimoto.github.io/datasets/houses.csv", header=T)
     D1 <- ts(D[,2], start=c(1987,1), freq=12)
@@ -357,7 +357,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[car]-----------------------------------------------------------------------
-#- Monthly car sales in Quebec 1960-1968
+#  Monthly car sales in Quebec 1960-1968
 
     D <- read.csv("https://nmimoto.github.io/datasets/car.csv", header=T)
     D1 <- ts(D[,2], start=c(1960,1), freq=12)
@@ -365,7 +365,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[winnebago]-----------------------------------------------------------------------
-#- Monthly unit sales, Winnebago Industries, Nov. 1966 – Feb. 1972
+#  Monthly unit sales, Winnebago Industries, Nov. 1966 – Feb. 1972
 
     D <- read.csv("https://nmimoto.github.io/datasets/winnebago.csv", header=T)
     D1 <- ts(D[,2], start=c(1966,1), freq=12)
@@ -373,8 +373,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[advertising]-----------------------------------------------------------------------
-#- Advertising and sales data: 36 consecutive monthly sales and advertising 
-#- expenditures of a dietary weight control product
+#  Advertising and sales data: 36 consecutive monthly sales and advertising 
+#  expenditures of a dietary weight control product
 
     D <- read.csv("https://nmimoto.github.io/datasets/advertising.csv", header=T)
     head(D); dim(D)
@@ -384,8 +384,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[sales2]-----------------------------------------------------------------------
-# Annual domestic sales and advertising of Lydia E. Pinkham Medicine Company:
-# both in thousands of dollars. 1907-1960. (Pankratz	 1991)
+#  Annual domestic sales and advertising of Lydia E. Pinkham Medicine Company:
+#  both in thousands of dollars. 1907-1960. (Pankratz	 1991)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/sales2.csv")
     ad     <- ts(D[,2], start=c(1907,1), freq=1)
@@ -410,8 +410,8 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[lake]-----------------------------------------------------------------------
-#- Level of Lake Huron 1875-1972.  
-#- From Brockwell and Davis (2002) 
+#  Level of Lake Huron 1875-1972.  
+#  From Brockwell and Davis (2002) 
 #
     D  <- read.csv("https://nmimoto.github.io/datasets/lake.csv")
     D1 <- ts(D, start=1875, freq=1)
@@ -419,23 +419,25 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[FraizierMonthly]-----------------------------------------------------------------------
-#- Monthly Discharge data of Fraizier river
+#  Monthly Discharge data of Fraizier river
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/FraizierMonthly.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/Frazier.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
     plot(D1, type='o')
 
 
 #[Boise]-----------------------------------------------------------------------
-#- Boise River near Twin Springs, Idaho, Oct. 1912 ? Sep. 1960
-#- From Time Series Data Library
+#  Boise River near Twin Springs, Idaho, Oct. 1912 ? Sep. 1960
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Boise.csv")
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[Snow]-----------------------------------------------------------------------
-#- Annual snowfall in Buffalo, 1910-1972.
-#- From Time Series Data Library
+#  Annual snowfall in Buffalo, 1910-1972.
+#  From Time Series Data Library
 
     D  <- read.csv("https://nmimoto.github.io/datasets/Snow.csv")
     D1 <- ts(D[,2], start=c(1910,1), freq=1)
@@ -443,14 +445,16 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[michigan]-----------------------------------------------------------------------
-#- Annual precipitation (inches), Lake Michigan, 1900 to 1986
+#  Annual precipitation (inches), Lake Michigan, 1900 to 1986
 
     D <- read.csv("https://nmimoto.github.io/datasets/michigan.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[gtemp]-----------------------------------------------------------------------
-#- Global temparature data from Shumway
-#- package(astsa)
+#  Global temparature data from Shumway
+#  package(astsa)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/gtemp.txt")
     D1 <- ts(D, start=c(1880), freq=1)
@@ -458,77 +462,98 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[Temp]-----------------------------------------------------------------------
-#- Daily maximum temperatures in Melbourne, Australia, 1981-1990
-#- From Time Series Data Library
+#  Daily maximum temperatures in Melbourne, Australia, 1981-1990
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Temp.csv")
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[Temp2]-----------------------------------------------------------------------
-#- Mean daily temperature, Fisher River near Dallas, Jan 01, 1988 to Dec 31, 1991
-#- From Time Series Data Library
+#  Mean daily temperature, Fisher River near Dallas, Jan 01, 1988 to Dec 31, 1991
+#  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/Temp2.csv")
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[Rhine]-----------------------------------------------------------------------
-#- Rhine River near basle, Switzerland, 1807 to 1957
-#- From Time Series Data Library
+#  Rhine River near basle, Switzerland, 1807 to 1957
+#  From Time Series Data Library
 
     D  <- read.csv("https://nmimoto.github.io/datasets/Rhine.csv")
     D1 <- ts(D[,2], start=c(1807,1), freq=1)
+    plot(D1, type='o')
 
 
 #[erie]-----------------------------------------------------------------------
-#- Monthly Lake Erie Levels 1921 – 1970,
+#  Monthly Lake Erie Levels 1921 – 1970,
 
     D <- read.csv("https://nmimoto.github.io/datasets/erie.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[clear]-----------------------------------------------------------------------
-#- Monthly riverflow in cms, Clear water River at kamiah, Idaho, 1911 - 1965
+#  Monthly riverflow in cms, Clear water River at kamiah, Idaho, 1911 - 1965
 
     D <- read.csv("https://nmimoto.github.io/datasets/clear.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[mad]-----------------------------------------------------------------------
-#- Monthly riverflow in cms, Mad River at springfield, OH., 1915 - 1960
+#  Monthly riverflow in cms, Mad River at springfield, OH., 1915 - 1960
 
     D <- read.csv("https://nmimoto.github.io/datasets/mad.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[feather]-----------------------------------------------------------------------
-#- Monthly riverflow in cms, Feather River at oroville, California, Oct.1902 – Sep. 1977
+#  Monthly riverflow in cms, Feather River at oroville, California, Oct.1902 – Sep. 1977
 
     D <- read.csv("https://nmimoto.github.io/datasets/feather.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[neches]-----------------------------------------------------------------------
-#- Monthly riverflow in cms, Neches River at rockland, Texas, 1914 - 1960
+#  Monthly riverflow in cms, Neches River at rockland, Texas, 1914 - 1960
 
     D <- read.csv("https://nmimoto.github.io/datasets/neches.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[magne]-----------------------------------------------------------------------
-#- Monthly riverflow in cms, N. Magnetawan River at burks falls, 1916 – Sep. 1977
+#  Monthly riverflow in cms, N. Magnetawan River at burks falls, 1916 – Sep. 1977
 
     D <- read.csv("https://nmimoto.github.io/datasets/magne.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[oldman]-----------------------------------------------------------------------
-#- Mean daily flow, Oldman Rivernear Brocket, Jan 01, 1988 to Dec 31, 1991
+#  Mean daily flow, Oldman Rivernear Brocket, Jan 01, 1988 to Dec 31, 1991
 
     D <- read.csv("https://nmimoto.github.io/datasets/oldman.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[jokulsa]-----------------------------------------------------------------------
-#- Mean daily flow in cms, Jokulsa Eystri River, 1 Jan 1972 – 31 Dec 1974
+#  Mean daily flow in cms, Jokulsa Eystri River, 1 Jan 1972 – 31 Dec 1974
 
     D <- read.csv("https://nmimoto.github.io/datasets/jokulsa.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[buffalo]-----------------------------------------------------------------------
-#- Annual snowfall in Buffalo, 1910-1972.
+#  Annual snowfall in Buffalo, 1910-1972.
 
     D <- read.csv("https://nmimoto.github.io/datasets/buffalo.csv", header=T)
     head(D); dim(D)
@@ -537,7 +562,7 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[chicago]-----------------------------------------------------------------------
-#- Annual snowfall in Chicago, 1939 to 1978
+#  Annual snowfall in Chicago, 1939 to 1978
 
     D <- read.csv("https://nmimoto.github.io/datasets/chicago.csv", header=T)
     head(D); dim(D)
@@ -546,25 +571,31 @@ Baltmore city annual water use, liters per capita per day, 1885-1968
 
 
 #[ozone]-----------------------------------------------------------------------
-#- Ozone, Arosa, 1932-1972
+#  Ozone, Arosa, 1932-1972
 
     D <- read.csv("https://nmimoto.github.io/datasets/ozone.csv", header=T)
+    D1 <- ts(D[,2], start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[winter]-----------------------------------------------------------------------
-#- Winter negative temperature sum (in deg. C), 1781 – 1988
+#  Winter negative temperature sum (in deg. C), 1781 – 1988
 
     D <- read.csv("https://nmimoto.github.io/datasets/winter.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[volcanic]-----------------------------------------------------------------------
-#- Volcanic dust veil index, northern hemisphere, 1500-1969
+#  Volcanic dust veil index, northern hemisphere, 1500-1969
 
     D <- read.csv("https://nmimoto.github.io/datasets/volcanic.csv", header=T)
+    D1 <- ts(D, start=c(1,1), freq=1)
+    plot(D1, type='o')
 
 
 #[sunspot]-----------------------------------------------------------------------
-Annual sunspot relative number 1936-1972
+#  Annual sunspot relative number 1936-1972
 
     D  <- read.csv("https://nmimoto.github.io/datasets/sunspot.csv")
     D1 <- ts(D[,2], start=c(1936,1), freq=1)
@@ -572,7 +603,7 @@ Annual sunspot relative number 1936-1972
 
 
 #[sunspot2]-----------------------------------------------------------------------
-Monthly sunspot number, Zurich, 1749-1983
+#  Monthly sunspot number, Zurich, 1749-1983
 
     D  <- read.csv("https://nmimoto.github.io/datasets/sunspot2.csv")
     D1 <- ts(D[,2], start=c(1749,1), freq=12)
@@ -580,10 +611,10 @@ Monthly sunspot number, Zurich, 1749-1983
 
 
 #[earthquakes]-----------------------------------------------------------------------
-#- Number of earthquakes per year magnitude 7.0 or greater. 1900-1998
+#  Number of earthquakes per year magnitude 7.0 or greater. 1900-1998
 #  National Earthquake Information Center. 
-#- Different lists will give different numbers depending on the formula 
-#- used for calculating the magnitude
+#  Different lists will give different numbers depending on the formula 
+#  used for calculating the magnitude
 
     D <- read.csv("https://nmimoto.github.io/datasets/earthquakes.csv", header=T)
     D1 <- ts(D[,2], start=c(1900,1), freq=1)
@@ -591,12 +622,7 @@ Monthly sunspot number, Zurich, 1749-1983
 
 
 
-#[quakes]-----------------------------------------------------------------------
-#Number of earthquakes per year magnitude 7.0 or greater. 1900-1998
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/quakes.csv")
-    D1 <- ts(D[,2], start=c(1900,1), freq=1)
-    plot(D1, type='o')
 
 
 
