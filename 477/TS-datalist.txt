@@ -284,7 +284,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(B, type='o')
     
 
-#[wine]-----------------------------------------------------------------------
+#[wine n=142]------------------------------------------------------------------
 #  Monthly Wine sales in Australia wine.TSM from Brockwell and Davis (2002)
 
     D  <- read.csv("https://nmimoto.github.io/datasets/wine.csv")
@@ -292,7 +292,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(D1, type='o')
 
 
-#[engines]-----------------------------------------------------------------------
+#[engines n=190]---------------------------------------------------------------
 #  Monthly Motor vehicles engines and parts/CPI, Canada, 1976-1991
 
     D <- read.csv("https://nmimoto.github.io/datasets/engines.csv", header=T)
@@ -308,7 +308,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(D1, type='o')
 
 
-#[blenders]-----------------------------------------------------------------------
+#[blenders n=60]---------------------------------------------------------------------
 #  Lenex corporation: Monthl shipment of blenders Jan’67-Dec’71
   
     D <- read.csv("https://nmimoto.github.io/datasets/blenders.csv", header=T)
