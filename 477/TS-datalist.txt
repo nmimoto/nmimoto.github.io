@@ -6,6 +6,9 @@
 ###
 ###############################################
 
+library(forecast)
+source('https://nmimoto.github.io/R/TS-00.txt')
+
 
 
 
@@ -290,7 +293,7 @@
 
 
 #[engines]-----------------------------------------------------------------------
-#  Motor vehicles engines and parts/CPI, Canada, 1976-1991
+#  Monthly Motor vehicles engines and parts/CPI, Canada, 1976-1991
 
     D <- read.csv("https://nmimoto.github.io/datasets/engines.csv", header=T)
     D1 <- ts(D[,2], start=c(1976,1), freq=12)
@@ -298,7 +301,7 @@
 
 
 #[scott]-----------------------------------------------------------------------
-#  scott tissue sales 
+#  Daily scott tissue sales 
   
     D <- read.csv("https://nmimoto.github.io/datasets/scott.csv", header=T)
     D1 <- ts(D, start=c(1,1), freq=7)
@@ -306,41 +309,32 @@
 
 
 #[blenders]-----------------------------------------------------------------------
-#  Lenex corporation: shipment of blenders Jan’67-Dec’71
+#  Lenex corporation: Monthl shipment of blenders Jan’67-Dec’71
   
     D <- read.csv("https://nmimoto.github.io/datasets/blenders.csv", header=T)
     head(D); dim(D)
-    blender <- ts(D[,2], start=c(1967,1), freq=12)
-    plot(blender)
+    D1 <- ts(D[,2], start=c(1967,1), freq=12)
+    plot(D1)
 
 
-#[radios]-----------------------------------------------------------------------
-#  Lenex corporation: shipment of radios Jan’67-Dec’78 (12F5.0)
-
-    D <- read.csv("https://nmimoto.github.io/datasets/radios.csv", header=T)
-    head(D); dim(D)
-    radio <- ts(D[,2], start=c(1967,1), freq=12)
-    plot(radio)
-
-
-#[canop]-----------------------------------------------------------------------
+#[canop n=60]------------------------------------------------------------------------
 #  Lenex corporation: shipment of can openers Jan’67-Dec’71
 
     D <- read.csv("https://nmimoto.github.io/datasets/canop.csv", header=T)
     head(D); dim(D)
-    canop <- ts(D[,2], start=c(1967,1), freq=12)
-    plot(canop)
+    D1 <- ts(D[,2], start=c(1967,1), freq=12)
+    plot(D1)
 
 
-#[shampoo]-----------------------------------------------------------------------
-#  Sales of shampoo over a three year period
+#[shampoo n=36]----------------------------------------------------------------------
+#  Monthly Sales of shampoo over a three year period
 
     D  <- read.csv("https://nmimoto.github.io/datasets/shampoo.csv", header=T)
     D1 <- ts(D[,2], start=c(1,1), freq=12)
     plot(D1, type='o')
 
 
-#[companyx]-----------------------------------------------------------------------
+#[companyx n=77]---------------------------------------------------------------------
 #  Sales of company X, Jan. 1965 to May 1971
 
     D <- read.csv("https://nmimoto.github.io/datasets/companyx.csv", header=T)
@@ -348,7 +342,16 @@
     plot(D1, type='o')
 
 
-#[houses]-----------------------------------------------------------------------
+#[radios n=144]----------------------------------------------------------------------
+#  Lenex corporation: shipment of radios Jan’67-Dec’78 (12F5.0)
+
+    D <- read.csv("https://nmimoto.github.io/datasets/radios.csv", header=T)
+    head(D); dim(D)
+    D1 <- ts(D[,2], start=c(1967,1), freq=12)
+    plot(D1)
+
+
+#[houses n=107]----------------------------------------------------------------------
 #  Sales of new one-family houses, USA, from Jan 1987 through Nov 1995
 
     D <- read.csv("https://nmimoto.github.io/datasets/houses.csv", header=T)
@@ -356,7 +359,7 @@
     plot(D1, type='o')
 
 
-#[car]-----------------------------------------------------------------------
+#[car n=108]-------------------------------------------------------------------------
 #  Monthly car sales in Quebec 1960-1968
 
     D <- read.csv("https://nmimoto.github.io/datasets/car.csv", header=T)
@@ -364,7 +367,7 @@
     plot(D1, type='o')
 
 
-#[winnebago]-----------------------------------------------------------------------
+#[winnebago n=66]--------------------------------------------------------------------
 #  Monthly unit sales, Winnebago Industries, Nov. 1966 – Feb. 1972
 
     D <- read.csv("https://nmimoto.github.io/datasets/winnebago.csv", header=T)
