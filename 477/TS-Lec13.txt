@@ -1,0 +1,85 @@
+###
+###
+###  Correlation and Covariance Review - R code only
+###
+###
+####################################
+
+
+## 1. Covariance
+
+  library(mvtnorm)
+  set.seed(363)
+  X = rmvnorm(100, c(5,5),   matrix(c(1,.7,.7,1), 2,2))
+  Y = rmvnorm(100, c(25,25), matrix(c(3,2.1,2.1,3), 2,2))
+  layout(matrix(1:2, 1, 2))
+  plot(X)
+  plot(Y)
+  cov(X)
+  cov(Y)
+  cor(X)
+  cor(Y)
+
+
+
+## 2. Autocorrelation  
+
+
+  acf1 <- acf    # copy the original acf function
+  library(TSA)   # load package TSA, which replaces default acf
+  acf  <- acf1   # copy back the original 
+
+  data(hare)     # load hare data from TSA
+
+  length(hare)
+
+  thisYear <- hare[2:31]     
+  lastYear <- hare[1:30]
+
+  plot(lastYear, thisYear, ylab="This Year",xlab="Previous Year", xlim=c(-10,100), ylim=c(-10,100))
+  cor(lastYear, thisYear)    # calculate correlation
+
+
+
+  acf(hare)                      # compute and plot ACF
+
+  Rho.hat <- acf(hare)           # compute ACF and assign to Rho.hat 
+  Rho.hat
+
+  Rho.hat <- acf(hare, plot=FALSE)   # compute ACF w/o plotting
+
+  acf(hare, type="covariance")   # compute and plot ACVF 
+
+  Gam.hat <- acf(hare, type="covariance")   # store numbers from ACVF
+  Gam.hat
+
+  Gam.hat[0]
+
+  var(hare)                      # not same as Gam.hat[0]
+  var(hare) * 30 / 31            # same as Gam.hat[0]
+
+
+
+
+
+
+
+
+
+<br><br><br><hr>
+
+        
+
+
+
+<br><br><br><br><br><br><br><br><br><br>
+
+. 
+  
+
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
+
+

@@ -1,0 +1,122 @@
+###
+###
+###  Testing Mean - R code only
+###
+###
+####################################
+
+
+
+
+#----- 1. Is the ture mean 0? 
+
+  set.seed(235)                    # set seed for RS generation (you don't need to do this)
+  mu = sample(c(0,2,1),1)          # mu is randomly drawn from 0, 1, or 2
+  Y  = mu + rnorm(100,0,5)         # Y is mu + random noise 
+
+  mean(Y)                          # Calculate sample mean 
+
+  plot(Y, type="o")                      # type="o" means both line and point
+  abline(h=0)                            # add horizontal line at 0
+  abline(h=mean(Y), col="blue", lty=2)   # add blue dashed line at sample mean
+
+
+  ### CI for mean $\mu$
+  mean(Y)                      # sample mean of Y
+  sd(Y)                        # sample SD of Y
+
+  ME = 1.96*sd(Y)/sqrt(100)    # margin of error (width of CI)
+  ME
+  
+  CI.upper = mean(Y) + ME
+  CI.lower = mean(Y) - ME
+  c(CI.lower, mean(Y), CI.upper)     # show 3 numbers as vector
+
+  plot(Y, type="o")                                  # plot Y
+  abline(h=0)                                        # draw horizontal line at 0
+  abline(h=mean(Y), col="blue", lty=2)               # blue dash line at mean(Y)
+  abline(h=c(CI.upper, CI.lower), col="red", lty=2)  # two red dash line at CI.upper and CI.lower
+
+
+
+
+#----- 2. Time Series Case 
+
+  ### Example: AR(1) data
+
+  set.seed(1352)
+  mu = sample(c(0,1,2), 1)
+  X  = arima.sim(n=70, list(ar = c(.7) ), sd=5 )     # 
+  Y  = mu + X
+
+  layout(matrix(1:2, 1, 2))             # plot side by side
+  plot(Y, type="o")                     # plot Y
+  abline(h=0)                           # draw at 0
+  abline(h=mean(Y), col="blue")         # draw blue line at sample mean 
+  acf(Y)                                # plot acf as 2nd plot     
+
+
+  #--- CI for ture mean using ACVF ---
+  n = length(Y)  # This is n 
+  n              # see what's inside 
+
+  Ga <- acf(Y, type="covariance", plot=FALSE)   # calculate ACVF values without plotting
+  str(Ga)                                       # See the structure inside Ga 
+  Ga.hat = Ga$acf                               # extract only "acf" part (it's actually ACVF)
+
+  sum.limit = floor( sqrt(n) )                  # make sqrt(n) into integer (for later use) 
+  nu.sq <- Ga.hat[1] + 2*sum( (1-(1:sum.limit)/n) * Ga.hat[2:(sum.limit+1)] )
+                                                #- Ga.hat[1] is ACVF at lag 0
+  mean(Y)                   
+  sqrt(nu.sq/n)        # Margin of Error accounting for ACVF
+  sqrt(var(Y)/n)       # Margin of Error if we treat Y as Rand Sam (Wrong)
+
+  CI.u <- mean(Y) + 1.96*sqrt(nu.sq/n)
+  CI.l <- mean(Y) - 1.96*sqrt(nu.sq/n)
+  c(CI.l, mean(Y), CI.u)                       # show CI.l, mean(Y), CI.u as vector
+
+  plot(Y, type="o")
+  abline(h=0)                                  # add black line at 0
+  abline(h=mean(Y), col="blue")                # add blue horizontal line at mean(Y)
+  abline(h=c(CI.u, CI.l), col="red", lty=2)    # add red dash lines at CI
+
+
+  ### Example: Color data
+  data(color) 
+
+  layout(matrix(1:2, 1, 2))             # plot side by side
+  plot(color, type="o")                 # plot 
+  abline(h=0)                           # draw at 0
+  abline(h=mean(color), col="blue")     # draw blue line at sample mean 
+  acf(color)  
+
+
+
+  Y = color                         # So that I can reuse the above code without changing each Y
+
+
+#--- CI for ture mean using ACVF ---
+  n = length(Y)  # This is n 
+  n              # see what's inside 
+
+  Ga <- acf(Y, type="covariance", plot=FALSE)   # calculate ACVF values without plotting
+  str(Ga)                                       # See the structure inside Ga 
+  Ga.hat = Ga$acf                               # extract only "acf" part (it's actually ACVF)
+
+  sum.limit = floor( sqrt(n) )                  # make sqrt(n) into integer (for later use) 
+  nu.sq <- Ga.hat[1] + 2*sum( (1-(1:sum.limit)/n) * Ga.hat[2:(sum.limit+1)] )
+                                                # Ga.hat[1] is ACVF at lag 0
+  mean(Y)                   
+  sqrt(nu.sq/n)        # Margin of Error accounting for ACVF
+  sqrt(var(Y)/n)       # Margin of Error if we treat Y as Rand Sam (Wrong)
+
+  CI.u <- mean(Y) + 1.96*sqrt(nu.sq/n)
+  CI.l <- mean(Y) - 1.96*sqrt(nu.sq/n)
+  c(CI.l, mean(Y), CI.u)                       # show CI.l, mean(Y), CI.u as vector
+
+  plot(Y, type="o")
+  abline(h=0)                                  # add black line at 0
+  abline(h=mean(Y), col="blue")                # add blue horizontal line at mean(Y)
+  abline(h=c(CI.u, CI.l), col="red", lty=2)    # add red dash lines at CI
+
+ 
