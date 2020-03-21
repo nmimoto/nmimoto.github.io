@@ -1,9 +1,67 @@
 ###
 ###
-###  - R code only
+### (7-2) Seasonal ARIMA - R code only
 ###
 ###
 ####################################
+
+
+# 2. Seasonal ARIMA model
+
+## Theoretical ACF
+
+    rho <- ARMAacf(ar=c(.7), ma=c( .7,0,0,0,0,0,0,0,0,0,0,.5,.35), lag.max=40)
+    plot(rho, col="red")
+
+
+
+
+# 3. Ex: CO2 data 
+
+  acf1 <- acf; library(TSA); acf <- acf1
+  data(co2)  #- we are using co2 data in TSA package (there's another one in R)
+
+  plot(co2, type="o", main='CO2 Data')
+  frequency(co2)
+  acf(co2,  lag.max=36)
+  pacf(co2, lag.max=36)
+
+  library(forecast)
+  source('https://nmimoto.github.io/R/TS-00.txt') 
+
+  #- take Del -
+  plot(diff(co2),ylab='(Del) CO2',xlab='Time')
+  layout(matrix(1:2, 1, 2))
+  acf(diff(co2)  , lag.max=36)
+  pacf(diff(co2) , lag.max=36)
+  layout(1)
+
+
+  #- take Del_12 -
+  plot(diff(co2, 12),main='(Del_12) CO2', xlab='Time')
+  layout(matrix(1:2, 1, 2))
+  acf(diff(co2, 12)  , lag.max=36)
+  pacf(diff(co2, 12) , lag.max=36)
+  layout(1)
+  
+  #- Take Del and Del_12 -
+  plot( diff(diff(co2, 12)), main="(Del) (Del_12) CO2" )
+  layout(matrix(1:2, 1, 2))
+  acf(  diff(diff(co2, 12)), lag.max=50)
+  pacf( diff(diff(co2, 12)), lag.max=50)
+  layout(1)
+
+  Fit1 = Arima(co2, order=c(0,1,1), seasonal=list(order=c(0,1,1), period=12))
+  Fit1
+  Randomness.tests(Fit1$residuals)
+
+  Fit2 = auto.arima(co2, stepwise=FALSE, approximation=FALSE)
+  Fit2  
+  Randomness.tests(Fit2$residuals)
+
+  Stationarity.tests( diff(co2, 12) )
+
+
 
 
 
