@@ -195,7 +195,7 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                        seasonal = seasonal, 
                        xreg=xreg), 
                      error = function(ss){
-                       cat(paste("\n\n    i=",i,"  MLE-CSS failed.  Using CSS.\n\n"))
+                       cat(paste("    i=",i,"  MLE-CSS failed.  Using CSS.\n"))
                        return(
                          Arima( Y[i:(i+window.size-1)],
                          order=Arima.order,
