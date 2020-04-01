@@ -75,9 +75,9 @@ Randomness.tests <- function( A, plott=TRUE) {
  
   colnames(P) <- c("BL15","BL20","BL25","ML15","ML20","JB","SD") 
 
-  cat("  B-L test H0: the sereis is uncorrelated\n")
-  cat("  M-L test H0: the square of the sereis is uncorrelated\n")
-  cat("  J-B test H0: the sereis came from Normal distribution\n")
+  cat("  B-L test H0: the series is uncorrelated\n")
+  cat("  M-L test H0: the square of the series is uncorrelated\n")
+  cat("  J-B test H0: the series came from Normal distribution\n")
   cat("  SD         : Standard Deviation of the series\n\n")
 
   return(P)
