@@ -183,34 +183,38 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
     Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
     for (i in 1:(length(Y)-window.size)) {
       # Use Arima() with given options
-
-      # Model Estimation 
-      if (xreg){
-          #- When Linear Trend is Present
-          Fit00 <- Arima( Y[i:(i+window.size-1)],
-                          order=Arima.order,
-                          include.mean = include.mean,
-                          include.drift = include.drift,
-                          lambda = lambda,
-                          seasonal = seasonal,
-                          xreg=time(Y[i:(i+window.size-1)]))
-          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))       # one step prediction
-          
-      } else {
-          #- When Linear Trend is Not Present
-          Fit00 <- Arima( Y[i:(i+window.size-1)],
-                          order=Arima.order,
-                          include.mean = include.mean,
-                          include.drift = include.drift,
-                          lambda = lambda,
-                          seasonal = seasonal)
       
-          Y.h  <- forecast(Fit00, 1)       # one step prediction
+      if (xreg){ xreg=time(Y[i:(i+window.size-1)]) } else { xreg=NULL }
+      
+      Fit00 <- tryCatch(
+                     Arima( Y[i:(i+window.size-1)],
+                       order=Arima.order,
+                       include.mean = include.mean,
+                       include.drift = include.drift,
+                       lambda = lambda,
+                       seasonal = seasonal, 
+                       xreg=xreg), 
+                     error = function(ss){
+                       cat(paste("\n\n    i=",i,"  MLE-CSS failed.  Using CSS.\n\n"))
+                       return(
+                         Arima( Y[i:(i+window.size-1)],
+                         order=Arima.order,
+                         include.mean = include.mean,
+                         include.drift = include.drift,
+                         lambda = lambda,
+                         seasonal = seasonal,
+                         xreg=xreg,
+                         method="CSS") ) } )
+
+      # Model one step forecast  
+      if (xreg){                        
+          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))
+      } else {
+          Y.h  <- forecast(Fit00, 1)
       }
       Yhat[i]     <- Y.h$mean
       Yhat.CIu[i] <- Y.h$lower[2]
       Yhat.CIl[i] <- Y.h$upper[2]     
-
     }
     
     # Yhat starts at window.size+1 up to length(Y)
@@ -255,7 +259,7 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
 
 # Example of how to use it
 #
-#  #- Set options 
+#- Set options 
 #  Y <- Oil                   # Original data
 #  window.size <- 200         # Window size for estimation
 #  Arima.order <- c(0,1,1)    # Arima(p,d,q) order
@@ -264,7 +268,7 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
 #  #- set Arima() options: 
 #  include.mean = TRUE        #
 #  include.drift = FALSE      #
-#  lambda = 1                 # 1=no transformaton 0=Log
+#  lambda   = NULL            # NULL=no transformaton. 0=Log
 #  xreg     = NULL            # set to TRUE if Linear Trend is present
 #  seasonal = c(0, 0, 0)      # seasonal component
 #
