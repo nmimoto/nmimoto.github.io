@@ -184,7 +184,7 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
     for (i in 1:(length(Y)-window.size)) {
       # Use Arima() with given options
       
-      if (xreg){ xreg=time(Y[i:(i+window.size-1)]) } else { xreg=NULL }
+      if (is.null(xreg)){ xreg=NULL } else { xreg=time(Y[i:(i+window.size-1)]) }
       
       Fit00 <- tryCatch(
                      Arima( Y[i:(i+window.size-1)],
@@ -207,10 +207,10 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                          method="CSS") ) } )
 
       # Model one step forecast  
-      if (xreg){                        
-          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))
-      } else {
+      if (is.null(xreg)){ 
           Y.h  <- forecast(Fit00, 1)
+      } else {
+          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))
       }
       Yhat[i]     <- Y.h$mean
       Yhat.CIu[i] <- Y.h$lower[2]
