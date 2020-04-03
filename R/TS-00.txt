@@ -179,7 +179,7 @@ Rolling1step.forecast <- function(Y, window.size, Arima.order, pred.plot,
                         include.mean, include.drift, lambda, xreg, seasonal){
 
     library(forecast)
-    if (xreg==0){ xreg = NULL }
+    if (is.null(xreg)==1 || xreg==0){ xreg = NULL }
   
     Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
     for (i in 1:(length(Y)-window.size)) {
