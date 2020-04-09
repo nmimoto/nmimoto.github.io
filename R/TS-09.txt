@@ -8,11 +8,15 @@
   X3 <- xts(X, order.by=as.Date(time(X)))
   X3["1984"]
 
-  #--- XTS to TS ---
+  #- XTS to TS 
   X4 <- ts(X3, start=as.numeric(strftime(start(X3), format="%Y")), freq=12)
 
 
 
+
+#--- turn XTS from .CSV file
+  D <- read.csv("https://nmimoto.github.io/datasets/SPY.csv", header=T)
+  X <- xts(D[,10], order.by=as.Date(D[,"Date"], format="%m/%d/%Y"))
 
 
 
