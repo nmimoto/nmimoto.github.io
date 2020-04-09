@@ -22,8 +22,13 @@ library(forecast)
 #---------------------------------------------
 Randomness.tests <- function( A, plott=TRUE) {
 
-  if (sum(is.na(A))>0){  A <- A[which(is.na(A)==0)]  }
 
+  # remove NA
+  if (sum(is.na(A))>0) A <- A[which(is.na(A)==0)] 
+
+  # turn to numeric if xts
+  if (is.xts(A)) A <- as.numeric(A)  
+  
   library(tseries) 
 
   L1 <- Box.test(A,   lag = 15, type = "Ljung-Box")
