@@ -1,26 +1,24 @@
 #
 #    USe try() and tryCatch() to loop going despite the error
-#    4/15/2011
 #
-#===========================================================
+#====================================================================
 
 x <- rnorm(100, 2, 1)
 x
 which(x<0)
 
-
 log(x)
-log("a")
 
 
 #--- Define nonsensical function that gives error for neg x ---------
-log.a <- function(x){
+log.a <- function(x){   
   ifelse(x<0, a <- log("a"), a<- log(x))
   return(a)
 }
 
 
-#--- This loop stops at where x is negetive value, because of log.a function.
+
+#--- This loop stops where x<0, because log.a() gives error -----------
 T <- 0
 for (i in 1:100) {
   print(i)
@@ -28,28 +26,45 @@ for (i in 1:100) {
 }
 
 
-#--- You can Use try() to keep the loop going ------------------------
+
+#--- You can Use try() to keep the loop going --------------------------
 T <- 0
 for (i in 1:100) {
   print(i)
-  T[i] <- try( log.a(x[i]), TRUE )  #TRUE supresses the error message
-  #T[i] <- try( log.a(x[i]), FALSE )
+  T[i] <- try( log.a(x[i]), TRUE )    #returns TRUE when log.a() gives error
 }
-T             #loop goes on despite of the error
-mean(T)       #Even though loop finishes, we still can't do this because of error message
+T             #loop went on despite of the error
+mean(T)       #we still can't do this b/c of error error
 
 
 
-#--- Use tryCatch() to get better output for error case -------------------------------
+#--- Use tryCatch() to get better output for error case ----------------
 T <- 0
 for (i in 1:100) {
   print(i)
   T[i] <- tryCatch( log.a(x[i]), error=function(ss){return(NA)}  )   # put NA if error is given
 }
 T
-mean(T)                           #Loop finishes, and still can't do this b/c of NA, but....
-mean(  T[which(is.na(T)==0)]  )   #now we can do this
+mean(T)                      #loop went on despite of the error
+mean(  T[(is.na(T)==0)]  )   #now we can do this
 
+
+
+#--- Or do this to see the error message -------------------------------
+T <- 0
+for (i in 1:100) {
+  T[i] <- tryCatch( 
+            log.a(x[i]),  
+            error = function(error_condition) {
+              #- See what error message was 
+              cat(paste("\n  error msg when i=", i, ": \n  ", error_condition$message, "\n\n"))  
+              return(NA)
+	          }
+          )
+}
+T
+mean(T)                           #loop went on despite of the error
+mean(  T[which(is.na(T)==0)]  )   #now we can do this
 
 
 
