@@ -1,0 +1,490 @@
+---
+title:  "InClass-A3 Sample Analysis"
+author: ""
+date: 
+output: pdf_document
+---
+
+<!-------
+  library(rmarkdown); render("InClass-A3-Sol.Rmd", pdf_document(toc=TRUE, toc_depth=2, number_sections=FALSE))
+--------------------------------------------->
+
+
+
+
+<br><br><hr>
+
+Here is the code to load the data from the web.  
+
+```{r, fig.width=8, fig.height=4}
+  source('https://nmimoto.github.io/R/TS-00.txt') 
+
+  D  <- read.csv("https://nmimoto.github.io/datasets/wine.csv")
+  D1   <- ts(D, start=c(1980,1), freq=1) 
+  plot(D1, type='o')
+```
+
+Now your “D1” in R contains monthly wine sales in Australia.
+
+
+
+
+<br><br><hr>
+
+<!----------------------------------------------------->
+# Preliminary Analysis   
+
+<br><br>
+
+
+<!--------->
+## 1.	Does “D1” look like stationary time series?
+State your graphical observations and conclusions drawn from
+p-values form Stationarity.tests().  
+
+```{r, fig.width=8, fig.height=4}
+  Stationarity.tests(D1)
+
+
+## KPSS and ADF conflicting
+```
+
+
+
+<br><br> 
+
+<!--------->
+## 2.	Take difference of D1 using diff(),
+plot it and check the stationarity.  State your graphical observations and
+conclusions drawn from p-values form Stationarity.tests().
+
+
+```{r, fig.width=8, fig.height=4}
+  plot(diff(D1))
+  Stationarity.tests(diff(D1))
+
+##  d=1 is Stationary. 
+```
+
+
+<br><br> 
+
+<!--------->
+## 3.	Should we take any transformation before differencing?
+Why or why not? If yes, use Box-Cox power transformation.
+Pick your value of lambda.  
+
+
+```{r, fig.width=8, fig.height=4}
+  plot(diff(D1))
+  plot((D1))
+  plot(diff(log(D1)))
+
+## Even though D1 passed the stationarity tests, it looks like it
+## has increasing variance problem.
+## This is probably due to D1 increasing as time goes on.
+## Taking a log will solve this problem. 
+##
+## Set lambda=0.
+```
+
+<br><br> 
+
+#### For all problems below lambda=0. 
+
+
+
+<br><br><hr>
+
+<!----------------------------------------------------->
+# ARIMA(d=1) analysis
+
+
+<br><br> 
+
+<!--------->
+## 4.	Use auto.arima() function to find best ARIMA(p,d,q)
+model with constraint that d=1.  What is the suggested model?
+(use stepwise=FALSE, approximation=FALSE option.)
+Does it pass the residual test for model adequacy?  Copy and
+Paste the output from auto.arima() and Randomness.tests().  (not the plot)  
+
+```{r, fig.width=8, fig.height=4}
+
+  Fit01 <- auto.arima(D1, d=1, lambda=0, stepwise=FALSE, approximation=FALSE)
+  Fit01
+  Randomness.tests(Fit01$residuals)
+
+## ARIMA(3,1,2) is suggested.
+##
+## Residual analysis does not show adequate fit. P-value for Ljung-Box tests are
+## too low, indicating there's still autocorrelation left in the residual.
+##
+## Acf plot comfirms this. 
+
+```
+
+<br><br> 
+
+<!--------->
+## 5.	Now we search for better ARIMA model without the guidance of AICc.
+Start with ARIMA(15, 1, 15) with the drift model, use Arima()
+function to estimate parameters.  Reduce p and/or q if the last
+parameter in AR or MA is not significant.  Stop if the LAST parameter
+of both AR and MA term is significant.  Remove the drift if not significant.  
+What is your final model?  Compare AICc of your final model to
+the ones you got from (4).  Which one is lower?  Why did this
+model was not suggested in (4)?   Does this final model pass
+the residual adequacy test?   
+(Only include the output of your final model.  Model pram + Residual p-values.)
+
+
+
+```{r, eval=FALSE, fig.width=8, fig.height=4}
+
+#- If you start removing AR(15) first
+
+  Arima(D1, lambda=0, order=c(15,1,15), include.drift=TRUE)  
+    #AR15 not significant. 
+
+  #Arima(D1, lambda=0, order=c(14,1,15), include.drift=TRUE)
+    #This gives estimation error. use CSS.
+
+  Arima(D1, lambda=0, order=c(14,1,15), include.drift=TRUE, method="CSS")
+    #MA15 not sig
+
+  Arima(D1, lambda=0, order=c(14,1,14), include.drift=TRUE)
+    #AR14 not sig
+
+  Arima(D1, lambda=0, order=c(13,1,14), include.drift=TRUE)  
+    #AR13, MA14 both not sig
+    # a) remove AR13    b) remove MA14
+
+  Arima(D1, lambda=0, order=c(12,1,14), include.drift=TRUE)  
+    #a) MA14 not sig
+
+  Arima(D1, lambda=0, order=c(13,1,13), include.drift=TRUE)  
+    #b) AR13 not sig
+```
+
+
+```{r, eval=FALSE, fig.width=8, fig.height=4}
+
+  Fit05 <- Arima(D1, lambda=0, order=c(12,1,13), include.drift=TRUE)
+  Fit05
+    #a) b) MA13 barely sig
+    
+  Randomness.tests(Fit05$residuals)
+
+
+
+#- If you start removing MA(15) first
+
+  Fit05b <- Arima(D1, lambda=0, order=c(15,1,13), include.drift=TRUE)
+  Fit05b
+    #AR15 not significant. 
+
+  Randomness.tests(Fit05b$residuals)
+
+
+##  Depending of what you remove first you end up with either
+##  ARIMA(12,1,13) with drift, or ARIMA(15,1,13) with drift.
+##  (lambda is set to 0).
+##
+##  I will use ARIMA(12,1,13) with drift to answer questions below.  
+##
+##  AICc of Fit05 is -146.11.  AICc of Fit01 is -10.39.  Based on AICc,
+##  ARIMA(12,1,13) should have been reported by auto.arima(), but
+##  was not looked at, because maximum p and q of the default setting is 5.
+##
+##  The model fit of both ARIMA(12,1,13) with drift and
+##  ARIMA(15,1,13) with drift is adequate by residual analysis.
+##
+
+```
+
+```{r, eval=FALSE, echo=FALSE, fig.width=8, fig.height=4}
+
+  auto.arima(D1, lambda=0, max.order=30, max.q=20, max.p=20, stepwise=FALSE, approximation=FALSE, trace=TRUE)
+
+# Magically it chooses ARIMA(7,1,1) w drift AICc=-45.7.
+# Has bunch of AIC=Inf.  
+
+  auto.arima(D1, lambda=0, max.order=30, max.q=20, max.p=20, stepwise=FALSE, approximation=FALSE, trace=TRUE)
+```
+
+
+
+
+
+
+<br><br><hr>
+
+<!----------------------------------------------------->
+# ARIMA(d=0) with Linear Trend analysis
+
+
+
+
+<br><br> 
+
+<!--------->
+## 6.	Another model we can fit this data is d=0 with linear trend model.
+Use auto.arima() with d=0 and xreg=time(D1) option
+to find best ARMA(p,q) model to go on top of the linear trend.
+Don’t forget to use the same lambda as before.  What is your linear
+trend  model?  Does this final model pass the residual adequacy test?   
+(Model pram + Residual p-values.)
+
+
+```{r, fig.width=8, fig.height=4}
+  
+  Fit06 <- auto.arima(D1, stepwise=FALSE, approximation=FALSE,
+                                        lambda=0, xreg=time(D1))
+  Fit06
+  
+  Randomness.tests(Fit06$residuals)
+  
+## Model fit is not adequate. P-value is too low for all 
+## L-B test.
+## There's significant autocorrelation at lag 12.  
+## Should try ARMA with higher p,q like we did in #5.
+
+
+  Fit06b <- Arima(D1, order=c(15,0,15), xreg=time(D1), lambda=0)
+  Fit06b  
+  Randomness.tests(Fit06b$residuals)
+## Model fit is now adequate. AR15 and MA15 both significant.  
+## Slope and intercept basically unchanged from before.  
+    
+```
+
+
+
+
+
+<br><br> 
+
+<!--------->
+## 7.	Is the slope estimate you get in (6) consistent with
+the drift term you had in (5)?  
+
+
+```{r, fig.width=8, fig.height=4}
+
+Fit05
+
+Fit06b
+
+## drift term from Fit05 is 0.0061.  
+## xreg (slope) term from Fit06b is 0.0068.  
+## They are close and therefore consistent.
+## At this point, we can not decide on which model is more
+## plausible.  We will do more test on #8.  
+```
+
+
+<br><br> 
+
+<!--------->
+## 8.	Use the following code to fit the regression line outside
+of auto.arima(), and test the regression residuals for stationarity.
+Is the estimate consistent with (6)?  (Replace lambda with your lambda)
+
+```{r, fig.width=8, fig.height=4}
+  D2 <- BoxCox(D1, lambda=0)
+  Reg <- lm(D2~time(D2))
+  summary(Reg)
+  plot(D2)
+  abline(Reg, col="red")
+  Stationarity.tests(Reg$residuals)
+
+## Large, small, small p-values unaniously indicates that
+## the Regression residuals are stationary.
+## This means that model in (#5) is not a good model(necessary) for the data,
+## even though ARMA residual analysis looked good on #5.  
+## We should be modeling this data with
+##        Yt = Linear Trend + ARMA error
+## as in #6.
+```
+
+
+
+
+
+<br><br><hr>
+
+<!----------------------------------------------------->
+# Compare the two model
+
+
+<br><br> 
+
+<!--------->
+## 9.	Perform 12-step forecast using the model from (5).
+What is the 95% PI for the next observation?  Include the numbers here.  
+
+```{r, fig.width=8, fig.height=4}
+  forecast(Fit05, 12)
+  plot(forecast(Fit05, 12))
+
+##  Older version of the question wrongly said CI instead of PI.
+##  We are getting Prediction Interval for next 12 observations.
+
+##  Assuming Normality, 95% PI for next obs is 
+```
+
+<br><br> 
+
+<!--------->
+## 10.	Perform 12-step forecast using the model from (6).
+What is the 95% PI for the next observation?  Include the numbers here.  
+(Remember that your forecast() needs xreg.  See slide (6-5))
+
+
+```{r, fig.width=8, fig.height=4}
+  h=12
+  forecast(Fit06b, h, xreg=last(time(D1))+(1:h)/frequency(D1))
+  plot(forecast(Fit06b, h, xreg=last(time(D1))+(1:h)/frequency(D1)))
+## Assuming Normality, 95% PI for next obs is 
+```
+
+
+
+
+<br><br>
+
+<!--------->
+## 11.	Perform Rolling 1-step prediction of last 42 observations
+retrospectively using model from (5).  Report prediction rMSE.
+Compare that with sigma-hat from the model.  
+
+
+```{r, eval=TRUE, fig.width=8, fig.height=4}
+
+  #- Set options 
+  Y <- D1                    # Original data
+  window.size <- 80         # Window size for estimation
+  Arima.order <- c(12,1,13)  # Arima(p,d,q) order
+  pred.plot   <- TRUE        # do you want plot at end? 
+  
+  #- set Arima() options: 
+  include.mean  = FALSE
+  include.drift = TRUE       
+  lambda   = 0               # NULL=no transformaton. 0=Log
+  xreg     = NULL            # NULL=no xreg. TRUE=Linear Trend is present
+  seasonal = c(0, 0, 0)      # seasonal component
+  
+  #- then use the function 
+  Rolling1step.forecast(Y, window.size, Arima.order, pred.plot, 
+                          include.mean, include.drift, lambda, xreg, seasonal)
+  
+  #Rolling1step.forecast.old(Y, window.size, Arima.order, pred.plot, 
+  #                        include.mean, include.drift, lambda, xreg, seasonal)
+```
+
+
+
+```{r, eval=TRUE, fig.width=8, fig.height=4}
+  # Transforming Sigma Back 
+ 
+  D2     <- BoxCox(D1, lambda=0)
+  D.base <- D2[length(D1)-(42:1)]  # last 42 obs in D1
+  Y  <- rnorm(1000*42, 0, 0.1120268)    # simulating normal data with same theoretical model rMSE
+  Y2 <- Y+rep(D.base, times=1000)                 # add        
+  X  <- InvBoxCox(Y2, lambda = 0) #inverse transform
+  sd(X)
+
+```
+
+
+
+
+
+<br><br>
+
+<!--------->
+## 12.	Perform Rolling 1-step prediction of last 42 observations
+retrospectively using model from (6).  Report prediction rMSE.
+Compare that with sigma-hat from the model.  
+
+
+
+
+```{r, eval=TRUE, fig.width=8, fig.height=4}
+
+#- Set options 
+Y <- D1                    # Original data
+window.size <- 100         # Window size for estimation
+Arima.order <- c(15,0,15)  # Arima(p,d,q) order
+pred.plot   <- TRUE        # do you want plot at end? 
+
+#- set Arima() options: 
+include.mean  = TRUE       #
+include.drift = FALSE      #
+lambda   = 0               # NULL=no transformaton. 0=Log
+xreg     = TRUE            # NULL=no xreg. TRUE=Linear Trend is present
+seasonal = c(0, 0, 0)      # seasonal component
+
+#- then use the function 
+Rolling1step.forecast(Y, window.size, Arima.order, pred.plot, 
+                        include.mean, include.drift, lambda, xreg, seasonal)
+
+```
+
+
+
+
+
+
+
+<br><br> 
+
+<!--------->
+## 13.	Which model do you like better and why?  Model from (5) or (6)?
+Write  down your mathematical model, and list estimates for all
+parameters.  You can type using following notation.
+(you may not need to use some of them) 
+
+```{r, fig.width=8, fig.height=4}
+
+## Both models were fitting and adequate,
+## but in #8, regression residuals were stationary.  
+## This indicates Linear Trend + ARMA has no problem fitting/explaining
+## the data, and therefore, no need for ARIMA with d=1.
+## Model from #6 is my best model.
+
+Fit06b
+```
+
+* Mathematical expression:
+
+  \begin{align*}
+    Y_t &= \mbox{observation}
+    \\ Y_t &= a+b t + X_t
+    \\ X_t \mbox{ is ARIMA(15,0,15)}
+  \end{align*}
+
+  \begin{align*}
+    X_t &= phi_1 X_{t-1} + phi_1 X_{t-1} + phi_2 X_{t-2} + \cdots + phi_{15} X_{t-15}
+    + e_t + theta_1 e_{t-1} + cdots + theta_{15} e_{t-15}
+  \end{align*}
+  \begin{align*}
+    e_t \sim WN(0,\sigma^2)
+  \end{align*}
+
+
+
+        
+
+
+
+<br><br><br><br><br>
+
+[TS Class Webpage](https://nmimoto.github.io/477/) -- [R resource page](https://nmimoto.github.io/R/)
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
+
+
