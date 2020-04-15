@@ -86,13 +86,23 @@
 
 
 
-#--- Estimation with different methods
-  Est  <- arima(X, order=c(1,0,1))  
-  Est  <- arima(X, order=c(1,0,1), method="CSS")  
-  Est  <- arima(X, order=c(1,0,1), method="ML", init=c(0,0,0) )  
 
-  Est$coef
-  Est$var.coef
+#--- Estimation with different methods
+
+  # Skip some parameters (Phis, Thetas, Mean).
+  Fit  <- Arima(Wave, order=c(4,0,4), fixed=c(NA,NA,NA,NA,  NA,0,0,NA,  NA ) )
+  Fit
+
+  # CSS when MLE doesn't work
+  Fit  <- Arima(X, order=c(1,0,1), method="CSS")  
+  Fit
+
+  # MLE with your own start point 
+  Fit  <- Arima(X, order=c(1,0,1), method="ML", init=c(0,0,0) )  
+  Fit
+
+  Fit$coef
+  Fit$var.coef
 
 
 
