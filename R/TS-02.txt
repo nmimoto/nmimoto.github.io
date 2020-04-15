@@ -1,12 +1,53 @@
-#
-#
-# ARIMA(p,d,q)
-#
-#
-###############################################
+###
+###
+###  R functions for ARIMA(p,d,q)
+###
+###
+########################################################
+###  Sign conventions in Textbooks 
+###
+###  [Cryer]'s sign convention is (1-phi B) X_t = (1-theta B) e_t.
+###  [Brockwell]'s             is (1-phi B) X_t = (1+theta B) e_t.
+###
+###  For AR(1)    (1-.5 B) X_t = e_t,           ACF should be all positive.
+###               (1+.5 B) X_t = e_t,           ACF should be alternating in sign.
+###
+###  For MA(1)             X_t = (1-.5 B) e_t   ACF at lag 1 should be negative
+###                        X_t = (1+.5 B) e_t   ACF at lag 1 should be positive
+########################################################
+
+
+
+
+#--- Theoretical ACF and PACF 
+#      ARMAacf() uses  [Brockwell]:  (1-phi B) X_t = (1+theta B) e_t
+
+    Theta = c(.2,  .3, .2,  .2)
+    MArho1 <- ARMAacf(ma = Theta, lag.max=20, pacf=FALSE)
+    MApacf1<- ARMAacf(ma = Theta, lag.max=20, pacf=TRUE)
+
+    layout(matrix(1:2, 1,2))
+    plot(0:20, MArho1, type="h", col="red");   abline(h=0)
+    plot(1:20, MApacf1, type="h", col="red");   abline(h=0)
+
+
+
+#--- Theoretical ACVF 
+#      tacvfARMA() uses [Cryer]:  (1-phi B) X_t = (1-theta B) e_t
+
+  library(ltsa)
+  MAgam2 <- tacvfARMA(theta= c(.2, .3, .2, .2), maxLag=20, sigma2=1)   #- Theoretical ACVF
+  MArho2 <- MAgam2/MAgam2[1]                                           #- Theoretical ACF
+
+  plot(0:20, MArho2, type="h", col="red");   abline(h=0)
+
+
+  
 
 
 #--- Basic Simulation with ARIMA(p,d,q) ---
+#      arima.sim() uses [Brockwell]:  (1-phi B) X_t = (1+theta B) e_t
+
   mu <- 5
   x  <- arima.sim(n = 250, list(ar = c(-0.6, .2), ma = c(0.5) )) + mu
 
@@ -14,7 +55,10 @@
   acf(x)
 
 
-#-- Estimate parameters
+
+#--- Estimate parameters
+  library(forecast)     # install.packages("forecast") 
+  Fit01 <- Arima(
   est <- arima(x, order = c(2, 0, 0))  # fit ARMA(2,1)
   est
 
