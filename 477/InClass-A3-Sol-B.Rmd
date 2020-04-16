@@ -1,0 +1,409 @@
+---
+title:  "InClass-A3 Sample Analysis"
+author: ""
+date: 
+output: pdf_document
+---
+
+<!-------
+  library(rmarkdown); render("InClass-A3-Sol-B.Rmd", pdf_document(toc=TRUE, toc_depth=2, number_sections=FALSE))
+--------------------------------------------->
+
+
+
+
+<br><br><hr>
+
+Here is the code to load the data from the web.  
+
+```{r, fig.width=8, fig.height=4}
+  source('https://nmimoto.github.io/R/TS-00.txt') 
+
+  D  <- read.csv("https://nmimoto.github.io/datasets/wine.csv")
+  D1   <- ts(D, start=c(1980,1), freq=12) 
+  plot(D1, type='o')
+```
+
+Now your “D1” in R contains monthly wine sales in Australia.
+
+
+### We will talke log of the data
+
+
+<!----------------------------------------------------->
+# 1. auto.arima() analysis
+
+<br><br> 
+
+```{r, fig.width=8, fig.height=4}
+
+  Fit01 <- auto.arima(D1, d=1, lambda=0, stepwise=FALSE, approximation=FALSE)
+  Fit01
+  Randomness.tests(Fit01$residuals)
+
+##  ARIMA(0,1,1)x(0,1,1)[12]  is suggested.
+##  Residual analysis shows adequacy by both L-B test and M-L test.
+##
+##  Errors (after the log) seems to be nomally distributed, and 
+##  J-B test confirms that. (p-value > .05) 
+##
+##  We must investigate the choice of d=1, and D=1.  
+```
+
+
+<br><br><br><hr>
+
+<!----------------------------------------------------->
+# 2. Preliminary Analysis   
+
+```{r, fig.width=8, fig.height=4}
+
+  plot( log(D1), type='o')
+
+  plot( diff(log(D1)), type='o')  # d=1
+
+  plot( diff(log(D1), 12), type='o')  # D=1
+
+  plot( diff( diff(log(D1), 12)), type='o')  # d=1 and D=1
+
+## Do we really need to take d=1 and D=1?
+```
+
+
+<br><br> \hspace{10mm}
+
+<!--------->
+## Stationarity Check
+
+```{r, fig.width=8, fig.height=4}
+
+  Stationarity.tests( diff(log(D1)))
+
+  Stationarity.tests( diff(log(D1, 12)))
+
+  Stationarity.tests( diff(diff(log(D1), 12)))
+
+## d=1 alone makes it stationary 
+## D=1 alone makes it stationary 
+## d=1 D=1 together may make it over-differenced. 
+```
+
+
+
+
+
+<br><br><br><br><hr> \clearpage
+
+<!----------------------------------------------------->
+# 3. Difference only (d=1 D=0) model 
+
+```{r d1, fig.width=8, fig.height=4}
+
+  Fit21 <- auto.arima(D1, d=1, D=0, lambda=0, stepwise=FALSE, approximation=FALSE)   
+  Fit21
+  Randomness.tests(Fit21$resid)
+
+## Arima(1,1,1)x(1,0,0)[12] suggested
+## Residual does not show adequate fit.  Large ACF at lag 12. 
+##
+
+#  Fit21b <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(2,0,0))   
+#  Fit21b
+#  Randomness.tests(Fit21b$resid)
+
+## Estimation problem
+
+
+  Fit21c <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(1,0,1))   
+  Fit21c
+  Randomness.tests(Fit21c$resid)
+
+## Residual shows adequate fit. 
+
+
+  Fit21d <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(1,0,1),
+                                   include.drift=TRUE, method="CSS")   
+  Fit21d
+
+## If method="CSS-MLE" (default) then gives error.
+## with CSS, drift not significant. 
+
+
+```
+
+
+
+
+
+<br><br><br><br><hr> \clearpage
+
+<!----------------------------------------------------->
+# 4. Seasonal Diff only (d=0 D=1) model 
+
+```{r D1, fig.width=8, fig.height=4}
+
+  Fit31 <- auto.arima(D1, d=0, D=1, lambda=0, stepwise=FALSE, approximation=FALSE)   
+  Fit31
+  Randomness.tests(Fit31$resid)
+
+## Arima(1,0,1)x(0,1,1)[12] w drift suggested
+## Residuals show adequate fit.  
+##
+
+
+```
+
+
+
+
+<br><br><br><br><hr> \clearpage
+
+<!----------------------------------------------------->
+# 5. Revisit (d=1 D=1) model 
+
+```{r both, fig.width=8, fig.height=4}
+
+  # what was suggested by auto.arima()
+  Fit41 <- Arima(D1, lambda=0, order=c(0,1,1), seasonal=c(0,1,1))   
+  Fit41
+  Randomness.tests(Fit41$resid)
+
+## Arima(1,0,1)x(0,1,1)[12] w drift suggested
+## Residuals show adequate fit.  
+##
+
+```
+
+
+
+```{r, fig.width=8, fig.height=4}
+
+  Arima(D1, lambda=0, order=c(0,1,1), seasonal=c(0,1,0))   
+  
+  Arima(D1, lambda=0, order=c(0,1,0), seasonal=c(0,1,1))   
+```
+
+
+
+
+
+
+
+
+
+<br><br><br><br><hr> \clearpage
+
+<!----------------------------------------------------->
+# 6. Linear Trend Model
+
+
+
+### From A3
+
+```{r, fig.width=8, fig.height=4}
+
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15))
+  Fit
+  Randomness.tests(Fit$resid)
+
+```
+
+<br><br> \hspace{10mm} 
+
+### Seasonal ARMA
+
+
+```{r lm, fig.width=8, fig.height=4}
+
+  Fit51 <- auto.arima(D1, d=0, D=0, lambda=0, xreg=time(D1),
+                              stepwise=FALSE, approximation=FALSE)
+  Fit51
+  Randomness.tests(Fit51$resid)
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(1,0,1))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(2,0,2))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(3,0,3))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(5,0,4), seasonal=c(1,0,1))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(0,0,0), seasonal=c(0,0,0))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(3,0,0))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,1), seasonal=c(3,0,1))
+  Fit52 
+  Randomness.tests(Fit51$resid)
+
+
+
+```
+
+
+
+
+```{r, eval=FALSE, fig.width=8, fig.height=4}
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15),
+               fixed=c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,
+                       NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15), method=("CSS"),
+               fixed=c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,  0,NA,NA,NA,NA,
+                       NA,NA,NA,NA,NA,NA,NA,NA,NA, 0,  0,NA,NA,NA,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,14), method=("CSS"),
+               fixed=c(NA,NA,NA,NA,NA,  NA,NA,NA, 0, 0,   0,NA,NA,NA,NA,
+                       NA, 0,NA, 0,NA,  NA,NA,NA, 0, 0,   0,NA,NA,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,14), method=("CSS"),
+               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
+                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,NA,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,13), method=("CSS"),
+               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
+                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,12), method=("CSS"),
+               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
+                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,12), 
+               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
+                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,
+                       NA,NA ) )
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15))
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+  # Skip some parameters (Phis, Thetas, icpt, xreg)
+  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(14,0,14))
+  Fit
+  Randomness.tests(Fit$resid)
+
+
+
+```
+
+
+
+
+<br><br>
+
+<!--------->
+## Rolling 1-step with D=1 model
+
+
+```{r, fig.width=8, fig.height=4}
+
+  Fit31 <- auto.arima(D1, d=0, D=1, lambda=0, stepwise=FALSE, approximation=FALSE)   
+  Fit31
+  Randomness.tests(Fit31$resid)
+
+## Arima(1,0,1)x(0,1,1)[12] w drift suggested
+```
+
+
+```{r, eval=TRUE, fig.width=8, fig.height=4}
+
+#- Set options 
+Y <- D1                    # Original data
+window.size <- 100         # Window size for estimation
+Arima.order <- c(1,0,1)  # Arima(p,d,q) order
+pred.plot   <- TRUE        # do you want plot at end? 
+
+#- set Arima() options: 
+include.mean  = TRUE       #
+include.drift = FALSE      #
+lambda   = 0               # NULL=no transformaton. 0=Log
+xreg     = NULL            # NULL=no xreg. TRUE=Linear Trend is present
+seasonal = c(0, 1, 1)      # seasonal component
+
+#- then use the function 
+Rolling1step.forecast(Y, window.size, Arima.order, pred.plot, 
+                        include.mean, include.drift, lambda, xreg, seasonal)
+
+```
+
+
+
+
+
+
+
+
+
+        
+
+
+
+<br><br><br><br><br>
+
+[TS Class Webpage](https://nmimoto.github.io/477/) -- [R resource page](https://nmimoto.github.io/R/)
+
+</body>
+<!--------------------------------------------------------------------->
+<!--------------------------------------------------------------------->
+
+

@@ -168,7 +168,7 @@ the residual adequacy test?
 ```
 
 
-```{r, eval=FALSE, fig.width=8, fig.height=4}
+```{r, fig.width=8, fig.height=4}
 
   Fit05 <- Arima(D1, lambda=0, order=c(12,1,13), include.drift=TRUE)
   Fit05
@@ -411,7 +411,7 @@ Compare that with sigma-hat from the model.
 
 
 
-```{r, eval=TRUE, fig.width=8, fig.height=4}
+```{r, eval=TRUE, fig.width=8, fig.height=6}
 
 #- Set options 
 Y <- D1                    # Original data
@@ -466,8 +466,8 @@ Fit06b
   \end{align*}
 
   \begin{align*}
-    X_t &= phi_1 X_{t-1} + phi_1 X_{t-1} + phi_2 X_{t-2} + \cdots + phi_{15} X_{t-15}
-    + e_t + theta_1 e_{t-1} + cdots + theta_{15} e_{t-15}
+    X_t &= \phi_1 X_{t-1} + \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_{15} X_{t-15}
+    + e_t + \theta_1 e_{t-1} + \cdots + \theta_{15} e_{t-15}
   \end{align*}
   \begin{align*}
     e_t \sim WN(0,\sigma^2)
