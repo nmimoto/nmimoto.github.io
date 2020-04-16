@@ -13,47 +13,77 @@ nmimoto@uakron.edu
 
 
 
-2. Pick a dataset to work on.  You can use dataset listed under
-"Data List" on class webpage, or you can find something on the web.
-If you happen to have time series data (say, from your work)
-you can use them as well.
+2. Pick a dataset to work on.
 
-The dataset must be approved for the project.
-When you make a decision, email me.
+  You can use dataset listed under "Data List" on class webpage,
+  or you can find something on the web.
+  If you happen to have time series data (say, from your work)
+  you can use them as well.
+
+  The dataset must be approved for the project. When you make a decision, email me.
 
 
 
 3.  You are exptected to do:
 
-Find best SARIMA model that fits the data.
+  Find best SARIMA model that fits the data.
 
-Write report in MS Word explaining how you arrived at the final model.
+  Write report in MS Word explaining how you arrived at the final model.
 
-Report can not be more than 5 pages, including output, and figures.
+  Report can not be more than 5 pages, including output, and figures.
 
-Key output, and key plots should be included,
-but you must carefully choose what to include. 
-Don't just include all the plots, or just omit all the outputs.  
+  Key output, and key plots should be included, but you must carefully
+  choose what to include. Don't just include all the plots, or just
+  omit all the outputs.  
 
-R code should be attached at the end.  Code is not counted toward 5 pages.
+  R code should be attached at the end.  R code is not counted toward 5 pages.
 
 
 
 
 4.  You can refer to Modeling Guidelines.
 
-Below are list of general questions that you need to answer in your report.  
+  Below are list of general questions that you need to answer in your report.  
 
-  Seasonality?
-  
-  Stationality?  Do you need d=1? D=1? Both?
-  
-  Need Transformation? (log)
-  
-  Linear Trend or Random Trend?
-  
-  Order selection of ARMA(p,q)x(P,Q)
-  
-  Residual Analysis
+    Seasonality?
+    Stationality?  Do you need d=1? D=1? Both?
+    Need Transformation? (log?)
+    Linear Trend or Random Trend?
+    Order selection of ARMA(p,q)x(P,Q)
+    Residual Analysis
 
+
+
+
+5. You will be graded for:
+
+  Clarity of explanation of how analysis was conducted.
+
+  Whether you used appropreate statistical method for given situation.
+    
+  Correctness of your interpretations of the outputs from statistical tools.
+
+
+  You will not be graded on whether your final model is actually
+  the best model for the dataset or not.  
+
+
+
+
+6. I am available for consulting via email and WebEx meeting.
+
+  You can also submit draft/partial report to me to get feedback.
+  (I need at least two days to return the feedback.)
+
+
+
+7.  Report must be submitted in Brightspace.
+
+  If you used dataset that is outside of R package or the class website, then
+  you must submit the dataset as well.  
+
+
+
+
+Any questions, email nmimoto@uakron.edu.
 
