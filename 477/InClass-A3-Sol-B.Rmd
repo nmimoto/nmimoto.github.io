@@ -37,17 +37,24 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
 ```{r, fig.width=8, fig.height=4}
 
-  Fit01 <- auto.arima(D1, d=1, lambda=0, stepwise=FALSE, approximation=FALSE)
-  Fit01
-  Randomness.tests(Fit01$residuals)
+  Fit11 <- auto.arima(D1, lambda=0, stepwise=FALSE, approximation=FALSE)
+  Fit11
+  Randomness.tests(Fit11$residuals)
 
-##  ARIMA(0,1,1)x(0,1,1)[12]  is suggested.
+##  ARIMA(1,0,1)x(0,1,1)[12]  is suggested.
 ##  Residual analysis shows adequacy by both L-B test and M-L test.
 ##
 ##  Errors (after the log) seems to be nomally distributed, and 
 ##  J-B test confirms that. (p-value > .05) 
 ##
-##  We must investigate the choice of d=1, and D=1.  
+##  We must investigate the choice of d, D, and drift
+
+
+  # Include drift 
+  Fit12 <- Arima(D1, lambda=0, order=c(1,0,1), seasonal=c(0,1,1), include.drift=TRUE)
+  Fit12
+  Randomness.tests(Fit12$residuals)
+
 ```
 
 
@@ -62,11 +69,6 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
   plot( diff(log(D1)), type='o')  # d=1
 
-  plot( diff(log(D1), 12), type='o')  # D=1
-
-  plot( diff( diff(log(D1), 12)), type='o')  # d=1 and D=1
-
-## Do we really need to take d=1 and D=1?
 ```
 
 
@@ -81,11 +83,8 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
   Stationarity.tests( diff(log(D1, 12)))
 
-  Stationarity.tests( diff(diff(log(D1), 12)))
-
 ## d=1 alone makes it stationary 
 ## D=1 alone makes it stationary 
-## d=1 D=1 together may make it over-differenced. 
 ```
 
 
@@ -135,53 +134,7 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
 
 
-<br><br><br><br><hr> \clearpage
 
-<!----------------------------------------------------->
-# 4. Seasonal Diff only (d=0 D=1) model 
-
-```{r D1, fig.width=8, fig.height=4}
-
-  Fit31 <- auto.arima(D1, d=0, D=1, lambda=0, stepwise=FALSE, approximation=FALSE)   
-  Fit31
-  Randomness.tests(Fit31$resid)
-
-## Arima(1,0,1)x(0,1,1)[12] w drift suggested
-## Residuals show adequate fit.  
-##
-
-
-```
-
-
-
-
-<br><br><br><br><hr> \clearpage
-
-<!----------------------------------------------------->
-# 5. Revisit (d=1 D=1) model 
-
-```{r both, fig.width=8, fig.height=4}
-
-  # what was suggested by auto.arima()
-  Fit41 <- Arima(D1, lambda=0, order=c(0,1,1), seasonal=c(0,1,1))   
-  Fit41
-  Randomness.tests(Fit41$resid)
-
-## Arima(1,0,1)x(0,1,1)[12] w drift suggested
-## Residuals show adequate fit.  
-##
-
-```
-
-
-
-```{r, fig.width=8, fig.height=4}
-
-  Arima(D1, lambda=0, order=c(0,1,1), seasonal=c(0,1,0))   
-  
-  Arima(D1, lambda=0, order=c(0,1,0), seasonal=c(0,1,1))   
-```
 
 
 
@@ -194,7 +147,7 @@ Now your “D1” in R contains monthly wine sales in Australia.
 <br><br><br><br><hr> \clearpage
 
 <!----------------------------------------------------->
-# 6. Linear Trend Model
+# 4. Linear Trend Model
 
 
 
@@ -348,24 +301,21 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
 
 
+<br><br><br><br><hr> \clearpage
 
-<br><br>
-
-<!--------->
-## Rolling 1-step with D=1 model
+<!----------------------------------------------------->
+# 5. Rolling 1-step with D=1 model
 
 
 ```{r, fig.width=8, fig.height=4}
 
-  Fit31 <- auto.arima(D1, d=0, D=1, lambda=0, stepwise=FALSE, approximation=FALSE)   
-  Fit31
-  Randomness.tests(Fit31$resid)
+  Fit12
+  Randomness.tests(Fit12$resid)
 
-## Arima(1,0,1)x(0,1,1)[12] w drift suggested
+## Arima(1,0,1)x(0,1,1)[12] w drift 
 ```
 
-
-```{r, eval=TRUE, fig.width=8, fig.height=4}
+```{r, eval=TRUE, fig.width=8, fig.height=6}
 
 #- Set options 
 Y <- D1                    # Original data
@@ -375,7 +325,7 @@ pred.plot   <- TRUE        # do you want plot at end?
 
 #- set Arima() options: 
 include.mean  = TRUE       #
-include.drift = FALSE      #
+include.drift = TRUE       #
 lambda   = 0               # NULL=no transformaton. 0=Log
 xreg     = NULL            # NULL=no xreg. TRUE=Linear Trend is present
 seasonal = c(0, 1, 1)      # seasonal component
