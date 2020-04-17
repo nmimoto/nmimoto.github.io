@@ -9,18 +9,18 @@
 nmimoto@uakron.edu
 
 
-1. Form a gorup of less than 4 students.  
+1. Form a gorup of up to 4 students.  
 
 
 
 2. Pick a dataset to work on.
 
   You can use dataset listed under "Data List" on class webpage,
-  or you can find something on the web.
-  If you happen to have time series data (say, from your work)
-  you can use them as well.
+  or you can find something on the web. If you happen to have
+  time series data (say, from your work) you can use them as well.
 
   The dataset must be approved for the project. When you make a decision, email me.
+
 
 
 
@@ -30,13 +30,13 @@ nmimoto@uakron.edu
 
   Write report in MS Word explaining how you arrived at the final model.
 
-  Report can not be more than 5 pages, including output, and figures.
+  Report can not be more than 5 pages, including R outputs, and figures.
 
   Key output, and key plots should be included, but you must carefully
   choose what to include. Don't just include all the plots, or just
   omit all the outputs.  
 
-  R code should be attached at the end.  R code is not counted toward 5 pages.
+  All R code should be attached at the end.  R code deos not count toward 5 pages.
 
 
 
@@ -45,12 +45,18 @@ nmimoto@uakron.edu
 
   Below are list of general questions that you need to answer in your report.  
 
+    Where did you get the data? 
     Seasonality?
     Stationality?  Do you need d=1? D=1? Both?
     Need Transformation? (log?)
     Linear Trend or Random Trend?
     Order selection of ARMA(p,q)x(P,Q)
     Residual Analysis
+
+    (if appropreate)
+      Sign of over-differencing?
+      Sign of under-differencing?
+      Is one model better than the other? why?
 
 
 
@@ -62,7 +68,6 @@ nmimoto@uakron.edu
   Whether you used appropreate statistical method for given situation.
     
   Correctness of your interpretations of the outputs from statistical tools.
-
 
   You will not be graded on whether your final model is actually
   the best model for the dataset or not.  
@@ -84,10 +89,10 @@ nmimoto@uakron.edu
 
 
 
-8 DUE DATE:  May 1st 11pm
+8 DUE DATE:  May 1st 11pm 
 
   You are strongly encouraged to submit the report by above due, but
-  submissions are accepted until May 8th 11pm.  
+  late submissions are accepted until May 8th 11pm.  
 
 
 
