@@ -1,0 +1,194 @@
+###
+###
+###
+###
+###
+
+
+
+library(tidyverse)   # install.packages("tidyverse")
+
+# Includes: 
+#   dplyr
+#   ggplot2
+#   readr
+#   tibble
+#   tidyr
+#   purrr
+
+
+D1 <- read_csv("data/EmployeeData.csv")
+
+
+##
+##  mutate() to create new columns
+##
+
+D2 <- D1 %>%
+   mutate(
+     AnnualBase  = ifelse(frequency=="HOURLY", base*40*52, base*5*52),
+     AnnualTotal = ifelse(frequency=="HOURLY", base*40*52, base*5*52),
+     AnnualBonus = AnnualTotal - AnnualBase  )
+
+
+
+View(D2)
+
+min(D2$AnnualBase) 
+
+ggplot(D2, aes(x=AnnualBase)) + geom_histogram(binwidth=1000)
+
+
+
+##
+##  filter() to extract certain rows
+##
+
+D2 %>% filter(year==2017 & county %in% c("CASCADE", "POWELL") | AnnualBonus >= 20000)
+
+
+# Year is one of 2015, 2016, 1017, county NOT in CASCADE, or POWELL.
+D2 %>% filter(year   %in% 2015:2017 &
+              !county %in% c("CASCADE", "POWELL") )
+
+
+
+
+
+##
+##  pivoting and unpivoting
+##
+
+#  group_by()     # rows summary  (better for later use)
+#  pivot_wider()  # column summary
+#  summarise()    # summation
+#  pivot_longer() # unpivoting  (better for feeding into models)
+
+
+# Aggregate by county
+  D.county <- D2 %>% group_by(county) %>% count()
+  D.county
+
+# Aggregate by county and sort 
+  D.county <- D2 %>% group_by(county) %>% count() %>% arrange(desc(n))
+  D.county
+
+# Aggregate by county and sort 
+  D.county <- D2 %>% group_by(county) %>% count() %>% arrange(n)
+  D.county
+
+# Show more rows on screen
+  print(D.county, n=100)
+
+
+# plot what's already aggregated
+  ggplot(data=D.county, aes(x=county, y=n)) + geom_bar(stat="identity") + coord_flip()
+
+# aggregate while plotting
+  ggplot(data=D2, aes(x=county)) + stat_count() + coord_flip()
+  ggplot(data=D2, aes(x=county)) + geom_bar() + coord_flip()
+
+
+
+# Get mean and median by dept for one county
+D3 <- D2 %>% filter(county=="LEWIS AND CLARK") %>%
+   group_by(department) %>%
+      summarize(
+        Av.Base = mean(AnnualBase),
+        Med.Base = median(AnnualBase)
+      )
+print(D3, n=20)
+
+
+# Get mean of all numeric column
+D2 %>% filter(county=="LEWIS AND CLARK") %>%
+   group_by(department) %>%
+      summarize_if(is.numeric, mean)
+
+
+
+# Av Base for each year (long format)
+D3 <- D2 %>% filter(county=="LEWIS AND CLARK") %>%
+   group_by(department, year) %>%
+      summarize(AvBase = mean(AnnualBase))
+D3
+
+
+# Now spread that over side ways (wide format)
+D4 <- D3 %>% pivot_wider(names_from=year, values_from=AvBase)
+D4
+
+
+# Stack them back to long fomrat
+D5 <- D4 %>% pivot_longer(-department, names_to="Yr", values_to="BaseAv")
+D5
+
+# gets 7 more rows than D3
+
+
+
+
+##
+## joining
+##
+
+
+EName <- read_csv("data/EmployeeNames.csv")
+ESal  <- read_csv("data/EmployeeSalary.csv")
+EHist <- read_csv("data/EmployeeHistory.csv")
+
+
+# EName has wrong col names for EmployeeID
+EName
+colnames(EName)[1] <- "EmployeeID"
+EName
+
+left_join( EName, ESal,  by="EmployeeID")   # salary of 1003 & 1023 are missing. lists 7ppl.
+left_join( ESal,  EName, by="EmployeeID")   # name of 1034 is missing. lists 6ppl.
+right_join(EName, ESal,  by="EmployeeID")   # same as above except the col order
+
+anti_join(EName, ESal)      # found 1003 & 1023 missing salary
+anti_join(ESal,  EName)     # found 1034 missing name  
+
+full_join( EName, ESal)     # list all 8 ppl (3 has some NA)
+inner_join(EName, ESal)     # list 5 ppl (no NA)
+
+
+E1 <- full_join(EName, ESal)  
+left_join(E1, EHist)
+
+
+
+
+
+# Latest Dept Assignment 
+EHist %>%
+  arrange(desc(Year)) %>%
+  distinct(EmployeeID, .keep_all=TRUE)
+
+
+# First Dept Assignment
+EHist %>%
+  arrange(Year) %>%
+  distinct(EmployeeID, .keep_all=TRUE) %>%
+  arrange(EmployeeID)
+
+
+
+
+## Make more data in EHist, and get fitst + last assignment
+## Sort in wide format + long format.
+
+
+
+
+
+
+
+##
+## Export to Excel 
+##
+
+  write_csv("Emmm.csv")
+
+##  use Power Query in Excel
