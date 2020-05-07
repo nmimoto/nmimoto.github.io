@@ -1,139 +1,144 @@
----
-title:  "InClass-A3 Sample Analysis"
-author: ""
-date: 
-output: pdf_document
----
+#
+#
+#  R command list for ARIMA(p,d,q)
+#
+#
+###############################################
 
-<!-------
-  library(rmarkdown); render("InClass-A3-Sol-B.Rmd", pdf_document(toc=TRUE, toc_depth=2, number_sections=FALSE))
---------------------------------------------->
 
+#-- If not installed on your PC ---
+#
+#  install.packages("tseries")
+#  install.packages("forecast")
+#  install.packages("FitARMA")
+#  install.packages("nlme")
+#  install.packages("fGarch")  
+#  install.packages('quantmod')  
+#  install.packages("TSA")  
+#  install.packages("astsa")  
+#
+#---------------------------------------------
+#-- Sign Convention of ARMA functions
+#
+#  Cryer's sign convention is (1-phi B) Y_t = (1-theta) e_t.
+#  Brockwell's             is (1-phi B) Y_t = (1+theta) e_t.
+#
+#  For AR(1) (1-.5 B) Y_t = e_t,             ACF should be all positive.
+#            (1+.5 B) Y_t = e_t,             ACF should be alternating in sign.
+#                                                                            
+#  For MA(1)          Y_t = (1-.5 B) e_t     ACF at lag 1 should be negative 
+#                     Y_t = (1+.5 B) e_t     ACF at lag 1 should be positive
+#
 
 
 
-<br><br><hr>
 
-Here is the code to load the data from the web.  
 
-```{r, fig.width=8, fig.height=4}
-  source('https://nmimoto.github.io/R/TS-00.txt') 
 
-  D  <- read.csv("https://nmimoto.github.io/datasets/wine.csv")
-  D1   <- ts(D, start=c(1980,1), freq=12) 
-  plot(D1, type='o')
-```
+library(tseries)    # for adf.test()
+library(forecast)   # for auto.arima()
+library(FitARMA)    # for TacvfARMA()
+library(fGarch)   
+library('quantmod')
 
-Now your “D1” in R contains monthly wine sales in Australia.
 
+#  library(astsa)    #-  Shumway package
+#  acf1 <- acf; library(TSA); acf <- acf1    #-  Cryer package acf() will be replaced!!
 
-### We will talke log of the data
 
 
-<!----------------------------------------------------->
-# 1. auto.arima() analysis
 
-<br><br> 
 
-```{r, fig.width=8, fig.height=4}
+#---------------------------------------
+#--- Theoretical ACF, PACF and ACVF
 
-  Fit11 <- auto.arima(D1, lambda=0, stepwise=FALSE, approximation=FALSE)
-  Fit11
-  Randomness.tests(Fit11$residuals)
 
-##  ARIMA(1,0,1)x(0,1,1)[12]  is suggested.
-##  Residual analysis shows adequacy by both L-B test and M-L test.
-##
-##  Errors (after the log) seems to be nomally distributed, and 
-##  J-B test confirms that. (p-value > .05) 
-##
-##  We must investigate the choice of d, D, and drift
+  #--- Theo ACF and PACF ---
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t   
 
+  T.acf  <- ARMAacf(ar=c(.4, .2), ma=c(.2, -.1), lag.max=20)
+  T.pacf <- ARMAacf(ar=c(.4, .2), ma=c(.2, -.1), lag.max=20, pacf=T)
 
-  # Include drift 
-  Fit12 <- Arima(D1, lambda=0, order=c(1,0,1), seasonal=c(0,1,1), include.drift=TRUE)
-  Fit12
-  Randomness.tests(Fit12$residuals)
+  layout(matrix(1:2, 1,2))
+  plot(T.acf);  lines(T.acf,  type='h');  abline(h=0)
+  plot(T.pacf); lines(T.pacf, type='h');  abline(h=0)
 
-```
 
 
-<br><br><br><hr>
+  #--- Theo ACVF ---
+  # sign of MA parameter is like [Cryer]:  Y_t = (1 - theta B) e_t
 
-<!----------------------------------------------------->
-# 2. Preliminary Analysis   
+  library(FitARMA)
+  Gam <- TacvfARMA(phi=c(.4, .2), theta=c(-.2, .1))
+  Gam
+  T.acf2 <- Gam/Gam[1]
 
-```{r, fig.width=8, fig.height=4}
+  layout(matrix(1:2, 1,2))
+  plot(Gam); lines(Gam, type='h'); abline(h=0)
+  plot(T.acf2);  lines(T.acf2,  type='h');  abline(h=0)
 
-  plot( log(D1), type='o')
 
-  plot( diff(log(D1)), type='o')  # d=1
 
-```
 
 
-<br><br> \hspace{10mm}
 
-<!--------->
-## Stationarity Check
 
-```{r, fig.width=8, fig.height=4}
 
-  Stationarity.tests( diff(log(D1)))
 
-  Stationarity.tests( diff(log(D1, 12)))
 
-## d=1 alone makes it stationary 
-## D=1 alone makes it stationary 
-```
+#-------------------------------------------
+#-- Simulate ARIMA, plot sample ACF, PACF
 
 
+  #--- Basic Simulation with ARMA ---
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t
+  # generated X is in ts object
+  
+  X  <- arima.sim(n = 250, list(ar = c(-0.6, .2), ma = c(0.5) ), sd = 2) + 5  
 
 
 
-<br><br><br><br><hr> \clearpage
+  #-- Estimate parameters
+  # sign of MA parameter is like [Brockwell]:  Y_t = (1+theta B) e_t
 
-<!----------------------------------------------------->
-# 3. Difference only (d=1 D=0) model 
+  library(forecast)
 
-```{r d1, fig.width=8, fig.height=4}
+  Fit1 <- Arima(X, order = c(2, 0, 1))         #- from forecast package
+  Fit1
 
-  Fit21 <- auto.arima(D1, d=1, D=0, lambda=0, stepwise=FALSE, approximation=FALSE)   
-  Fit21
-  Randomness.tests(Fit21$resid)
+  Fit1$coef
 
-## Arima(1,1,1)x(1,0,0)[12] suggested
-## Residual does not show adequate fit.  Large ACF at lag 12. 
-##
+  forecast(Fit1, h=10)
 
-#  Fit21b <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(2,0,0))   
-#  Fit21b
-#  Randomness.tests(Fit21b$resid)
 
-## Estimation problem
+  layout(matrix(1:4, 2,2, byrow=TRUE))
+  plot(X, type="o")
+  acf( X, main="ACF")                         #- Sample ACF 
+  pacf(X, main="PACF")                        #- Sample PACF 
+  acf( X, main="ACVF", type="covariance" )    #- Sample ACVF
 
+  dev.new(); plot(forecast(Fit1))
 
-  Fit21c <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(1,0,1))   
-  Fit21c
-  Randomness.tests(Fit21c$resid)
 
-## Residual shows adequate fit. 
 
+  #--- ARIMA simulation
+  X  <- arima.sim(n = 250, list(order=c(2,1,1), ar = c(-0.6, .2), ma = c(0.5) ), sd = 2) 
 
-  Fit21d <- Arima(D1, lambda=0, order=c(1,1,1), seasonal=c(1,0,1),
-                                   include.drift=TRUE, method="CSS")   
-  Fit21d
+  plot(X)
 
-## If method="CSS-MLE" (default) then gives error.
-## with CSS, drift not significant. 
 
 
-```
 
 
 
 
+#---------------------------------------
+#--- Model Selection
 
+  #--- Choose ARIMA model based on lowest AICc,  (AIC, BIC optional)
+  library(forecast)
+  auto.arima(X)
+  auto.arima(X, d=1, seasonal=FALSE)
 
 
 
@@ -143,217 +148,73 @@ Now your “D1” in R contains monthly wine sales in Australia.
 
 
 
+#---------------------------------------
+#--- Regression 
 
-<br><br><br><br><hr> \clearpage
 
-<!----------------------------------------------------->
-# 4. Linear Trend Model
+  #--- Simulate ARIMA(p,d,q) with trend ---
+  M  <- 1:150
+  e1 <- rnorm(150, 0, 5) 
+  X  <- arima.sim(n = 150, list(ar = c(-0.6, .2), ma = c(0.5)), innov=e1) + 5 + .2*M
 
+  plot(X)
 
+  #-- OLS --
+  Reg1 <- lm(X ~ time(X))  
+  summary(Reg1)
 
-### From A3
+  Fit1 <- arima(Reg1$resid, order=c(2,0,1), include.mean=FALSE)
+  Fit1
 
-```{r, fig.width=8, fig.height=4}
+  #-- GLS --
+  library(nlme)     # for gls()
+  Reg2 <- gls(X ~ time(X),  cor=corARMA(c(-0.6, .2, .5), form = ~ t, p = 2, q = 1))
+  summary(Reg2)
 
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15))
-  Fit
-  Randomness.tests(Fit$resid)
 
-```
+  #-- 
+  library(forecast)
+  Fit2 <- Arima(X, order=c(2,0,1), xreg=time(X)) 
+  Fit2
 
-<br><br> \hspace{10mm} 
+  Fit3 <- Arima(X, order=c(2,0,1), xreg=time(X), include.mean=FALSE)    #- no intercept
+  Fit3
 
-### Seasonal ARMA
+  Fit4 <- Arima(X, order=c(2,0,1), xreg=cbind(time(X), time(X)^2), include.mean=FALSE) #- quadratic regression
+  Fit4
 
 
-```{r lm, fig.width=8, fig.height=4}
 
-  Fit51 <- auto.arima(D1, d=0, D=0, lambda=0, xreg=time(D1),
-                              stepwise=FALSE, approximation=FALSE)
-  Fit51
-  Randomness.tests(Fit51$resid)
 
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(1,0,1))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(2,0,2))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(3,0,3))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
 
+#---------------------------------------
+#--- Misc.
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(5,0,4), seasonal=c(1,0,1))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
+  #--- Generate ARIMA with customized errors from outside function
+  e1 <- rnorm(500, 0, 5)
+  x  <- arima.sim(n=250, list(ar = c(.4, .3)), innov=e1)
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(0,0,0), seasonal=c(0,0,0))
-  Fit52 
-  Randomness.tests(Fit51$resid)
+  e2 <- rt(300, 5)
+  x  <- arima.sim(n = 300, list(ar = c(.4, .3)), innov=e2)
 
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,0), seasonal=c(3,0,0))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
-  Fit52 <- Arima(D1, lambda=0, xreg=time(D1), order=c(1,0,1), seasonal=c(3,0,1))
-  Fit52 
-  Randomness.tests(Fit51$resid)
 
+  #--- Estimation with different methods
+  Est  <- Arima(X, order=c(1,0,1))  
+  Est  <- Arima(X, order=c(1,0,1), method="CSS")  
+  Est  <- Arima(X, order=c(1,0,1), method="ML", init=c(0,0,0) )    #MLE with specified starting points.
+  Est  <- Arima(X, order=c(3,0,0), fixed=c(NA, 0, NA, NA) )        #Fit AR(3) with phi2=0.
 
+  Est$coef
+  Est$var.coef
 
-```
-
-
-
-
-```{r, eval=FALSE, fig.width=8, fig.height=4}
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15),
-               fixed=c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,
-                       NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15), method=("CSS"),
-               fixed=c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,  0,NA,NA,NA,NA,
-                       NA,NA,NA,NA,NA,NA,NA,NA,NA, 0,  0,NA,NA,NA,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,14), method=("CSS"),
-               fixed=c(NA,NA,NA,NA,NA,  NA,NA,NA, 0, 0,   0,NA,NA,NA,NA,
-                       NA, 0,NA, 0,NA,  NA,NA,NA, 0, 0,   0,NA,NA,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,14), method=("CSS"),
-               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
-                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,NA,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,13), method=("CSS"),
-               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
-                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,12), method=("CSS"),
-               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
-                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,12), 
-               fixed=c(NA, 0,NA,NA,NA,   NA,NA, 0, 0, 0,   0,NA,NA,NA,NA,
-                       NA, 0,NA, 0,NA,    0,NA, 0, 0, 0,   0,NA,
-                       NA,NA ) )
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(15,0,15))
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-  # Skip some parameters (Phis, Thetas, icpt, xreg)
-  Fit  <- Arima(D1, lambda=0, xreg=time(D1), order=c(14,0,14))
-  Fit
-  Randomness.tests(Fit$resid)
-
-
-
-```
-
-
-
-<br><br><br><br><hr> \clearpage
-
-<!----------------------------------------------------->
-# 5. Rolling 1-step with D=1 model
-
-
-```{r, fig.width=8, fig.height=4}
-
-  Fit12
-  Randomness.tests(Fit12$resid)
-
-## Arima(1,0,1)x(0,1,1)[12] w drift 
-```
-
-```{r, eval=TRUE, fig.width=8, fig.height=6}
-
-#- Set options 
-Y <- D1                    # Original data
-window.size <- 100         # Window size for estimation
-Arima.order <- c(1,0,1)  # Arima(p,d,q) order
-pred.plot   <- TRUE        # do you want plot at end? 
-
-#- set Arima() options: 
-include.mean  = TRUE       #
-include.drift = TRUE       #
-lambda   = 0               # NULL=no transformaton. 0=Log
-xreg     = NULL            # NULL=no xreg. TRUE=Linear Trend is present
-seasonal = c(0, 1, 1)      # seasonal component
-
-#- then use the function 
-Rolling1step.forecast(Y, window.size, Arima.order, pred.plot, 
-                        include.mean, include.drift, lambda, xreg, seasonal)
-
-```
-
-
-
-
-
-
-
-
-
-        
-
-
-
-<br><br><br><br><br>
-
-[TS Class Webpage](https://nmimoto.github.io/477/) -- [R resource page](https://nmimoto.github.io/R/)
-
-</body>
-<!--------------------------------------------------------------------->
-<!--------------------------------------------------------------------->
 
 
