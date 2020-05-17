@@ -1,0 +1,35 @@
+###
+###  Anaconda Virtual Environmnet for Mac
+###
+###----------------------------------------
+
+
+conda create --name EmacsEnv python=3.6
+
+conda activate EmacsEnv
+
+conda deactivate
+
+pip  install -r requirements.txt
+
+(added flask==0.12.2 line to requirements.txt)
+
+(update to  plotly 4.4.1)
+
+
+
+conda list
+
+
+
+
+
+Emacs
+pyvenv-workon
+/opt/anaconda3/envs/EmacsEnv is the env folder
+
+
+import os
+print(os.getcwd())   # get wd
+os.listdir("materials")
+dir_path = os.path.dirname(os.path.realpath(__file__))
