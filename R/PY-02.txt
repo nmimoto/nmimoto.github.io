@@ -1,35 +1,85 @@
 ###
-###  Anaconda Virtual Environmnet for Mac
+###  Python Basics 
 ###
 ###----------------------------------------
 
+"""
+Basic Practice: http://codingbat.com/python
+More Mathematical (and Harder) Practice: https://projecteuler.net/archives
+List of Practice Problems: http://www.codeabbey.com/index/task_list
+SubReddit Devoted to Daily Practice Problems: https://www.reddit.com/r/dailyprogrammer
+A very tricky website with very few hints and tough problems http://www.pythonchallenge.com/
+"""
 
-conda create --name EmacsEnv python=3.6
-
-conda activate EmacsEnv
-
-conda deactivate
-
-pip  install -r requirements.txt
-
-(added flask==0.12.2 line to requirements.txt)
-
-(update to  plotly 4.4.1)
-
-
-
-conda list
-
-
-
-
-
-Emacs
-pyvenv-workon
-/opt/anaconda3/envs/EmacsEnv is the env folder
-
-
+# Check current working directory
 import os
-print(os.getcwd())   # get wd
-os.listdir("materials")
-dir_path = os.path.dirname(os.path.realpath(__file__))
+
+path = os.getcwd()
+print(path)
+
+print(type(path))
+
+  # os.chdir("/Users/username/Folder1")  # change dir
+  # os.chdir("C:\\Users\\UserName\\Folder1")
+
+
+# convert a list to single string (list can have both string and number)
+list01 = ['I', 'want', 4, 'apples', 'and', 18, 'bananas']
+str01  = ' '.join(map(str, list01))
+print(str01)
+
+print(contents2)
+
+
+# Slice Assignment Example
+# https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
+
+a = [1, 3, 5]
+b = a
+print(a)
+print(b)
+a = [x + 2 for x in a]
+print(b is a)
+print(a)
+print(b)   # b is not same as a
+
+
+a = [1, 3, 5]
+b = a
+print(a)
+print(b)
+a[:] = [x + 2 for x in a]
+print(b is a)
+print(a)
+print(b)   # b IS same as a!
+
+
+
+# I/O with Python
+Infile = open('SOA-Orig-Porb.txt')
+Infile.read()   # one single string of everything in the file.
+Infile.read()   # returns nothing because the cursor is at the EoF
+Infile.seek(0)  # reset cursor
+Infile.read()   # now it can read again
+
+Infile.seek(0)
+Infile.readlines() # each line is separate entry in one list
+
+Infile.close()
+
+
+
+# I/O Another way (you don't have to .close() this way)
+with open('SOA-Orig-Prob.txt', mode='r') as Infile:
+    contents  = Infile.read()
+with open('SOA-Orig-Prob-02.txt', mode='w') as Outfile1:
+    Outfile1.write(contents)
+
+
+# I/O as list
+with open('SOA-Orig-Prob.txt', mode='r') as Infile:
+    contents = Infile.readlines()
+with open('SOA-Orig-Prob-03.txt', mode='w') as Outfile:
+    #Outfile.write(contents2)  # gives error because it's list, not string
+    str01  = ' '.join(map(str, contents))
+    Outfile.write(str01)
