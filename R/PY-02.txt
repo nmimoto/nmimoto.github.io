@@ -11,7 +11,7 @@ SubReddit Devoted to Daily Practice Problems: https://www.reddit.com/r/dailyprog
 A very tricky website with very few hints and tough problems http://www.pythonchallenge.com/
 """
 
-# Check current working directory
+#--- Check current working directory
 import os
 
 path = os.getcwd()
@@ -23,16 +23,10 @@ print(type(path))
   # os.chdir("C:\\Users\\UserName\\Folder1")
 
 
-# convert a list to single string (list can have both string and number)
-list01 = ['I', 'want', 4, 'apples', 'and', 18, 'bananas']
-str01  = ' '.join(map(str, list01))
-print(str01)
-
-print(contents2)
 
 
-# Slice Assignment Example
-# https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
+#--- Slice Assignment Example
+#    https://stackoverflow.com/questions/4081217/how-to-modify-list-entries-during-for-loop
 
 a = [1, 3, 5]
 b = a
@@ -55,7 +49,7 @@ print(b)   # b IS same as a!
 
 
 
-# I/O with Python
+#--- I/O with Python
 Infile = open('SOA-Orig-Porb.txt')
 Infile.read()   # one single string of everything in the file.
 Infile.read()   # returns nothing because the cursor is at the EoF
@@ -69,14 +63,14 @@ Infile.close()
 
 
 
-# I/O Another way (you don't have to .close() this way)
+#- I/O Another way (you don't have to .close() this way)
 with open('SOA-Orig-Prob.txt', mode='r') as Infile:
     contents  = Infile.read()
 with open('SOA-Orig-Prob-02.txt', mode='w') as Outfile1:
     Outfile1.write(contents)
 
 
-# I/O as list
+#- I/O as list
 with open('SOA-Orig-Prob.txt', mode='r') as Infile:
     contents = Infile.readlines()
 with open('SOA-Orig-Prob-03.txt', mode='w') as Outfile:
