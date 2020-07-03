@@ -1,35 +1,40 @@
 ###
-###  Anaconda Virtual Environmnet for Mac
+###  List
 ###
 ###----------------------------------------
 
 
-conda create --name EmacsEnv python=3.6
-
-conda activate EmacsEnv
-
-conda deactivate
-
-pip  install -r requirements.txt
-
-(added flask==0.12.2 line to requirements.txt)
-
-(update to  plotly 4.4.1)
-
-
-
-conda list
+#--- convert a list to single string (list can have both string and number)
+mylist     = ['I', 'want', 4, 'apples', 'and', 18, 'bananas']
+newstring  = ' '.join(map(str, mylist))
+print(newstring)
 
 
 
 
+#--- Conditionally Replace items in a list
+# https://www.saltycrane.com/blog/2008/08/how-conditionally-replace-items-list/
+mylist  = ['I', 'want', 'and', 'apples', 'and', 'or', 'bananas']
+newlist = []
+for item in mylist:
+    if item == 'and':
+        item = 'x'
+    newlist.append(item)
+print(mylist)
+print(newlist)
 
-Emacs
-pyvenv-workon
-/opt/anaconda3/envs/EmacsEnv is the env folder
+
+#- Conditionally Replace items in a list 2
+mylist  = ['I', 'want', 'and', 'apples', 'and', 'or', 'bananas']
+for (i, item) in enumerate(mylist):
+    if item == 'and':
+        mylist[i] = 'x'
+print(mylist)
+print(newlist)
 
 
-import os
-print(os.getcwd())   # get wd
-os.listdir("materials")
-dir_path = os.path.dirname(os.path.realpath(__file__))
+#- Conditionally Replace items in a list 3
+#  https://stackoverflow.com/questions/32699654/python-replace-elements-in-list-with-conditional
+mylist = ['I', 'want', 'and', 'apples', 'and', 'or', 'bananas']
+newlist = ['x' if item == 'and' else item for item in mylist]
+print(newlist)
