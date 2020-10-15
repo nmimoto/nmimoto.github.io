@@ -1,15 +1,10 @@
 Downloaded from:
+https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
+
+Which is same as:
 https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)
 
-breast-cancer-wisconsin.data
-wdbc.data   <--- USING THIS ONE
-wpbc.data
 
-
-
-1. Title: Wisconsin Diagnostic Breast Cancer (WDBC)
-
-...
 
 5. Number of instances: 569
 
