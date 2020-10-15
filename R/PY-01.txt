@@ -1,8 +1,9 @@
 ###
+###
 ###  Anaconda Virtual Environmnet for Mac
 ###
-###----------------------------------------
-
+###
+##################################################
 
 (go to dir that has requirements.txt in it)
 
@@ -16,11 +17,7 @@ conda deactivate
 
 
 
-
-
 conda list
-
-
 
 
 
@@ -33,3 +30,47 @@ import os
 print(os.getcwd())   # get wd
 os.listdir("materials")
 dir_path = os.path.dirname(os.path.realpath(__file__))
+
+
+
+
+
+
+
+#-------------------------------------------------
+###
+###
+###  Download data from sklearn
+###
+###
+##################################################
+
+import os
+print(os.getcwd())   # get wd
+
+import pandas as pd
+import numpy as np
+from sklearn import datasets
+
+# Orig = datasets.load_digits()
+orig = datasets.load_breast_cancer(as_frame=True)
+
+type(orig)
+type(orig.data)
+type(orig.target)
+
+orig_top = orig.data.head()
+print(orig_top)
+
+print(orig.feature_names)
+print(orig.data)
+print(orig.target)
+
+
+orig.data.to_csv('outputX.csv')
+np.savetxt("outputY.csv", orig.target, delimiter=",")
+
+
+
+
+
