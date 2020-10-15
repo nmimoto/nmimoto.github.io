@@ -4,17 +4,17 @@
 ###----------------------------------------
 
 
+(go to dir that has requirements.txt in it)
+
 conda create --name EmacsEnv python=3.6
 
 conda activate EmacsEnv
 
-conda deactivate
-
 pip  install -r requirements.txt
 
-(added flask==0.12.2 line to requirements.txt)
+conda deactivate
 
-(update to  plotly 4.4.1)
+
 
 
 
