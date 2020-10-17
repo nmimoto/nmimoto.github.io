@@ -1,0 +1,227 @@
+####
+###
+###  Logistic Regession - Default Data (in ISLR package)
+###               with Oversampling
+###
+####################################################
+
+
+###-------------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Heart <- read_csv(file="http://faculty.marshall.usc.edu/gareth-james/ISL/Heart.csv")
+Heart
+
+names(Heart)
+#0  "X1"          index
+#1  "Age"
+#2  "Sex"
+#3  "ChestPain"       Qualitative
+#4  "RestBP"
+#5  "Chol"
+#6  "Fbs"
+#7  "RestECG"
+#8  "MaxHR"
+#9  "ExAng"
+#10 "Oldpeak"
+#11 "Slope"
+#12 "Ca"
+#13 "Thal"     (Thalium stress test)   Qualitative
+#14 "AHD"      Yes/No based on an angiographic test  Qualitative <-- Response
+
+
+# Change class of ChestPain and Thal
+Heart2 <- Heart %>% select(-"X1")
+Heart2 <- Heart2 %>% mutate( ChestPain=as.factor(ChestPain),
+                            Thal=as.factor(Thal),
+                            AHD=as.factor(AHD))
+Heart2
+
+# Heart2 is the main format.
+summary(Heart2)
+sum(is.na(Heart2))    # check for NA in data
+Heart2 <- Heart2 %>% na.omit()
+dim(Heart2)
+
+pairs(Heart2)
+
+table(Heart2$AHD)
+#  No Yes
+# 160 137
+
+cor(Heart2)  # gives error
+
+
+# Pick only Numerical Colums for plotting
+Heart3 <- Heart2 %>% select(-c("ChestPain", "Thal"))
+Heart3 <- Heart3 %>% mutate( AHD=as.numeric(AHD=="Yes"))
+Heart3 <- Heart3 %>% na.omit()
+Heart3
+
+cor(Heart3)
+
+library(corrplot)   # install.packages("corrplot")
+corrplot(cor(Heart3), method="number")
+corrplot(cor(Heart3))
+
+
+
+
+
+###--------------------------------------------------------------------
+###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Heart2               # Entire Data set (have to be data.frame)
+train.size <- 250            # num of rows for training set
+test.size <-  47             # num of rows for testing set
+resp.col.name <- "AHD"       # name of response column
+num.folds <- 5               # k for k-fold CV
+my.seed <- 7211             # give a seed
+
+    #---
+    set.seed(my.seed)
+    ix = sample(1:nrow(Orig))
+    Orig2 = Orig[ix, ]
+    Train.set  = Orig2[1:train.size, ]
+    Train.resp = Orig2[1:train.size, resp.col.name]
+    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
+    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
+
+    # K-fold Cross Validation
+    library(cvTools)     # install.packages("cvTools")
+    set.seed(my.seed)
+    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
+
+    CV.train      = list(Train.set[ folds$which!=1, ])
+    CV.train.resp = list(Train.resp[folds$which!=1,1])
+    CV.valid      = list(Train.set[ folds$which==1, ])
+    CV.valid.resp = list(Train.resp[folds$which==1,1])
+
+    for (k in 2:num.folds) {
+      CV.train[[k]]      = Train.set[ folds$which!=k, ]
+      CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
+      CV.valid[[k]]      = Train.set[ folds$which==k, ]
+      CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+    }
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+
+
+
+
+
+
+###-----------------------------------------------------------
+###--- Logistic Regression Training Set (No CV. Just Training vs Test)
+
+###--- Model 1 All in
+Fit02 <- glm(AHD ~ . ,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol ,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol -Age,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol -Age,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol -Age -Fbs,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol -Age -Fbs -ExAng,  family=binomial, data=Train.set )
+#Fit02 <- glm(AHD ~ . -Chol -Age -Fbs -ExAng -RestECG,  family=binomial, data=Train.set )
+
+summary(Fit02)
+
+#- Extract fitted response (training)
+Train.prob =predict(Fit02, type ="response")  # fitted responses
+head(Train.prob)                             # see first few
+                                             # Fit01$fitted  will do the same
+#- Predict in Test Set
+Test.prob = predict(Fit02, newdata=Test.set, type="response")
+
+#- Pick a threshold
+threshold = .5
+
+#- Check the training set accuracy
+library(caret)
+Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
+Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+CM.train <- confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+CM.test  <- confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+
+CM.train[["byClass"]][["Sensitivity"]] # Pick out sensitivity
+CM.train[["byClass"]][["Specificity"]] # Pick out specificity
+CM.train            # Training set result
+CM.train$table      # output just the table
+CM.test             # Testing set
+CM.test$table       # output just the table
+
+colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
+
+###--- Check ROC curve and AUC
+library(pROC)
+layout(matrix(1:2,1,2))
+#- Training Set ROC
+plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"), main="Training")
+  # point corresponding to CM.train
+  abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+  auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+  text(.2, .2, paste("AUC=",round(auc.train, 3)))
+
+#- Test Set ROC
+plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"), main="Test")
+  # point corresponding to CM.test
+  abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+  auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+  text(.2, .2, paste("AUC=",round(auc.test, 3)))
+layout(1)
+
+
+
+###--- Plot the fitted curve for visualization
+Y <- Train.set$AHD=="Yes"
+X <- Train.set$RestBP
+plot(X, Y, xlab="", ylab="AHD")
+lines(X, Fit02$fitted, lwd=2, col="red", type="p")
+
+
+
+
+
+
+
+
+
+
+###-----------------------------------------------------------
+###--- Threshold Picker
+
+#cost.list = c(0,0,3,1)/4           # order of (TP, TN, FP, FN)
+cost.list = c(0,0,2,1)/3           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,1)/2           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,2)/3           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,3)/4           # order of (TP, TN, FP, FN)
+
+
+threshold.list = seq(0.01,.99,.01)    # grid for threshold
+cost=0
+library(caret)      # for confusionMatrix
+for (i in 1:length(threshold.list)){
+
+    threshold = threshold.list[i]
+
+    #- Check the training set accuracy
+    Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+    CM.test  <- confusionMatrix(factor(Test.pred),
+                                factor(as.matrix(Test.resp)),
+                                positive="Yes")
+    TP = CM.test$table[2,2]   # True  Pos
+    TN = CM.test$table[1,1]   # True  Neg
+    FP = CM.test$table[2,1]   # False Pos
+    FN = CM.test$table[1,2]   # False Neg
+
+    cost[i] = sum(c(TP, TN, FP, FN) * cost.list)
+}
+plot(threshold.list, cost, xlab="threshold")
+
+cost.list
+which.min(cost)
+min(cost)
+threshold.list[which.min(cost)]
