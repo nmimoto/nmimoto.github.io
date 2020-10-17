@@ -1,0 +1,20 @@
+Downloaded from ISLR authors page:
+http://faculty.marshall.usc.edu/gareth-james/ISL/Heart.csv
+
+
+
+#0  "X1"          index
+#1  "Age"
+#2  "Sex"
+#3  "ChestPain"       Qualitative
+#4  "RestBP"
+#5  "Chol"
+#6  "Fbs"
+#7  "RestECG"
+#8  "MaxHR"
+#9  "ExAng"
+#10 "Oldpeak"
+#11 "Slope"
+#12 "Ca"
+#13 "Thal"     (Thalium stress test)   Qualitative
+#14 "AHD"      Yes/No based on an angiographic test  Qualitative <-- Response
