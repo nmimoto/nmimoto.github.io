@@ -1,6 +1,6 @@
 ###
 ###
-###  Breast Cancer Data - Logistic
+###  Breast Cancer Data - Prelim
 ###
 ###
 ####################################################
