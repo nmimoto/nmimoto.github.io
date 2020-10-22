@@ -17,9 +17,9 @@ names(Digits)
 
 
 # Remove "id" and change class "digit" to factor, rename "digit" to "resp"
-Digits2 <- Digits %>% select(-"index") %>%
-    mutate(digit=factor(digit)) %>%
-    rename(resp=digit)
+Digits1 <- Digits %>% select(-"index") 
+Digits2 <- Digits1 %>% mutate(digit=factor(digit)) %>% 
+  rename(resp=digit)
 Digits2
 
 
@@ -36,13 +36,14 @@ library(grid)
     print(n_row)
     grid <- expand.grid(X=0:7, Y=0:7)
     grid <- grid[,c(2,1)]
-    grid$Z <- t(Digits2[n_row, -1])
+    grid$Z <- t(Digits1[n_row, -1])
     colnames(grid) <- c("X", "Y", "Z")
 
     # Heatmap
     pplot <- ggplot(grid, aes(X, Y, fill= Z)) +
         geom_tile() +
-        ggtitle(paste("Digit =", Digits2[n_row,1]))
+        ggtitle(paste("Digit =", Digits1[n_row,1]))
+    print(pplot)
     print(pplot, vp=grid::viewport(angle=-90))
 
     #there's also rotate() options from library(ggpubr)
