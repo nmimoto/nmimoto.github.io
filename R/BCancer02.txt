@@ -176,7 +176,7 @@ Fit03 <- glm(resp~ V01 + V28, family=binomial, data=Train.set )
 summary(Fit03)
 
 #- Predict on Test set
-Test.prob = predict(Fit01, newdata=Test.set, type="response")
+Test.prob = predict(Fit03, newdata=Test.set, type="response")
 
 
 
