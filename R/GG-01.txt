@@ -1,247 +1,139 @@
-
-
-
-# add color to hist
-hist(chickwts$weight, xlab="weight", labels=T,
-           col=c("seagreen2", "seashell2", "skyblue1"))
-
-
-
-# jitter so that you can see overlapping points
-plot(cars$speed, cars$dist)
-plot(jitter(cars$speed), jitter(cars$dist))
-
-mtext("TopLeft", side=3, adj=0)    # side=3 is top, adj=0 is left 
-mtext("TopRight", side=3, adj=1)   # side=3 is top, adj=1 is right
-
-
-data(chickwts)
-head(chickwts)
-
-boxplot(chickwts$weight ~ chickwts$feed)
-dotchart(chickwts$weight, groups=chickwts$feed)
-stripchart(chickwts$weight ~ chickwts$feed)
-
-
-
-
-## Mosaic plot (categorical vs categorical)
-
-HairEyeColor # this is already table.  Not data.frame
-
-mosaicplot(HairEyeColor)
-
-mosaicplot(HairEyeColor[,,"Male"])
-
-
-# to make table from data.frame
-library(ggplot2)                
-data(ggplot2::mpg)         
-mosaicplot( table(mpg$class, mpg$cyl) )
-
-
-
-
-
-
-<!--------->
-## 34. Stacked Barplot
-
-library(ggplot2)
-data(ggplot2::mpg)
-
-T1 <- table(mpg$cyl, mpg$class)
-barplot(T1, legend=rownames(T1),
-        args.legend=list(x="topleft", title="Num of Cly"))
-
-
-barplot(T1, legend=c("4 cyl","5 cyl","6 cyl","8 cyl"),
-        args.legend=list(x="topleft", title="Num of Cly"))
-
-   
-mtcars
-table(mtcars$vs, mtcars$cyl)
-
-
-
-
-
-
-
-
-
-
-
-
-
----------------------------------------
 ###
+###  ggplot2 with Diamonds data
 ###
-### ggplot2 with data:diamonds
+###  ggplot grammer: 
 ###
+###    ggplot(data, aes(  )) +          (required)
+###      geom_    and/or   stat_  +     (one is required)
+###        Facests                      (optional) 
+###        Coordinate system            (optional)
+###        Themes                       (optional)
+###        annotation                   (optional)
 ###
-#######################################
+###  See CheatSheet-ggplot2 for list of available functions
+###########################################################################
 
 
-##  ggplot grammer: 
-##
-##    ggplot(data= , aes(  ))    +    (required)
-##      geom_    and/or   stat_  +    (one is required)
-##        Facests                     (optional) 
-##        Coordinate system           (optional)
-##        Themes                      (optional)
-##
-##  See CheatSheet-ggplot2 for list of available functions
-
-
-
-
+###--- Dataset 
 library(ggplot2)
 ggplot2::diamonds
 
-names(diamonds)
-
-str(diamonds)
+diamonds      # it is tibble (data.frame)
+#  A data frame with 53940 rows and 10 variables:
 
 ?diamonds
-
-##  A data frame with 53940 rows and 10 variables:
-##
-##  price : price in US dollars (\$326–\$18,823)
-##  carat : weight of the diamond (0.2–5.01)
-##  cut   : quality of the cut (Fair, Good, Very Good, Premium, Ideal)
-##  color : diamond colour, from D (best) to J (worst)
-##  clarity : a measurement of how clear the diamond is (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best))
-##  x : length in mm (0–10.74)
-##  y : width  in mm (0–58.9)
-##  z : depth  in mm (0–31.8)
-##  depth : total depth percentage = z / mean(x, y) = 2 * z / (x + y) (43–79)
-##  table : width of top of diamond relative to widest point (43–95)
+#
+#  price : price in US dollars (\$326–\$18,823)
+#  carat : weight of the diamond (0.2–5.01)
+#  cut   : quality of the cut (Fair, Good, Very Good, Premium, Ideal)
+#  color : diamond colour, from D (best) to J (worst)
+#  clarity : a measurement of how clear the diamond is (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best))
+#  x : length in mm (0–10.74)
+#  y : width  in mm (0–58.9)
+#  z : depth  in mm (0–31.8)
+#  depth : total depth percentage = z / mean(x, y) = 2 * z / (x + y) (43–79)
+#  table : width of top of diamond relative to widest point (43–95)
 
 
 
 
-
-###-----------------------------------
+###--------------------------------------------------------------------------
 ###---  Scatter Plot (geom_point)
-###
 
-# plot two attributes 
-ggplot(data=diamonds, aes(x=carat, y=price)) + geom_point()
+# Plot carat vs price  
+ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
 
-# zoom in 
-ggplot(data=diamonds, aes(x=carat, y=price)) +
+# Zoom in 
+ggplot(diamonds, aes(x=carat, y=price)) +
                    geom_point() +
                    coord_cartesian(xlim=c(0,1), ylim=c(0,1500))
 
+# Add CUT using color 
+ggplot(diamonds, aes(x=carat, y=price, color=cut)) + 
+                   geom_point()
 
+# Add smoothed line for each CUT
+ggplot(diamonds, aes(x=carat, y=price, color=cut)) + 
+                   geom_point() +       # geom_point(shape=24, color="red", fill="green") 
+                   stat_smooth()        # stat_smooth(method="lm", se=FALSE)   # lm, glm, gam, loess, rlm, etc. 
 
-# add CUT using color 
-ggplot(data=diamonds, aes(x=carat, y=price, color=cut)) + geom_point()
+# Add CLARITY using shape
+ggplot(diamonds, aes(x=carat, y=price, color=cut, shape=clarity)) + 
+                   geom_point()
 
-
-
-
-
-
-# add CLARITY using shape
-ggplot(data=diamonds, aes(x=carat, y=price, color=cut, shape=clarity)) + geom_point()
-
-
-
-# you can also use alpha (opacity) and size
-ggplot(data=diamonds,
-        aes(x=carat, y=price, color=cut,
-            shape=clarity, size=depth, alpha=.1)) + geom_point()
+# Add DEPTH by using size, and set alpha (opacity)  
+ggplot(diamonds, aes(x=carat, y=price, color=cut, shape=clarity, size=depth, alpha=.1)) + 
+                   geom_point()
 
 
 
 
+###---  Facetting (facet_grid and facet_wrap)
+
+# Plot carat vs price facet by CUT (column)
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   facet_grid(.~cut)
+
+# Plot carat vs price facet by CUT (row)
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   facet_grid(cut~.)
+
+# Plot carat vs price facet by clarity (wrapped)
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   facet_wrap(~clarity)
+
+# 2-way facet by CUT vs clarity 
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   facet_grid(cut~clarity)
 
 
 
 
+###---  Cuting and Zooming 
 
+# Cuts off data
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   xlim(c(3,5))    
 
-# stat layer
-base <- ggplot(data=diamonds, aes(x=carat, y=price, color=cut)) 
-base + geom_point() + geom_smooth()      #<- what method does does this use? 
-
-base + stat_smooth()      
-base + stat_smooth(se=FALSE)      
-
-base + stat_smooth(method="lm", se=FALSE)
-base + stat_smooth(method="glm", se=FALSE)
-base + stat_smooth(method="gam", se=FALSE)
-base + stat_smooth(method="loess", se=FALSE)
-base + stat_smooth(method="rlm", se=FALSE)
-
-
-bsse + stat_point(shape=24, color="red", fill="green") + geom_smooth()      
+# Uses all data, just zooms in (slower)
+ggplot(diamonds, aes(x=carat, y=price)) + 
+                   geom_point() + 
+                   coord_cartesian(xlim=c(3,5))  
 
 
 
 
+###--------------------------------------------------------------------------
+###---  Box Plot (geom_boxplot)
+
+ggplot(diamonds, aes(y=price)) + geom_boxplot()
 
 
-
-# facetting layer
-p <- ggplot(data=diamonds, aes(x=carat, y=price)) + geom_point()
-
-p + facet_grid(.~cut)
-p + facet_grid(cut~.)
-p + facet_grid(cut~clarity)
-p + facet_wrap(~cut)
-p + facet_wrap(~clarity)
+# Use cut() to categorize by CARAT 
+ggplot(diamonds, aes(x=cut(carat, breaks=12), y=price)) + geom_boxplot()
+ggplot(diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price)) + geom_boxplot()
 
 
-
-P + coord_fixed(ratio=4)
-
-p + xlim(c(3,5))    # cuts off data
- 
-p + coord_catesian(xlim=c(3,5))  # uses all data, just zooms in
-
-
-
-
-
-
-
-
-
-
-
-
-
-###-----------------------------------
-###  Box Plot (geom_boxplot)
-###
-
-
-ggplot(data=diamonds, aes(y=price)) + geom_boxplot()
-
-
-# use cut() to categorize by CARAT 
-ggplot(data=diamonds, aes(x=cut(carat, breaks=12), y=price)) + geom_boxplot()
-ggplot(data=diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price)) + geom_boxplot()
-
-
-# separate and color by CUT
-ggplot(data=diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price, color=cut)) +
+# Separate and color by CUT
+ggplot(diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price, color=cut)) +
                       geom_boxplot()
 
 
-ggplot(data=diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price, fill=cut)) +
+ggplot(diamonds, aes(x=cut(carat, breaks=c(0:6)), y=price, fill=cut)) +
                       geom_boxplot()
-
-
-
 
 
 
 d2931 <- diamonds[diamonds$carat>=.29 & diamonds$carat<.31, ]
 ggplot(data=d2931, aes(x=cut, y=price)) + geom_boxplot()
+
+
+
 
 
 
@@ -359,36 +251,3 @@ ggplot(diamonds, aes(x=carat, y=price)) + geom_point() +
 # "reverse"  -x            -y
 # "sqrt"     x^(1/2)       y^2
 # "asn"      atanh(x)      tanh(y)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
