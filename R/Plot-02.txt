@@ -1,0 +1,71 @@
+# add color to hist
+hist(chickwts$weight, xlab="weight", labels=T,
+           col=c("seagreen2", "seashell2", "skyblue1"))
+
+
+
+
+# jitter so that you can see overlapping points
+plot(cars$speed, cars$dist)
+plot(jitter(cars$speed), jitter(cars$dist))
+
+mtext("TopLeft", side=3, adj=0)    # side=3 is top, adj=0 is left
+mtext("TopRight", side=3, adj=1)   # side=3 is top, adj=1 is right
+
+
+
+# dot plot with chickwts
+data(chickwts)
+head(chickwts)
+
+boxplot(chickwts$weight ~ chickwts$feed)
+dotchart(chickwts$weight, groups=chickwts$feed)
+stripchart(chickwts$weight ~ chickwts$feed)
+
+
+
+## Mosaic plot (categorical vs categorical)
+
+HairEyeColor # this is already table.  Not data.frame
+mosaicplot(HairEyeColor)
+mosaicplot(HairEyeColor[,,"Male"])
+
+
+
+
+
+# to make table from data.frame
+library(ggplot2)
+data(ggplot2::mpg)
+mosaicplot( table(mpg$class, mpg$cyl) )
+
+
+
+
+## Stacked Barplot
+library(ggplot2)
+data(ggplot2::mpg)
+
+T1 <- table(mpg$cyl, mpg$class)
+barplot(T1, legend=rownames(T1),
+        args.legend=list(x="topleft", title="Num of Cly"))
+
+
+barplot(T1, legend=c("4 cyl","5 cyl","6 cyl","8 cyl"),
+        args.legend=list(x="topleft", title="Num of Cly"))
+
+
+mtcars
+table(mtcars$vs, mtcars$cyl)
+
+
+
+
+str(mtcars)
+
+library(ggplot2)
+p <- ggplot(data=mtcars, aes(x=mpg))
+p + geom_histogram()
+p + geom_histogram(bins=6)
+
+p + geom_density(col="blue", fill="red", alpha=.4, linetype="dotted", size=2)
