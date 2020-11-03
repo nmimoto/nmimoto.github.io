@@ -1,6 +1,6 @@
 ####
 ###
-###  Logistic Regession - Default Data (in ISLR package)
+###  Default Data (in ISLR package) - Logistic Regession
 ###
 ###
 ####################################################
@@ -160,54 +160,47 @@ Test.prob = predict(Fit02, newdata=Test.set, type="response")
 threshold = .9
 
 
-#- Check the training set accuracy
-library(caret)
-Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
-Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
-CM.train <- confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
-CM.test  <- confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+    #- Check the training set accuracy
+    library(caret)
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
+    Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+    CM.train <- confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test  <- confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+    # Test set result
+    #           Reference
+    # Prediction  No Yes
+    #        No  957  25
+    #        Yes   4  14
+
+    colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+    rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
 
 
-CM.train            # Training set result
-CM.train$table      # output just the table
-
-CM.train[["byClass"]][["Sensitivity"]]
-CM.train[["byClass"]][["Specificity"]]
-
-CM.test             # Testing set
-CM.test$table      # output just the table
-
-
-# Test set result
-#           Reference
-# Prediction  No Yes
-#        No  957  25
-#        Yes   4  14
-
-colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
-rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
-
-
-
-###--- Check ROC curve and AUC
-
-library(pROC)
-#- Training Set
-plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
-  # point corresponding to CM.train
-  abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
-  auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
-  text(.2, .2, paste("AUC=",round(auc.train, 3)))
-
-#- Test Set
-plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
-  # point corresponding to CM.test
-  abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
-  auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
-  text(.2, .2, paste("AUC=",round(auc.test, 3)))
-
-
-
+    ###--- Check ROC curve and AUC
+    library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+      # point corresponding to CM.train
+      abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+      auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+      text(.2, .2, paste("AUC=",round(auc.train, 3)))
+    
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+      # point corresponding to CM.test
+      abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+      auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+      text(.2, .2, paste("AUC=",round(auc.test, 3)))
 
 
 ###--- Plot the result for visualization
