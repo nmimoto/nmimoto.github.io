@@ -1,6 +1,6 @@
 ####
 ###
-###  Logistic Regession - Default Data (in ISLR package)
+###  Heart Data (in ISLR package) - Logistic Regression
 ###               
 ###
 ####################################################
