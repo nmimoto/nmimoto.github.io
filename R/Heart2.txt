@@ -208,6 +208,87 @@ lines(X, Fit02$fitted, lwd=2, col="red", type="p")
 
 
 
+# Decision Tree
+prop.table(table(Train.set$y)) #proportions of outcomes
+library(tree)
+tree32 <- tree(y~., CV.train[[2]])
+plot(tree32)
+text(tree32, pretty = 1, cex = 0.7)
+summary(tree32)
+tree31 <- tree(y~., CV.train[[1]])
+plot(tree31)
+text(tree31, pretty = 1, cex = 0.7)
+summary(tree31)
+
+library(rpart)
+library(rpart.plot)
+tree00 <- rpart(y~., data = Train.set)
+summary(tree00)
+plot(tree00)
+text(tree00, pretty = 1, cex = 0.7)
+rpart.plot::rpart.plot(tree00)
+
+#--- Growing the tree
+library(tree)
+tree1 = tree(y~., Train.set)
+summary(tree1)
+tree1
+plot(tree1)
+text(tree1, pretty=0, cex=1)
+
+
+
+#- Pick a threshold
+DT.fit   <- tree1   # results from CV tuning
+threshold <- .5
+
+#------------------
+#- Training Confusion Matrix
+Train.prob0 = predict(DT.fit, Train.set, type="vector") 
+Train.prob  = Train.prob0[,"Yes"]
+Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
+CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+CM.train
+
+#- Testing Confusion Matrix
+Test.prob0 = predict(DT.fit, Test.set, type="vector") 
+Test.prob = Test.prob0[,"Yes"]
+Test.pred = ifelse(Test.prob[,"Yes"] > threshold, "Yes", "No")
+CM.test <- caret::confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
+CM.test
+
+#- ROC curve and AUC
+library(pROC)
+# Training
+layout(matrix(1:2,1,2))
+pROC::plot.roc(factor(as.matrix(Train.resp)), as.vector(Train.prob), levels=c("No", "Yes"))
+# point corresponding to CM.train
+abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+auc.train = pROC::auc(factor(as.matrix(Train.resp)), as.vector(Train.prob), levels=c("No", "Yes"))
+text(.2, .2, paste("AUC=",round(auc.train, 3)))
+#- Testing
+pROC::plot.roc(factor(as.matrix(Test.resp)),
+               as.vector(Test.prob), levels=c("No", "Yes"))
+# point corresponding to CM.train
+abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+auc.test = pROC::auc(factor(as.matrix(Test.resp)), as.vector(Test.prob), levels=c("No", "Yes"))
+text(.2, .2, paste("AUC=",round(auc.test, 3)))
+layout(1)
+c(auc.train, auc.test)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -249,3 +330,9 @@ cost.list
 which.min(cost)
 min(cost)
 threshold.list[which.min(cost)]
+
+
+
+
+
+
