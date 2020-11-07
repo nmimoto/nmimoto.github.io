@@ -110,22 +110,16 @@ Chosen.model <- Fit01
     abline(0,1, col="red")
 
     Test.RSS <- data.frame(
-      RMSE = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
-      Rsquare = caret::R2(Train.fitted, Train.resp)
+      RMSE = caret::RMSE(Test.fitted, as.matrix(Test.resp)),
+      Rsquare = caret::R2(Test.fitted, Test.resp)
     )
     Train.RSS
     Test.RSS
 
-# Train.RSS
-#            RMSE   Rsquare
-# resp 0.01134674 0.9998762
-# Test.RSS
-#            RMSE   Rsquare
-# resp 0.01134674 0.9998762
 
     
     
-#--- UNscale the response back (Rsquare does not change)
+#--- UNscale the response back (Rsquare does not change, but RMSE does change)
 Train.unscaled <- Means["resp"] + Train.fitted * SDs["resp"]
 Test.unscaled  <- Means["resp"] + Test.fitted * SDs["resp"]
 
@@ -133,10 +127,9 @@ Test.unscaled  <- Means["resp"] + Test.fitted * SDs["resp"]
     abline(0,1, col="red")
 
     Test.RSS <- data.frame(
-      RMSE = caret::RMSE(Train.unscaled, as.matrix(Train.resp)),
-      Rsquare = caret::R2(Train.unscaled, Train.resp)
+      RMSE = caret::RMSE(Test.unscaled, as.matrix(Test.resp)),
+      Rsquare = caret::R2(Test.unscaled, Test.resp)
     )
-    Train.RSS
     Test.RSS
 
 
