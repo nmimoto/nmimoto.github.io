@@ -5,6 +5,9 @@
 ###
 #################################
 
+
+
+
 ###---------------------------------------------------
 ###--- 0. Preliminary
 library(MASS)      # install.packages("MASS")
@@ -16,8 +19,9 @@ Boston
 
 #  ?Boston  # see explanation for variables
 ##--- Scale data for Neural Networks
-Scaled  <- scale(Boston)
-Boston2 <- as_tibble(Scaled) %>% mutate(resp=medv)  # rename "medv" as "resp"
+Boston2 <- Boston %>% mutate(resp=medv)  # rename "medv" as "resp"
+Scaled  <- scale(Boston2)      # comes with extra attributes
+Boston2 <- as_tibble(Scaled) 
 Boston2
 
 # Means and SDs for each column. To be used in un-scalling.
@@ -118,3 +122,25 @@ Chosen.model <- Fit01
 # Test.RSS
 #            RMSE   Rsquare
 # resp 0.01134674 0.9998762
+
+    
+    
+#--- UNscale the response back (Rsquare does not change)
+Train.unscaled <- Means["resp"] + Train.fitted * SDs["resp"]
+Test.unscaled  <- Means["resp"] + Test.fitted * SDs["resp"]
+
+    plot(Test.unscaled, as.matrix(Test.resp), xlab="Fitted", ylab="Actual")
+    abline(0,1, col="red")
+
+    Test.RSS <- data.frame(
+      RMSE = caret::RMSE(Train.unscaled, as.matrix(Train.resp)),
+      Rsquare = caret::R2(Train.unscaled, Train.resp)
+    )
+    Train.RSS
+    Test.RSS
+
+
+    
+    
+        
+    
