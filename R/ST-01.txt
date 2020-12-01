@@ -79,35 +79,6 @@
 
 
 
-#--- Use ggoplot2 to overlay histograms -----
-
-
-  #- Generate male and female height data
-  D <- data.frame(
-    sex=factor(rep(c("F", "M"), each=200)),
-    weight=round(c(rnorm(200, mean=55, sd=5), rnorm(200, mean=65, sd=5)))
-  )
-  head(D)
-
-
-
-  #- Overlay two histograms
-  library(ggplot2)
-  ggplot(D, aes(x=weight, fill=sex, color=sex)) +
-      geom_histogram(position="identity", alpha=0.5)
-
-
-
-  #- Overlay two hist with mean line
-    
-  #- Summarize the data
-  library(plyr)
-  mu <- ddply(D, "sex", summarise, grp.mean=mean(weight))
-  mu
-
-  ggplot(D, aes(x=weight, fill=sex, color=sex)) +
-      geom_histogram(position="identity", alpha=0.5) +
-      geom_vline(data=mu, aes(xintercept=grp.mean, color=sex), linetype="dashed")
 
 
 
