@@ -18,24 +18,33 @@
 
 
 #--- Two Historgram overlayed with opacity
-library(scales)
+  library(scales)
 
-x <- rnorm(1000)
-y <- rnorm(1000, 3, 2)
-h1 <- hist(x, breaks=50, plot=FALSE)
-h2 <- hist(y, breaks=50, plot=FALSE)
-plot(h1, col=alpha("blue", .9), xlim=c(-5,5))
-lines(h2, col=alpha("red", .5))
+  x <- rnorm(1000)
+  y <- rnorm(1000, 3, 2)
+  h1 <- hist(x, breaks=50, plot=FALSE)
+  h2 <- hist(y, breaks=50, plot=FALSE)
+  plot(h1, col=alpha("blue", .9), xlim=c(-5,5))
+  lines(h2, col=alpha("red", .5))
 
 
 
 #--- Two Histogram using ggplot2
-D <- data.frame(
-  gender=factor(rep(c("F", "M"), each=200)),
-  weight=round(c(rnorm(200, 55, 5), rnorm(200, 65, 5)))
-)
-head(D)
+  D <- data.frame(
+    gender=factor(rep(c("F", "M"), each=200)),
+    weight=round(c(rnorm(200, 55, 5), rnorm(200, 65, 5)))
+  )
+  head(D)
 
-library(ggplot2)
-ggplot(D, aes(x=weight, fill=sex, color=sex)) +
+  library(ggplot2)
+  ggplot(D, aes(x=weight, fill=sex, color=sex)) +
       geom_histogram(position="identity", alpha=0.5)
+
+
+
+
+
+
+
+
+
