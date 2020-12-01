@@ -1,0 +1,41 @@
+###
+###
+###  Histograms
+###
+###
+##################################################
+
+
+
+#--- One Historgram with two colors
+  x <- rnorm(1000)
+  h <- hist(x, breaks=50, plot=FALSE)
+  cuts <- (h$breaks < rep(-1,length(h$breaks)))
+  plot(h, col=ifelse(cuts, "red", "gray"))
+  abline(v=-1, col="blue", lwd=2)
+
+
+
+
+#--- Two Historgram overlayed with opacity
+library(scales)
+
+x <- rnorm(1000)
+y <- rnorm(1000, 3, 2)
+h1 <- hist(x, breaks=50, plot=FALSE)
+h2 <- hist(y, breaks=50, plot=FALSE)
+plot(h1, col=alpha("blue", .9), xlim=c(-5,5))
+lines(h2, col=alpha("red", .5))
+
+
+
+#--- Two Histogram using ggplot2
+D <- data.frame(
+  gender=factor(rep(c("F", "M"), each=200)),
+  weight=round(c(rnorm(200, 55, 5), rnorm(200, 65, 5)))
+)
+head(D)
+
+library(ggplot2)
+ggplot(D, aes(x=weight, fill=sex, color=sex)) +
+      geom_histogram(position="identity", alpha=0.5)
