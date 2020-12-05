@@ -244,3 +244,20 @@ ggplot(diamonds, aes(x=carat, y=price)) + geom_point() +
 # "reverse"       -x              -y
 # "sqrt"          x^(1/2)         y^2
 # "asn"           atanh(x)        tanh(y)
+
+
+
+
+###-----------------------------------
+###  Layout ggplots  
+library(ggplot2)
+ggplot2::diamonds
+
+p1 <- ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
+p2 <- ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
+p3 <- ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
+p4 <- ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
+
+ggarrange(p1, p2, p3, p4, nrow=2, ncol=2)
+
+
