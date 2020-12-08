@@ -1,0 +1,54 @@
+###
+###  Articles in ML/AI/StatLearning
+###            (updated 2020-12-08)
+###
+################################################################
+Training Issue: 
+
+    Deepmind Protein(1)
+    https://www.nature.com/articles/d41586-020-03348-4
+    Scientist not impressed(2)
+    https://futurism.com/the-byte/scientists-unimpressed-googles-protein-folding-algorithm
+    Hiden Weakness in ML
+    https://www.discovermagazine.com/technology/google-reveals-major-hidden-weakness-in-machine-learning
+    Way we train AI is flawed (Underspecification)
+    https://www.technologyreview.com/2020/11/18/1012234/training-machine-learning-broken-real-world-heath-nlp-computer-vision/
+
+Bias Issue:
+
+    Bias issue in AI
+    https://www.wsj.com/articles/how-to-make-artificial-intelligence-less-biased-11604415654?mod=flipboard
+    AI in healthcare is racist
+    https://www.zdnet.com/article/artificial-intelligence-in-healthcare-is-racist/
+
+
+Training Demo:
+
+    Article: Drive with NN
+    https://hackaday.com/2020/11/07/training-a-neural-network-to-play-a-driving-game/
+    Uber-AI on Atari Games
+    https://www.engadget.com/uber-ai-masters-atari-games-012832222.html
+
+
+Applications of ML:
+
+    Motion Capture with only 1 camera w ML
+    https://80.lv/articles/animation-deep-learning-vs-traditional-methods/
+    Automa te 3D-animation
+    https://www.reddit.com/r/MachineLearning/comments/jps5uw/n_digital_domains_deformation_simulation_system/
+    Auto color BW pics:
+    https://www.reddit.com/r/computervision/comments/jpqn86/this_ai_can_colorize_your_black_white_photos_with/
+    Archeological Site searched by ML
+    https://www.nytimes.com/2020/11/24/science/artificial-intelligence-archaeology-cnn.html
+    Rutgers researchers develop automated blood drawing robot
+    https://www.dailytargum.com/article/2020/02/rutgers-researchers-develop-automated-blood-drawing-robot
+    Find Pique replacemwnt with clustering:
+    https://cestlaz.github.io/stories/emacs/
+
+Language Processing:
+    https://syncedreview.com/2020/11/09/amazon-alexa-ais-language-model-is-all-you-need-explores-nlu-as-qa/
+
+GAN: 
+    Chinese Painting
+    https://syncedreview.com/2020/11/30/princeton-students-ai-model-generates-chinese-landscape-paintings-that-fool-human-evaluators/
+
