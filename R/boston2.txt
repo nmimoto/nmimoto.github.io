@@ -2,43 +2,68 @@
 ###
 ###  Boston data (MASS) - Polynomial Regression
 ###                         with 5-fold Cross Validation
-###
+###   ver 0.0.2
 ###
 #################################################################
 
-
-
-
 ###-------------------------------------------------
 ###--- 0. Preliminary
-library(MASS)  # install.packages("MASS")
-data(Boston)
 
-
-library(tidyverse)   # install.packages(tidyverse")
+# Using Boston3 from https://nmimoto.github.io/R/boston0.txt
+library(MASS)                # install.packages("MASS")
+library(tidyverse)           # install.packages("tidyverse")
 Boston <- as_tibble(Boston)
 Boston
 
-dim(Boston)
-# [1] 506  14
+# Rename "medv" column as "resp" to streamline analysis.
+Boston2 <- Boston %>% rename(resp=medv)
+Boston2
 
-attach(Boston)
+# move "resp" columnm to 1st
+Boston2 <- Boston2 %>% relocate(resp)
+Boston2
 
-#- Scatter plot
-plot(lstat, medv)
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
+Boston3
 
+# Importance List by Chisq test
+
+  # top list:
+  # 3  4  6 10
+  # "zn" "indus" "nox"   "rad"
+
+  # bottom list
+  # c(7, 8, 9, 13)
+  # "rm"    "age"   "dis"   "black"
+
+  #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (dbl)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
 
 
 
 
 ###-------------------------------------------------
-### 1. --- Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Boston               # Entire Data set (have to be data.frame)
+###--- 2. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
-test.size <- 106             # num of rows for testing set
-resp.col.name <- "medv"      # name of response column
+test.size <- 96              # num of rows for testing set
+resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
-my.seed <- 4234              # give a seed
+my.seed <- 3231              # give a seed
 
 
     #---
@@ -69,8 +94,8 @@ my.seed <- 4234              # give a seed
 # Output (all data.frame):
 #   Train.set      /  Train.resp
 #   Test.set       /  Test.resp
-#   CV.train[[k]]  /  CV.train.resp[[k]]
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+#   CV.train[[k]]  /  CV.train.resp[[k]]    k goes from 1 to num.folds
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]    k goes from 1 to num.folds
 
 
 
@@ -86,37 +111,38 @@ my.seed <- 4234              # give a seed
 
 
 #--- plot Training and Test for visualization
-plot(CV.train[[1]]$lstat, CV.train[[1]]$medv, xlab="lstat", ylab="medv")
-lines(CV.valid[[1]]$lstat, CV.valid[[1]]$medv, type="p", col="red",pch=19)
+fold = 1
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
 
 
 #--- If all data is used
 deg.poly = 1
-Fit00 <- lm( medv ~ poly(lstat, deg.poly) )
+Fit00 <- lm( resp ~ poly(lstat, deg.poly), data=Boston3)
 summary(Fit00)
 
 
 
 
 
-###--- 2.a Polynomial Regression for 1 d and 1 k
+###--- 3.a Polynomial Regression for 1 d and 1 k
 deg.poly = 3
 k=5
 
-Fit01 <- lm( medv ~ poly(lstat, deg.poly), data=CV.train[[k]] )
+Fit01 <- lm( resp ~ poly(lstat, deg.poly), data=CV.train[[k]] )
   summary(Fit01)
   #- CV Training MSE
   MSE.train <- mean(Fit01$residuals^2)
   #- CV Validation MSE
   Fit01.pred<- predict(Fit01, newdata=CV.valid[[k]])
-  MSE.valid <- mean((CV.valid[[k]]$medv - Fit01.pred)^2)
+  MSE.valid <- mean((CV.valid[[k]]$resp - Fit01.pred)^2)
 
   c(MSE.train, MSE.valid)
 
 
 # Plot the fit
-plot(CV.train[[k]]$lstat, CV.train[[k]]$medv, xlab="X", ylab="Y")
-lines(CV.valid[[k]]$lstat, CV.valid[[k]]$medv, col="red", type="p", pch=19)
+plot(CV.train[[k]]$lstat, CV.train[[k]]$resp, xlab="X", ylab="Y")
+lines(CV.valid[[k]]$lstat, CV.valid[[k]]$resp, col="red", type="p", pch=19)
 ix = sort(CV.train[[k]]$lstat, index.return=TRUE)$ix
 lines(CV.train[[k]]$lstat[ix], Fit01$fitted[ix], lwd=2, col="red" )
 text(30,49, paste("d=",deg.poly,": MSE.tr=",round(MSE.train,2)))
@@ -125,20 +151,24 @@ text(30,46, paste("k=",k,       ": MSE.va=",round(MSE.valid,2)), col="red")
   # layout( matrix(1:5, 1,5) )
   # layout(1)
 
+###
+### Now change deg.poly and k and run again
+###
 
 
-###--- 2.b Polynomial Regression for d=1:10 and k=1:5
+
+###--- 3.b Polynomial Regression for d=1:10 and k=1:5
 MSE.train <- MSE.valid <- matrix(0, 5, 10)
 for (deg.poly in 1:10) {
     for (k in 1:5) {
 
-        Fit01 <- lm( medv ~ poly(lstat, deg.poly), data=CV.train[[k]] )
+        Fit01 <- lm( resp ~ poly(lstat, deg.poly), data=CV.train[[k]] )
         summary(Fit01)
         #--- CV Training MSE
         MSE.train[k,deg.poly] <- mean(Fit01$residuals^2)
         #--- CV Validation MSE
         Fit01.pred<- predict(Fit01, newdata=CV.valid[[k]])
-        MSE.valid[k,deg.poly] <- mean((CV.valid[[k]]$medv - Fit01.pred)^2)
+        MSE.valid[k,deg.poly] <- mean((CV.valid[[k]]$resp - Fit01.pred)^2)
     }
 }
 MSE.train
@@ -153,32 +183,31 @@ lines(Av.MSE.valid, type="o", col="red")
 legend(2, 40, lty=1, c("Av. Train MSE","Av. Valid MSE"), col=c("black", "red"))
 
 
-
-
-###--- Make decision about best deg.poly to use from the Av MSE plot
 ###
+###   Make decision about best deg.poly to use from the Av MSE plot
 ###
+
 
 
 
 ###-------------------------------------------------
-###--- 3. Best Polynomial Regression Model for entire Training set
-deg.poly = 5
+###--- 4. Best Polynomial Regression Model for entire Training set
 
-Fit05 <- lm( medv ~ poly(lstat, deg.poly), data=Train.set)
+deg.poly = 5    #  You need to choose this value based on what you saw in 3b.
+
+Fit05 <- lm( resp ~ poly(lstat, deg.poly), data=Train.set)
 summary(Fit05)
 #- CV Training MSE
 MSE.train <- mean(Fit05$residuals^2)
 #- CV Validation MSE
 pred<- predict(Fit05, newdata=Test.set)
-MSE.test <- mean((Test.set$medv - pred)^2)
+MSE.test <- mean((Test.set$resp - pred)^2)
 
 c(MSE.train, MSE.test)
 
-
     # Plot the fit
-    plot(Train.set$lstat, Train.set$medv, xlab="lstat", ylab="medv", main="Final Model")
-    lines(Test.set$lstat, Test.set$medv, col="red", type="p", pch=19)
+    plot(Train.set$lstat, Train.set$resp, xlab="lstat", ylab="resp", main="Final Model")
+    lines(Test.set$lstat, Test.set$resp, col="red", type="p", pch=19)
     ix = sort(Train.set$lstat, index.return=TRUE)$ix
     lines(Train.set$lstat[ix], Fit05$fitted[ix], lwd=2, col="blue" )
     text(30,49, paste("d=",deg.poly,": MSE.train=",round(MSE.train,2)))
