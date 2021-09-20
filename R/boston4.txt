@@ -1,69 +1,69 @@
 ###
 ###
-### Boston Data - Decision Tree (Regression)
-###                w Bagging, Raondom Forest and Boosting
+### Boston Data (MASS) - Decision Tree (Regression)
+###                        with Bagging, Raondom Forest and Boosting
+###                        with 5-fold Cross Validation
+###   ver 0.0.2
 ###
 #################################
 
-###---------------------------------------------------
-###--- 0. Preliminary
-library(MASS)      # install.packages("MASS")
-data(Boston)
 
-library(tidyverse)   # install.packages(tidyverse")
+###-------------------------------------------------
+###--- 0. Preliminary
+
+# Using Boston3 from https://nmimoto.github.io/R/boston0.txt
+library(MASS)                # install.packages("MASS")
+library(tidyverse)           # install.packages("tidyverse")
 Boston <- as_tibble(Boston)
 Boston
 
-#  ?Boston  # see explanation for variables
+# Rename "medv" column as "resp" to streamline analysis.
+Boston2 <- Boston %>% rename(resp=medv)
+Boston2
 
-#1  crim     per capita crime rate by town.
-#2  zn       proportion of residential land zoned for lots over 25,000 sq.ft.
-#3  indus    proportion of non-retail business acres per town.
-#4  chas     Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
-#5  nox      nitrogen oxides concentration (parts per 10 million).
-#6  rm       average number of rooms per dwelling.
-#7  age      proportion of owner-occupied units built prior to 1940.
-#8  dis      weighted mean of distances to five Boston employment centres.
-#9  rad      index of accessibility to radial highways.
-#10 tax      full-value property-tax rate per $10,000.
-#11 ptratio  pupil-teacher ratio by town.
-#12 black    1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
-#13 lstat    lower status of the population (percent).
-#14 medv     median value of owner-occupied homes in \$1000s.
+# move "resp" columnm to 1st
+Boston2 <- Boston2 %>% relocate(resp)
+Boston2
 
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
+Boston3
 
-# 13 lstat = lower status of the population (percent)
-#      Proportion of population that is lower status
-#      = 1/2 (proportion of adults without,
-#      some high school education and proportion of male
-#      workers classified as laborers). The logarithmic
-#      specification implies that socioeconomic status
-#      distinctions mean more in the upper brackets of
-#      society than in the lower classes. Source: 1970 U. S. Census
+# Importance List by Chisq test
 
+  # top list:
+  # 3  4  6 10
+  # "zn" "indus" "nox"   "rad"
 
+  # bottom list
+  # c(7, 8, 9, 13)
+  # "rm"    "age"   "dis"   "black"
 
-#- Correlaiton Plots
-# pairs(Boston)   # shows scatterplot matrix (large)
-
-# library(corrplot)   # install.packages("corrplot")
-# corrplot(cor(Boston), method="number")
-# corrplot(cor(Boston))
-
-# attach(Boston)
-# hist(medv)
+  #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (dbl)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
 
 
 
 
-
-
-###-----------------------------------
-###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Boston               # Entire Data set (have to be data.frame)
+###-------------------------------------------------
+###--- 2. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
 test.size <- 96              # num of rows for testing set
-resp.col.name <- "medv"      # name of response column
+resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
 my.seed <- 3231              # give a seed
 
@@ -106,11 +106,11 @@ my.seed <- 3231              # give a seed
 
 
 ###-------------------------------------------------
-###--- 1. Decision Tree has high variance
+###--- 3. Decision Tree has high variance
 
 #---------
-library(tree)
-tree31 <- tree(medv ~., CV.train[[1]])
+library(tree)          # install.packages("tree")
+tree31 <- tree(resp ~., CV.train[[1]])
 summary(tree31)
 
 plot(tree31)
@@ -118,7 +118,7 @@ text(tree31, pretty=1, cex=.7)
 
 
 #---------
-tree32 <- tree(medv ~., CV.train[[2]])
+tree32 <- tree(resp ~., CV.train[[2]])
 summary(tree32)
 
 plot(tree32)
@@ -128,27 +128,27 @@ text(tree32, pretty=0, cex=.7)
 
 
 ###-------------------------------------------------
-###--- 2. Decision Tree Growing using rpart().  It has color plotting.
-library(rpart)
-library(rpart.plot)
-tree00<- rpart(medv~., data=Train.set)
+###--- 4. Decision Tree Growing using rpart().  It has color plotting.
+library(rpart)         # install.packages("rpart")
+library(rpart.plot)    # install.packages("rpart.plot")
+tree00<- rpart(resp~., data=Train.set)
 summary(tree00)
 
-plot(tree00)
-text(tree00)
+rpart.plot(tree00)     # now you can plot in color
 
-rpart.plot(tree00)
+plot(tree00)           # old way of plotting
+text(tree00)
 
 
 
 
 
 ###-------------------------------------------------
-###--- 3. Decision Tree (Grow and Prune using tree())
+###--- 5. Decision Tree (Grow and Prune using tree())
 
 #--- Growing the tree
-library(tree)
-tree1 = tree(medv~., Train.set)
+library(tree)          # install.packages("tree")
+tree1 = tree(resp~., Train.set)
 summary(tree1)
 tree1
 
@@ -162,6 +162,7 @@ Train.fitted
 plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
 abline(0,1, col="red")
 
+library(caret)          # install.packages("caret")
 Train.RSS <- data.frame(
   RMSE = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
   Rsquare = caret::R2(Train.fitted, Train.resp)
@@ -169,7 +170,7 @@ Train.RSS <- data.frame(
 Train.RSS
 
 #         RMSE   Rsquare
-#medv 3.777721 0.8377335
+#resp 3.777721 0.8377335
 
 
 #--- Predict the response, calculate test RMSE
@@ -185,7 +186,7 @@ Test.RSS <- data.frame(
 )
 Test.RSS
 #         RMSE   Rsquare
-#medv 4.605124 0.6852545
+#resp 4.605124 0.6852545
 
 #      RMSE   Rsquare
 #1 4.946511 0.6353647
@@ -232,10 +233,10 @@ Test.RSS
 
 
 ###-------------------------------------------------
-###--- 3. Bagging
+###--- 6. Bagging
 library(randomForest)
 set.seed(my.seed)
-treeRF01 = randomForest(medv~., data=Train.set, mtry=13, ntree=500, importance=TRUE)
+treeRF01 = randomForest(resp~., data=Train.set, mtry=13, ntree=500, importance=TRUE)
 treeRF01
 
 Test.pred = predict(treeRF01, newdata=Test.set)
@@ -256,7 +257,7 @@ Test.RSS
 ###--- change ntree to 25
 library(randomForest)
 set.seed(my.seed)
-treeRF02 = randomForest(medv~., data=Train.set, mtry=13, ntree=25, importance=TRUE)
+treeRF02 = randomForest(resp~., data=Train.set, mtry=13, ntree=25, importance=TRUE)
 treeRF02
 
 Test.pred = predict(treeRF02, newdata=Test.set)
@@ -267,6 +268,7 @@ varImpPlot (treeRF02)
 plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
 abline(0,1, col="red")
 
+library(caret)          # install.packages("caret")
 Test.RSS <- data.frame(
   RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
   Rsquare = caret::R2(Test.pred, Test.resp)
@@ -279,12 +281,12 @@ Test.RSS
 
 
 ###-------------------------------------------------
-###--- 3. Radnom Forest
+###--- 7. Radnom Forest
 
 ###--- change mtry to 6
 library(randomForest)
 set.seed(my.seed)
-treeRF03 = randomForest(medv~., data=Train.set, mtry=6, ntree=500, importance=TRUE)
+treeRF03 = randomForest(resp~., data=Train.set, mtry=6, ntree=500, importance=TRUE)
 treeRF03
 
 Test.pred = predict(treeRF03, newdata=Test.set)
@@ -295,6 +297,7 @@ varImpPlot (treeRF03)
 plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
 abline(0,1, col="red")
 
+library(caret)          # install.packages("caret")
 Test.RSS <- data.frame(
   RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
   Rsquare = caret::R2(Test.pred, Test.resp)
@@ -308,9 +311,9 @@ Test.RSS
 
 
 ###-------------------------------------------------
-###--- 4. Boosting
+###--- 8. Boosting
 set.seed(my.seed)
-treeBT01 = gbm::gbm(medv~., data=Train.set, distribution="gaussian", n.trees=5000,
+treeBT01 = gbm::gbm(resp~., data=Train.set, distribution="gaussian", n.trees=5000,
              interaction.depth=4)
 summary(treeBT01)
 
@@ -322,6 +325,7 @@ plot(treeBT01, i="lstat")
 plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
 abline(0,1, col="red")
 
+library(caret)          # install.packages("caret")
 Test.RSS <- data.frame(
   RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
   Rsquare = caret::R2(Test.pred, Test.resp)
@@ -334,8 +338,8 @@ Test.RSS
 
 
 ###-------------------------------------------------
-###--- 5. OLS for comparison
-Reg01 = lm(medv~., data=Train.set)
+###--- 9. OLS for comparison
+Reg01 = lm(resp~., data=Train.set)
 summary(Reg01)
 
 Test.pred=predict(Reg01, newdata=Test.set)
@@ -343,10 +347,11 @@ Test.pred=predict(Reg01, newdata=Test.set)
 plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
 abline(0,1, col="red")
 
+library(caret)          # install.packages("caret")
 Test.RSS <- data.frame(
   RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
   Rsquare = caret::R2(Test.pred, Test.resp)
 )
 Test.RSS
 #         RMSE   Rsquare
-#medv 3.862942 0.7645155
+#resp 3.862942 0.7645155

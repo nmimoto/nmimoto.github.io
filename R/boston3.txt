@@ -1,105 +1,70 @@
 ###
 ###
-### Boston data (MASS) - Regularization
-###                        LASSO and Ridge Regression
+###  Boston data (MASS) - Regularization: LASSO and Ridge Regression
+###                         with 5-fold Cross Validation
+###   ver 0.0.2
 ###
-###################################################
+#################################################################
 
 
-library(MASS)      # install.packages("MASS")
+###-------------------------------------------------
+###--- 0. Preliminary
 
-data(Boston)
-
-library(tidyverse)   # install.packages(tidyverse")
+# Using Boston3 from https://nmimoto.github.io/R/boston0.txt
+library(MASS)                # install.packages("MASS")
+library(tidyverse)           # install.packages("tidyverse")
 Boston <- as_tibble(Boston)
 Boston
 
-?Boston  # see explanation for variables
-
-#1  crim     per capita crime rate by town.
-#2  zn       proportion of residential land zoned for lots over 25,000 sq.ft.
-#3  indus    proportion of non-retail business acres per town.
-#4  chas     Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
-#5  nox      nitrogen oxides concentration (parts per 10 million).
-#6  rm       average number of rooms per dwelling.
-#7  age      proportion of owner-occupied units built prior to 1940.
-#8  dis      weighted mean of distances to five Boston employment centres.
-#9  rad      index of accessibility to radial highways.
-#10 tax      full-value property-tax rate per $10,000.
-#11 ptratio  pupil-teacher ratio by town.
-#12 black    1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
-#13 lstat    lower status of the population (percent).
-#14 medv     median value of owner-occupied homes in \$1000s.
-
-
-# 13 lstat = lower status of the population (percent)
-#      Proportion of population that is lower status
-#      = 1/2 (proportion of adults without,
-#      some high school education and proportion of male
-#      workers classified as laborers). The logarithmic
-#      specification implies that socioeconomic status
-#      distinctions mean more in the upper brackets of
-#      society than in the lower classes. Source: 1970 U. S. Census
-
-
-
-#- Correlaiton Plots
-pairs(Boston)   # shows scatterplot matrix (large)
-
-
-library(corrplot)   # install.packages("corrplot")
-corrplot(cor(Boston), method="number")
-corrplot(cor(Boston))
-
-
-
-#- Histogram of the respoonse variable
-attach(Boston)
-hist(medv)
-
-#1  crim
-#2  zn
-#3  indus
-#4  chas
-#5  nox
-#6  rm
-#7  age
-#8  dis
-#9  rad
-#10 tax
-#11 ptratio
-#12 black
-#13 lstat
-#14 medv  <- response (Y)
-
-
-
-#- Regression with all variables
-Reg01 <- lm(medv ~ . , data=Boston)
-summary(Reg01)
-
-
-
-# Change class of default and student column
-Boston2 <- Boston %>% mutate( chas=as.numeric(chas),
-                                rad=as.numeric(rad))
+# Rename "medv" column as "resp" to streamline analysis.
+Boston2 <- Boston %>% rename(resp=medv)
 Boston2
 
-# Standardize the data for Lasso and Ridge Reg
-Boston3 <- Boston2 %>% scale(center=TRUE, scale=TRUE)
-Boston3 <- as_tibble(Boston3)
+# move "resp" columnm to 1st
+Boston2 <- Boston2 %>% relocate(resp)
+Boston2
+
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
 Boston3
 
+# Importance List by Chisq test
 
+  # top list:
+  # 3  4  6 10
+  # "zn" "indus" "nox"   "rad"
+
+  # bottom list
+  # c(7, 8, 9, 13)
+  # "rm"    "age"   "dis"   "black"
+
+  #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (dbl)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
+
+
+
+
+###-------------------------------------------------
 ###--- 2. Data Separation (Copied from Rtut-CV)
-
-### --- Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Boston3               # Entire Data set (have to be data.frame)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
 test.size <- 96              # num of rows for testing set
-resp.col.name <- "medv"      # name of response column
+resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
-my.seed <- 16442             # give a seed
+my.seed <- 3231               # give a seed
 
 
     #---
@@ -138,17 +103,17 @@ my.seed <- 16442             # give a seed
 
 
 ###-------------------------------------------------
-###--- 2a. Ordinary Regression (Entire Training set)
-Fit01 = lm(medv ~. , data=Train.set)
+###--- 3. Ordinary Regression (w Entire Training set)
+Fit01 = lm(resp ~. , data=Train.set)
 summary(Fit01)
 
-# predict values medv in Test set
+# predict values resp in Test set
 pred = predict(Fit01, newdata = Test.set)
 
 library(caret)          # install.packages("caret")
 OLS <- data.frame(
-  RMSE = RMSE(pred, Test.set$medv),
-  Rsquare = R2(pred, Test.resp$medv)
+  RMSE = caret::RMSE(pred,  Test.set$resp),
+  Rsquare = caret::R2(pred, Test.resp$resp)
 )
 OLS
 
@@ -156,25 +121,25 @@ OLS
 
 
 ###-------------------------------------------------
-###--- 2b. Lasso Regression (Entire Training set. Auto 5-fold CV)
+###--- 4. Lasso Regression (Entire Training set. Auto 5-fold CV)
 library(glmnet)          # install.packages("glmnet")
 
 # Display the best lambda value
-x <- model.matrix(medv~., Train.set)[,-1]
-y <- Train.set$medv
+x <- model.matrix(resp ~., Train.set)[,-1]
+y <- Train.set$resp
 set.seed(my.seed)
 CV.for.lambda <- cv.glmnet(x, y, alpha = 1, nfolds=5)
 CV.for.lambda$lambda.min
 FitLasso <- glmnet(x, y, alpha = 1, lambda = CV.for.lambda$lambda.min)
 coef(FitLasso)
 
-x.test <- model.matrix(medv ~., Test.set)[,-1]
+x.test <- model.matrix(resp ~., Test.set)[,-1]
 pred <- as.vector(predict(FitLasso, x.test))
 
 # Model performance metrics
 LASSO <- data.frame(
-  RMSE = RMSE(pred, as.matrix(Test.resp)),
-  Rsquare = R2(pred, Test.resp)
+  RMSE    = caret::RMSE(pred,  Test.set$resp),
+  Rsquare = caret::R2(pred, Test.resp$resp)
 )
 LASSO
 
@@ -183,24 +148,24 @@ LASSO
 
 
 ###-------------------------------------------------
-###--- 2c. Ridge Regression (Entire Training set. Auto 5-fold CV)
+###--- 5. Ridge Regression (Entire Training set. Auto 5-fold CV)
 
 # Display the best lambda value
-x <- model.matrix(medv~., Train.set)[,-1]
-y <- Train.set$medv
+x <- model.matrix(resp ~., Train.set)[,-1]
+y <- Train.set$resp
 set.seed(my.seed)
 CV.for.lambda <- cv.glmnet(x, y, alpha = 0, nfolds=5)
 CV.for.lambda$lambda.min
 FitRidge <- glmnet(x, y, alpha = 0, lambda = CV.for.lambda$lambda.min)
 coef(FitRidge)
 
-x.test <- model.matrix(medv ~., Test.set)[,-1]
+x.test <- model.matrix(resp ~., Test.set)[,-1]
 pred <- as.vector(predict(FitRidge, x.test))
 
 # Model performance metrics
 RIDGE <- data.frame(
-  RMSE = RMSE(pred, as.matrix(Test.resp)),
-  Rsquare = R2(pred, Test.resp)
+  RMSE    = caret::RMSE(pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(pred, Test.resp)
 )
 RIDGE
 
