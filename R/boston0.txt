@@ -127,8 +127,8 @@ resp.col.name <- "resp"
 
   # pairs(Orig) equivalent
   library(GGally)      # install.packages("GGally")
-    GGally::ggpairs(Orig[, c(1, 2:7)], aes(alpha=1))
-    GGally::ggpairs(Orig[, c(1, 8:14)], aes(alpha=1))
+    GGally::ggpairs(Orig[, c(2:7, 1)], aes(alpha=1))
+    GGally::ggpairs(Orig[, c(8:14, 1)], aes(alpha=1))
 
 
   ###----------
