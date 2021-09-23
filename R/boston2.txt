@@ -1,6 +1,6 @@
 ###
 ###
-###  Boston data (MASS) - Polynomial Regression
+###  Boston data (MASS) - Polynomial Regression (X=lstat only)
 ###                         with 5-fold Cross Validation
 ###   ver 0.0.2
 ###
@@ -60,11 +60,13 @@ Boston3
 ### Divide Dataset to Training and Testing and Set up k fold CV
 Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
-test.size <- 96              # num of rows for testing set
+test.size <- 106              # num of rows for testing set
 resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
 my.seed <- 3231              # give a seed
 
+# [ training 400     ]     [testing 106]
+# [80][80][80][80][80]    
 
     #---
     set.seed(my.seed)
@@ -92,26 +94,23 @@ my.seed <- 3231              # give a seed
         CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
     }
 # Output (all data.frame):
-#   Train.set      /  Train.resp
-#   Test.set       /  Test.resp
+#   Train.set   [400x14]   /  Train.resp  [400x1]
+#   Test.set    [106x14]   /  Test.resp   [106x1]
 #   CV.train[[k]]  /  CV.train.resp[[k]]    k goes from 1 to num.folds
 #   CV.valid[[k]]  /  CV.valid.resp[[k]]    k goes from 1 to num.folds
 
 
-
-
-
-
+    
 
 
 ###-------------------------------------------------
-###--- 3. Polynomial Regression using 5-fold CV
+###--- 3. Polynomial Regression using 5-fold CV (X=lstat only)
 # deg.poly   1 to 10
 # CV fold k  1 to 5
 
 
 #--- plot Training and Test for visualization
-fold = 1
+fold = 2
 plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
 lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
 
@@ -127,7 +126,7 @@ summary(Fit00)
 
 ###--- 3.a Polynomial Regression for 1 d and 1 k
 deg.poly = 3
-k=5
+k=3
 
 Fit01 <- lm( resp ~ poly(lstat, deg.poly), data=CV.train[[k]] )
   summary(Fit01)
@@ -188,12 +187,15 @@ legend(2, 40, lty=1, c("Av. Train MSE","Av. Valid MSE"), col=c("black", "red"))
 ###
 
 
-
-
 ###-------------------------------------------------
-###--- 4. Best Polynomial Regression Model for entire Training set
+###--- 4. Best Polynomial Regression Model for entire Training set (X=lstat only)
 
-deg.poly = 5    #  You need to choose this value based on what you saw in 3b.
+
+# [80][80][80][80][80]                      <- 1 of these were red, 4 others were white
+# [ training 400     ]     [testing 106]    <- now all training is white, all testing is blue 
+
+
+deg.poly = 6    #  You need to choose this value based on what you saw in 3b.
 
 Fit05 <- lm( resp ~ poly(lstat, deg.poly), data=Train.set)
 summary(Fit05)
@@ -207,8 +209,8 @@ c(MSE.train, MSE.test)
 
     # Plot the fit
     plot(Train.set$lstat, Train.set$resp, xlab="lstat", ylab="resp", main="Final Model")
-    lines(Test.set$lstat, Test.set$resp, col="red", type="p", pch=19)
+    lines(Test.set$lstat, Test.set$resp, col="blue", type="p", pch=19)
     ix = sort(Train.set$lstat, index.return=TRUE)$ix
     lines(Train.set$lstat[ix], Fit05$fitted[ix], lwd=2, col="blue" )
     text(30,49, paste("d=",deg.poly,": MSE.train=",round(MSE.train,2)))
-    text(30,46, paste("          MSE.test=",round(MSE.test,2)), col="red")
+    text(30,46, paste("          MSE.test=",round(MSE.test,2)), col="blue")
