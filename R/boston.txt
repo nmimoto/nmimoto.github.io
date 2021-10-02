@@ -1,33 +1,32 @@
-Boston data inside MASS package of R.
-You can use following script to
+###
+###  Housing Values in Suburbs of Boston Data 
+###
 
+Data is available in MASS package of R.
+
+You can use following script to load the data and see description
 > library(MASS)   # run install.packages("MASS") if not installed yet.
 > Boston          # data
 > ?Boston         # see the description
 
---------------
-Boston {MASS}	R Documentation
-
-  Housing Values in Suburbs of Boston
-
-Description  The Boston data frame has 506 rows and 14 columns.
+Description: 
+  The Boston data frame has 506 rows and 14 columns.
 
 This data frame contains the following columns:
-
-  crim    per capita crime rate by town.
-  zn      proportion of residential land zoned for lots over 25,000 sq.ft.
-  indus   proportion of non-retail business acres per town.
-  chas    Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
-  nox     nitrogen oxides concentration (parts per 10 million).
-  rm      average number of rooms per dwelling.
-  age     proportion of owner-occupied units built prior to 1940.
-  dis     weighted mean of distances to five Boston employment centres.
-  rad     index of accessibility to radial highways.
-  tax     full-value property-tax rate per \$10,000.
-  ptratio pupil-teacher ratio by town.
-  black   1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
-  lstat   lower status of the population (percent).
-  medv    median value of owner-occupied homes in \$1000s.
+  crim    (quantitative) per capita crime rate by town.
+  zn      (quantitative) proportion of residential land zoned for lots over 25,000 sq.ft.
+  indus   (quantitative) proportion of non-retail business acres per town.
+  chas    (categorical)  Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+  nox     (quantitative) nitrogen oxides concentration (parts per 10 million).
+  rm      (quantitative) average number of rooms per dwelling.
+  age     (quantitative) proportion of owner-occupied units built prior to 1940.
+  dis     (quantitative) weighted mean of distances to five Boston employment centres.
+  rad     (quantitative) index of accessibility to radial highways.
+  tax     (quantitative) full-value property-tax rate per \$10,000.
+  ptratio (quantitative) pupil-teacher ratio by town.
+  black   (quantitative) 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+  lstat   (quantitative) lower status of the population (percent).
+  medv    (quantitative) median value of owner-occupied homes in \$1000s.
 
 
 Source
