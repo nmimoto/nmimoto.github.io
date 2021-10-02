@@ -1,0 +1,114 @@
+###
+###
+###  Newral Network Demo 2 - Cereal Data
+###
+###
+####################################################
+##
+## https://www.analyticsvidhya.com/blog/2017/09/creating-visualizing-neural-network-in-r/
+
+## Uses DASL cereal data
+
+## Creating index variable
+
+# Read the Data
+# cereals = read.csv("https://www.uakron.edu/statistics/faculty/nmimoto/pages/datasets/cereals.csv", header=T)
+# OLD data.  Not listed in large sites any more.
+library(tidyverse)
+cereals = read_csv("https://nmimoto.github.io/datasets/cereals.csv")
+cereals
+
+
+# pairs(cereals)
+
+
+# Create training and test set
+set.seed(80)
+ix.train = sample(1:75, size = 45)
+
+cereals.tR = cereals[ ix.train, ]
+cereals.tS = cereals[-ix.train, ]
+
+
+## Scale data for neural network
+max = apply(cereals, 2 , max)
+min = apply(cereals,  2 , min)
+cereals.scaled = as.data.frame(scale(cereals, center=min, scale=max-min))
+
+# creating training and test set
+scaled.tR = cereals.scaled[ ix.train, ]
+scaled.tS = cereals.scaled[-ix.train, ]
+
+
+
+
+
+
+###_---------------------------------------------------
+###-------- Fit Neural Network
+library(neuralnet)          # install.packages("neuralnet")
+set.seed(2)
+NN.fit = neuralnet(rating ~ calories + protein + fat + sodium + fiber,
+               scaled.tR, hidden = 3, linear.output=TRUE)
+plot(NN.fit)
+
+
+
+NN.fit = neuralnet(rating ~ calories + protein +  fat + sodium + fiber,
+               scaled.tR, hidden = c(4,3), linear.output=TRUE)
+plot(NN.fit)
+
+
+
+linear   <- function(x) x
+softplus <- function(x) log(1+exp(x))
+sigmoid <- function(x)  1/(1 + exp(-x))
+
+NN.fit = neuralnet(rating ~.,
+                   scaled.tR,
+                   act.fct = sigmoid,
+                   hidden = c(3, 3),
+                   linear.output=TRUE)
+plot(NN.fit)
+
+
+
+
+# Predict for TEST set
+NN.pred.scaled = compute(NN.fit,  scaled.tS[, c(1:5)])
+
+
+# un-scale to original scale
+NN.pred = (NN.pred.scaled$net.result *
+                  (max(cereals$rating) - min(cereals$rating))) +
+                  min(cereals$rating)
+
+plot(cereals.tS$rating, NN.pred, col='blue', pch=16,
+     ylab = "predicted rating", xlab = "real rating")
+abline(0,1)
+
+
+# Calculate Root Mean Square Error (RMSE)
+RMSE = ( mean((cereals.tS$rating - NN.pred)^2) )^0.5
+RMSE
+
+
+
+
+
+
+###-------- Fit Multiple Linear Regression
+MLR.fit = lm(rating ~ calories + protein + fat + sodium + fiber,
+               cereals.tR, hidden = 3, linear.output=TRUE)
+summary(MLR.fit)
+
+
+MLR.pred = predict(MLR.fit, newdata=cereals.tS)
+
+plot(cereals.tS$rating, MLR.pred, col='blue', pch=16,
+     ylab = "predicted rating", xlab = "real rating")
+abline(0,1)
+
+# Calculate Root Mean Square Error (RMSE)
+RMSE.2 = ( mean((cereals.tS$rating - MLR.pred)^2) )^0.5
+RMSE.2
