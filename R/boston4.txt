@@ -3,7 +3,7 @@
 ### Boston Data (MASS) - Decision Tree (Regression)
 ###                        with Bagging, Raondom Forest and Boosting
 ###                        with 5-fold Cross Validation
-###   ver 0.0.2
+###   ver 0.0.3
 ###
 #################################
 
@@ -62,7 +62,7 @@ Boston3
 ### Divide Dataset to Training and Testing and Set up k fold CV
 Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
-test.size <- 96              # num of rows for testing set
+test.size <- 106              # num of rows for testing set
 resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
 my.seed <- 3231              # give a seed
@@ -99,6 +99,11 @@ my.seed <- 3231              # give a seed
 #   CV.valid[[k]]  /  CV.valid.resp[[k]]
 
 
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+
 
 
 
@@ -123,6 +128,9 @@ summary(tree32)
 
 plot(tree32)
 text(tree32, pretty=0, cex=.7)
+
+
+
 
 
 
@@ -199,12 +207,12 @@ cv.for.pruning = cv.tree(tree1, FUN=prune.tree, K=5)   #5-fold CV
 names(cv.for.pruning)
 
 plot(cv.for.pruning$size, cv.for.pruning$dev, type="b")
-plot(cv.for.pruning$k, cv.for.pruning$dev, type="b")
-# dev is the Av. CV error rate
-# k is the pruning parameter (alpha)
-# size is the number of terminal nodes
-
+plot(cv.for.pruning$k,    cv.for.pruning$dev, type="b")
+                                        # size is the number of terminal nodes
+                                        # dev is the Av. CV error rate
+                                        # k is the pruning parameter (alpha)
 cv.for.pruning
+
 
 # We conclude that it's better to not purne.  If you want to prune, use below.
 prune1 = prune.tree(tree1, best=6)  # specify 8-node tree
