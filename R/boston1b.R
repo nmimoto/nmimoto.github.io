@@ -2,7 +2,7 @@
 ###
 ### Boston Data (MASS) - Multiple Regression
 ###                         with 5-fold Cross Validation
-###   ver 0.0.2
+###   ver 0.0.3
 ###
 ##################################################
 
@@ -16,12 +16,9 @@ library(tidyverse)           # install.packages("tidyverse")
 Boston <- as_tibble(Boston)
 Boston
 
-# Rename "medv" column as "resp" to streamline analysis.
-Boston2 <- Boston %>% rename(resp=medv)
-Boston2
-
-# move "resp" columnm to 1st
-Boston2 <- Boston2 %>% relocate(resp)
+Boston2 <- Boston %>%
+    rename(resp=medv) %>%    # Rename "medv" column as "resp" to streamline analysis.
+    relocate(resp)           # move "resp" columnm to 1st
 Boston2
 
 # turn "chas" column into 0/1 factor
@@ -29,14 +26,11 @@ Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
 Boston3
 
 # Importance List by Chisq test
-
   # top list:
-  # 3  4  6 10
-  # "zn" "indus" "nox"   "rad"
+  # c(3, 4, 6, 10)  /  "zn" "indus" "nox" "rad"
 
-  # bottom list
-  # c(7, 8, 9, 13)
-  # "rm"    "age"   "dis"   "black"
+  # bottom list:
+  # c(7, 8, 9, 13)  /  "rm" "age" "dis" "black"
 
   #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
   #2  crim    (dbl)
@@ -55,38 +49,235 @@ Boston3
 
 
 
+###-------------------------------------------------
+###--- 2. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston3              # Entire Data set (have to be data.frame)
+train.size <- 400            # num of rows for training set
+test.size <- 106              # num of rows for testing set
+resp.col.name <- "resp"      # name of response column
+num.folds <- 5               # k for k-fold CV
+my.seed <- 3231              # give a seed
+
+# [ training 400     ]     [testing 106]
+# [80][80][80][80][80]
+
+    #---
+    set.seed(my.seed)
+    ix = sample(1:nrow(Orig))
+    Orig2 = Orig[ix, ]
+    Train.set  = Orig2[1:train.size, ]
+    Train.resp = Orig2[1:train.size, resp.col.name]
+    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
+    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
+
+    # K-fold Cross Validation
+    library(cvTools)     # install.packages("cvTools")
+    set.seed(my.seed)
+    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
+
+    CV.train      = list(Train.set[ folds$which!=1, ])
+    CV.train.resp = list(Train.resp[folds$which!=1,1])
+    CV.valid      = list(Train.set[ folds$which==1, ])
+    CV.valid.resp = list(Train.resp[folds$which==1,1])
+
+    for (k in 2:num.folds) {
+        CV.train[[k]]      = Train.set[ folds$which!=k, ]
+        CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
+        CV.valid[[k]]      = Train.set[ folds$which==k, ]
+        CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+    }
+# Output (all data.frame):
+#   Train.set   [400x14]   /  Train.resp  [400x1]
+#   Test.set    [106x14]   /  Test.resp   [106x1]
+#   CV.train[[k]]  /  CV.train.resp[[k]]    k goes from 1 to num.folds
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]    k goes from 1 to num.folds
+
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+
+
+
+
 
 ###-------------------------------------------------
-###--- 1. Multiple Linear Regression
-
-
-#- Regression with all variables
+###--- 1. Multiple Regression with all variables, no Cross Validation all data
 Reg01 <- lm(medv ~ . , data=Boston)
 summary(Reg01)
 
 plot(Reg01)
 
 
+##
+## Search for the better model without CV
+##
 
-#- Backward stepwise regression
-Reg02 <- lm(medv ~ . -age, data=Boston)
+## subtracting
+Reg02 <- lm(medv ~. -rm -age -dis -black, data=Boston)
 summary(Reg02)
 
+Reg02 <- lm(medv ~. -rm -age -dis , data=Boston)
+summary(Reg02)
 
-Reg03 <- lm(medv ~ . -age-indus, data=Boston)
+Reg02 <- lm(medv ~. -age -black, data=Boston)
+summary(Reg02)
+
+Reg02 <- lm(medv ~. -age -black -indus, data=Boston)
+summary(Reg02)
+
+plot(Reg02)
+
+
+## adding
+Reg03 <- lm(medv ~ zn + indus + nox + rad, data=Boston)
 summary(Reg03)
 
-plot(Reg03)
+Reg03 <- lm(medv ~ crim + zn + indus + nox + rad, data=Boston)
+summary(Reg03)
 
 
-Reg04 <- lm(medv ~ crim + zn + indus, data=Boston)
-summary(Reg04)
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (dbl)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
+
+  # Importance List by Chisq test
+  # top list:
+  # c(3, 4, 6, 10)  /  "zn" "indus" "nox" "rad"
+
+  # bottom list:
+  # c(7, 8, 9, 13)  /  "rm" "age" "dis" "black"
 
 
 
-#--- Looking at the result
-str(Reg03)  # click on environment tab in Rstudio
 
-Reg03$residuals
 
-plot(Reg03$residuals)
+
+
+
+###-------------------------------------------------
+###--- 2. Multiple Regression with Cross Validation (use all columns)
+
+##
+## 2a. Do it for 1 fold
+##
+k=1  # CV fold number
+
+Reg01 <- lm(resp ~., data=CV.train[[k]])
+  summary(Reg01)
+  # plot(Reg01)      # plots 4 diagnosis plots
+
+  #--- Get training / validation fit
+  Train.fitted = predict(Reg01, newdata=CV.train[[k]])
+  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
+
+    #--- Plot Y vs Yhat
+    plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual")
+    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    abline(0,1)
+
+    library(caret)            # install.packages("caret")
+    CVFitDiagnosis <- data.frame(
+      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
+      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
+      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+    )
+    CVFitDiagnosis
+
+
+
+##
+## 2b. Make a loop over 5 CV folds
+##
+layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
+CVFitDiagnosis <- numeric(0)
+for (k in 1:5) {
+
+  Reg01 <- lm(resp ~., data=CV.train[[k]])
+  # summary(Reg01)
+  # plot(Reg01)      # plots 4 diagnosis plots
+
+  #--- Get training / validation fit
+  Train.fitted = predict(Reg01, newdata=CV.train[[k]])
+  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
+
+    #--- Plot Y vs Yhat
+    plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    abline(0,1)
+
+    library(caret)            # install.packages("caret")
+    CVFitDiagnosis1 <- data.frame(
+      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
+      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
+      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+    )
+    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
+}
+layout(1)
+
+CVFitDiagnosis
+
+Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
+Av.CVFitDiagnosis
+
+##
+##  Av. val.RMSE is the summary for how good this model is fitting over all CV
+##
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Multiple Regression with CV (search for better model)
+
+##
+##  Change the model and search for the better model
+##
+layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
+CVFitDiagnosis <- numeric(0)
+for (k in 1:5) {
+
+  Reg01 <- lm(resp ~., data=CV.train[[k]])      ## <====== Change the model here
+  # summary(Reg01)
+  # plot(Reg01)      # plots 4 diagnosis plots
+
+  #--- Get training / validation fit
+  Train.fitted = predict(Reg01, newdata=CV.train[[k]])
+  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
+
+    #--- Plot Y vs Yhat
+    plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    abline(0,1)
+
+    library(caret)            # install.packages("caret")
+    CVFitDiagnosis1 <- data.frame(
+      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
+      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
+      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+    )
+    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
+}
+layout(1)
+
+CVFitDiagnosis
+
+Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
+Av.CVFitDiagnosis
