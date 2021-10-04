@@ -102,8 +102,16 @@ summary(Reg04)
 
 
 #--- Looking at the result
-str(Reg03)  # click on environment tab in Rstudio
+str(Reg04)  # click on environment tab in Rstudio
 
-Reg03$residuals
+Reg04$residuals
 
-plot(Reg03$residuals)
+plot(Reg04$residuals)
+
+Reg04$fitted.values            # Yhat
+
+plot(Reg04$fitted.values)
+
+plot(Reg04$fitted.values, Reg04$residuals)       # same as 1st diagnostic plot
+
+plot(Reg04)                    # diagnostic plot
