@@ -1,21 +1,9 @@
 ###
+###  Data Wrangling with tidyverse
 ###
-###
-###
-###
-
-
-
 library(tidyverse)   # install.packages("tidyverse")
 
-# Includes: 
-#   dplyr
-#   ggplot2
-#   readr
-#   tibble
-#   tidyr
-#   purrr
-
+#  Packages included: dplyr,  ggplot2,  readr,  tibble,  tidyr,  purrr
 
 D1 <- read_csv("data/EmployeeData.csv")
 
@@ -37,6 +25,33 @@ View(D2)
 min(D2$AnnualBase) 
 
 ggplot(D2, aes(x=AnnualBase)) + geom_histogram(binwidth=1000)
+
+
+
+
+Boston2 <- Boston %>%
+    rename(resp=medv) %>%    # Rename "medv" column as "resp" to streamline analysis.
+    relocate(resp)           # move "resp" columnm to 1st
+Boston2
+
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
+Boston3
+
+
+Boston4 <- Boston2 %>% mutate( chas=as.numeric(chas),
+                               rad=as.numeric(rad))
+Boston4
+
+Orig <- Orig %>% 
+  mutate(Class_Levels=recode(Class_Levels, 
+                    '1'="200 level",
+                    '2'="401+461",
+                    '3'="4/5/600"  ))
+
+# Combine 2007 and 2007.5 as 2007. 
+Orig <- Orig %>% mutate(Semester=round(Semester,0))
+Orig
 
 
 
