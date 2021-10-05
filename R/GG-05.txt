@@ -1,0 +1,60 @@
+
+library(tidyverse)
+library(ggplot2)
+
+Orig <- read_csv("HistoricalEval03-longform.csv")
+Orig
+
+# Turn Class into Factor
+Orig <- Orig %>% mutate(Class_Levels=as.factor(Class))
+Orig
+
+# Change factor labels for plotting porpose
+Orig <- Orig %>% 
+  mutate(Class_Levels=recode(Class_Levels, 
+                    '1'="200 level",
+                    '2'="401+461",
+                    '3'="4/5/600"  ))
+
+# Combine 2007 and 2007.5 as 2007. 
+Orig <- Orig %>% mutate(Semester=round(Semester,0))
+Orig
+
+# Use aggregate for cond mean line
+Orig_agg <- aggregate(Rating ~ Semester + Class_Levels, data=Orig, mean)
+Orig_agg <- as.tibble(Orig_agg)
+Orig_agg
+
+
+
+# https://www.marsja.se/how-to-add-a-column-to-dataframe-in-r-with-tibble-dplyr/
+# https://suzan.rbind.io/2018/02/dplyr-tutorial-2/
+
+
+# Scatterplot with smoothed cond mean
+ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
+  geom_point() + geom_smooth(se=FALSE) + 
+  theme(legend.position="right")
+
+
+ggplot(Orig_agg, aes(x=Semester, y=Rating, color=Class_Levels)) + 
+  geom_point() + geom_line() + 
+  theme(legend.position="right") +
+  ggtitle("Av Rating for each Class_Levels")
+
+# Cond mean only
+ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
+  geom_point() + 
+  geom_point(data=Orig_agg) + 
+  geom_line(data=Orig_agg,lwd=1) + 
+  theme(legend.position="right") +
+  ggtitle("Cond mean of #19 Rating for each class offered 2007-2017")
+
+
+# Both combined 
+ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
+  geom_jitter() + 
+  geom_point(data=Orig_agg, cex=3) + 
+  geom_line(data=Orig_agg,lwd=1) + 
+  theme(legend.position="right") +
+  ggtitle("#19 Rating for each class offered 2007-2017 w Means for each AY. (Jittered)")

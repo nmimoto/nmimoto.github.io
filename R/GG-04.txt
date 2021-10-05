@@ -1,60 +1,147 @@
+###
+###  Contour and Heat Map
+###      1. from data
+###      2. from function
+###-----------------------------------
 
-library(tidyverse)
+
+#---------------
+# 1. From Data
+#
+# R Graph Gallery:
+# https://www.r-graph-gallery.com/2d-density-plot-with-ggplot2.html#distr
+
+
 library(ggplot2)
 
-Orig <- read_csv("HistoricalEval03-longform.csv")
-Orig
 
-# Turn Class into Factor
-Orig <- Orig %>% mutate(Class_Levels=as.factor(Class))
-Orig
+#--- Simulated Data
+A <- data.frame( x=rnorm(20000, 10,  3), y=rnorm(20000, 10, 3) )
+B <- data.frame( x=rnorm(20000, 20,  2), y=rnorm(20000, 20, 2) )
+C <- data.frame( x=rnorm(10000, 12,  1), y=rnorm(10000, 12, 1) )
+D1 <- rbind(A,B,C)
 
-# Change factor labels for plotting porpose
-Orig <- Orig %>% 
-  mutate(Class_Levels=recode(Class_Levels, 
-                    '1'="200 level",
-                    '2'="401+461",
-                    '3'="4/5/600"  ))
-
-# Combine 2007 and 2007.5 as 2007. 
-Orig <- Orig %>% mutate(Semester=round(Semester,0))
-Orig
-
-# Use aggregate for cond mean line
-Orig_agg <- aggregate(Rating ~ Semester + Class_Levels, data=Orig, mean)
-Orig_agg <- as.tibble(Orig_agg)
-Orig_agg
+dim(D1)
 
 
-
-# https://www.marsja.se/how-to-add-a-column-to-dataframe-in-r-with-tibble-dplyr/
-# https://suzan.rbind.io/2018/02/dplyr-tutorial-2/
-
-
-# Scatterplot with smoothed cond mean
-ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
-  geom_point() + geom_smooth(se=FALSE) + 
-  theme(legend.position="right")
+#--- Basic scatterplot
+ggplot(D1, aes(x=x, y=y) ) + geom_point()
 
 
-ggplot(Orig_agg, aes(x=Semester, y=Rating, color=Class_Levels)) + 
-  geom_point() + geom_line() + 
-  theme(legend.position="right") +
-  ggtitle("Av Rating for each Class_Levels")
+#--- 2d histogram
+  ggplot(D1, aes(x=x, y=y) ) + geom_bin2d() + theme_bw()
 
-# Cond mean only
-ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
-  geom_point() + 
-  geom_point(data=Orig_agg) + 
-  geom_line(data=Orig_agg,lwd=1) + 
-  theme(legend.position="right") +
-  ggtitle("Cond mean of #19 Rating for each class offered 2007-2017")
+  ggplot(D1, aes(x=x, y=y) ) + geom_bin2d(bins = 70) +
+    scale_fill_continuous(type = "viridis")
 
 
-# Both combined 
-ggplot(Orig, aes(x=Semester, y=Rating, color=Class_Levels)) + 
-  geom_jitter() + 
-  geom_point(data=Orig_agg, cex=3) + 
-  geom_line(data=Orig_agg,lwd=1) + 
-  theme(legend.position="right") +
-  ggtitle("#19 Rating for each class offered 2007-2017 w Means for each AY. (Jittered)")
+#--- Hexbin chart
+  ggplot(D1, aes(x=x, y=y) ) + geom_hex()
+
+  ggplot(D1, aes(x=x, y=y) ) + geom_hex(bins = 70) +
+    scale_fill_continuous(type = "viridis") +
+    theme_bw()
+
+
+
+#--- 2d density plot
+  ggplot(D1, aes(x=x, y=y) ) + geom_density_2d()
+
+
+  # Area only
+  ggplot(D1, aes(x=x, y=y) ) +
+    stat_density_2d(aes(fill = ..level..), geom = "polygon") +
+    scale_fill_continuous(type = "viridis")
+
+
+  # Area + contour
+  ggplot(D1, aes(x=x, y=y) ) +
+    stat_density_2d(aes(fill = ..level..), geom = "polygon", colour="white") +
+    scale_fill_continuous(type = "viridis")
+
+  # Using raster
+  ggplot(D1, aes(x=x, y=y) ) +
+    stat_density_2d(aes(fill = ..density..), geom = "raster", contour = FALSE) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme( legend.position='none' )
+
+
+
+
+
+
+#---------------
+# 2. From Function
+#
+
+
+#--- 2a. Multivariate normal
+library(ggplot2)
+library(mvtnorm)
+
+
+sigma= matrix(c(3,2,2,5), 2,2)
+f = function(x) mvtnorm::dmvnorm(x, mean=c(4,4), sigma=sigma)
+
+X = seq(0,10,.1)
+Y = seq(0,10,.1)
+XY <- expand.grid(X=X, Y=Y)
+
+Z = apply(XY, 1, f)
+D1 <- data.frame(cbind(XY, Z=Z))
+head(D1)
+
+
+ggplot( D1, aes(x=X, y=Y, z=Z)) + geom_contour()
+
+ggplot( D1, aes(x=X, y=Y, z=Z)) + geom_contour_filled()
+
+ggplot( D1, aes(x=X, y=Y, z=Z)) + geom_contour(bins=20)
+
+ggplot( D1, aes(x=X, y=Y, z=Z)) +
+  geom_raster(aes(fill = Z)) +
+  geom_contour(colour = "white")
+
+
+
+
+#--- 2b. Custom function
+library(ggplot2)
+
+f = function(x,y) {
+    if (length(x) == length(y)) {
+        return(3*x^2 - y^2 + 2*x)
+    } else {
+        return(NA)
+    }
+  }
+
+X = seq(0,10,.1)
+Y = seq(-5,10,.1)
+XY <- expand.grid(X=X, Y=Y)
+
+Z = f(XY[,1], XY[,2])
+D1 <- data.frame(cbind(XY, Z=Z))
+head(D1)
+
+ggplot( D1, aes(x=X, y=Y, z=Z)) + geom_contour_filled()
+
+
+f(1,2)
+f(1,-2)
+f(0,0)
+
+# add h=0 line.
+# draw f=1 line.
+
+
+
+
+#--------------
+# More examples
+
+https://rpubs.com/dkahle/ggmap-geom-contour-filled
+
+# Scroll to middle of the article
+https://www.tidyverse.org/blog/2020/03/ggplot2-3-3-0/
