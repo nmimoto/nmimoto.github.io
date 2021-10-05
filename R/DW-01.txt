@@ -7,7 +7,7 @@ library(tidyverse)   # install.packages("tidyverse")
 
 D1 <- read_csv("data/EmployeeData.csv")
 
-
+##------------------------------------------------------------
 ##
 ##  mutate() to create new columns
 ##
@@ -55,6 +55,18 @@ Orig
 
 
 
+
+Boston4 <- Boston2 %>% mutate(chas=chas+1)
+Boston4
+
+Boston4 <- Boston4 %>% mutate(n=round(rnorm(506,10,3),0), across(chas:rm, ~ .x + n))
+Boston4 <- Boston4 %>% relocate(n, .after=chas)
+
+
+
+
+
+##------------------------------------------------------------
 ##
 ##  filter() to extract certain rows
 ##
@@ -70,6 +82,14 @@ D2 %>% filter(year   %in% 2015:2017 &
 
 
 
+
+
+
+
+
+
+
+##------------------------------------------------------------
 ##
 ##  pivoting and unpivoting
 ##
@@ -143,6 +163,9 @@ D5
 
 
 
+
+
+##------------------------------------------------------------
 ##
 ## joining
 ##
@@ -197,9 +220,7 @@ EHist %>%
 
 
 
-
-
-
+##------------------------------------------------------------
 ##
 ## Export to Excel 
 ##
