@@ -281,3 +281,42 @@ CVFitDiagnosis
 
 Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
 Av.CVFitDiagnosis
+
+
+
+
+
+###-------------------------------------------------
+###--- 4. Final Fit with Train.set 
+
+## [ Train.set 400     ]     [Test.set 106]
+## [80][80][80][80][80]
+
+
+Reg01 <- lm(resp ~. -chas, data=Train.set)      ## <====== Best model you found in 3
+  # summary(Reg01)
+  # plot(Reg01)      # plots 4 diagnosis plots
+
+#--- Get training / validation fit
+Train.fitted = predict(Reg01, newdata=Train.set)
+Test.fitted  = predict(Reg01, newdata=Test.set)
+
+#--- Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.fitted, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+FinalFitDiagnosis <- data.frame(
+  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare  = caret::R2(Train.fitted,           Train.resp),
+  test.RMSE  = caret::RMSE(Test.fitted, as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(Test.fitted,           Test.resp)
+)
+FinalFitDiagnosis
+
+
+
+##
+##  Use test.RMSE or test.Rsquare as summary of the model fit.  These numbers does not have penalty for having more parameters.  
+##
