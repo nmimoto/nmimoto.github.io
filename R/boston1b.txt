@@ -2,7 +2,7 @@
 ###
 ### Boston Data (MASS) - Multiple Regression
 ###                         with 5-fold Cross Validation
-###   ver 0.0.3
+###   ver 0.0.4
 ###
 ##################################################
 
