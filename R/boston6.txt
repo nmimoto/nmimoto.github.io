@@ -2,7 +2,7 @@
 ###
 ### Boston Data (MASS) - Newral Network (Regression)
 ###                         with 5-fold Cross Validation
-###   ver 0.0.3
+###   ver 0.0.4
 ###
 #################################
 
@@ -138,36 +138,45 @@ lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
 library(neuralnet)            # install.packages("neuralnet")
 sigmoid <- function(x) 1 / (1 + exp(-x))
 
-k=1  # CV fold number
+k <- 1  # CV fold number
+DataA = CV.train[[k]]
+DataB = CV.valid[[k]]
 
-  Fit01 = neuralnet::neuralnet(resp ~.,
-                             CV.train[[k]],
-                             hidden=10,          # use c(5,5) for two layers
+Fit01 = neuralnet::neuralnet(resp ~.,
+                             DataA,
+                             hidden=10,
                              learningrate=1e-2,
                              act.fct=sigmoid,
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
 
-  summary(Fit01)
-  # plot(Fit01)  # Use only if NN is small enough (hidden <10)
+summary(Fit01)
+# plot(Fit01)  # Use only if NN is small enough (hidden <10)
 
-  #--- Get training / validation fit
-  Train.fitted = predict(Fit01, newdata=CV.train[[k]], type="vector")
-  Valid.fitted = predict(Fit01, newdata=CV.valid[[k]], type="vector")
+#--- Get training / validation fit
+Train.fitted = predict(Fit01, newdata=DataA, type="vector")
+Valid.fitted = predict(Fit01, newdata=DataB, type="vector")
 
-  #--- Plot Y vs Yhat
-  plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual", main=paste("K=",k))
-  lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
-  abline(0,1)
+#--- Plot Y vs Yhat
+plot( Train.fitted, as.matrix(DataA$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+lines(Valid.fitted, as.matrix(DataB$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
 
-  library(caret)            # install.packages("caret")
-  CVFitDiagnosis <- data.frame(
-    tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
-    tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
-    val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-    val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
-  )
-  CVFitDiagnosis
+library(caret)            # install.packages("caret")
+CVFitDiagnosis <- data.frame(
+  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(DataA$resp)),
+  tr.Rsquare  = caret::R2(Train.fitted,           DataA$resp),
+  val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(DataB$resp)),
+  val.Rsquare = caret::R2(Valid.fitted,           DataB$resp)
+)
+CVFitDiagnosis
+
+
+  ##
+  ##  Try Fit01 with Boston3.
+  ##  Try Fit01 with hidden=c(5,5).
+  ##  Try Fit01 with linear output=FALSE
+  ##
 
 
 
@@ -181,45 +190,50 @@ library(neuralnet)            # install.packages("neuralnet")
 sigmoid <- function(x) 1 / (1 + exp(-x))
 
 layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
-CVFitDiagnosis <- numeric(0)
+FitDiagnosis <- numeric(0)
 for (k in 1:5) {
 
+  DataA = CV.train[[k]]
+  DataB = CV.valid[[k]]
+
   Fit01 = neuralnet::neuralnet(resp ~.,
-                             CV.train[[k]],
-                             hidden=3,
+                             DataA,
+                             hidden=10,
                              learningrate=1e-2,
                              act.fct=sigmoid,
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
+  # summary(Fit01)
   # plot(Fit01)  # Use only if NN is small enough (hidden <10)
 
   #--- Get training / validation fit
-  Train.fitted = predict(Fit01, newdata=CV.train[[k]], type="vector")
-  Valid.fitted = predict(Fit01, newdata=CV.valid[[k]], type="vector")
+  Train.fitted = predict(Fit01, newdata=DataA, type="vector")
+  Valid.fitted = predict(Fit01, newdata=DataB, type="vector")
 
     #--- Plot Y vs Yhat
-    plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual",main=paste("K=",k))
-    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    plot( Train.fitted, as.matrix(DataA$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+    lines(Valid.fitted, as.matrix(DataB$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
     abline(0,1)
 
     library(caret)            # install.packages("caret")
-    CVFitDiagnosis1 <- data.frame(
-      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
-      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
-      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+    FitDiagnosis1 <- data.frame(
+        tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(DataA$resp)),
+        tr.Rsquare  = caret::R2(Train.fitted,           DataA$resp),
+        val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(DataB$resp)),
+        val.Rsquare = caret::R2(Valid.fitted,           DataB$resp)
     )
-    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
+    FitDiagnosis <- rbind(FitDiagnosis, FitDiagnosis1)
 }
 layout(1)
-CVFitDiagnosis
-Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
-Av.CVFitDiagnosis
+FitDiagnosis
+Av.FitDiagnosis = apply(CVFitDiagnosis, 2, mean)
+Av.FitDiagnosis
 
-##
-##  Av. val.RMSE is the summary for how good this model is fitting over all CV
-##     (Hint: try hidden= 3, 6, 10 to see how tr.RMSE vs valRMSE picture changes)
-
+  ##
+  ##  Av. val.RMSE is the summary for how good this model is fitting over all CV
+  ##     (Hint: try hidden= 3, 6, 10 to see how tr.RMSE vs valRMSE picture changes)
+  ##  You can also use A. vsl.Rsquares.  Both of them does not have penalty over
+  ##  number of parameters in the model.
 
 
 
@@ -229,36 +243,40 @@ Av.CVFitDiagnosis
 ##
 ## [ Train.set 400     ]     [Test.set 106]
 ## [80][80][80][80][80]
-
 library(neuralnet)            # install.packages("neuralnet")
 sigmoid <- function(x) 1 / (1 + exp(-x))
 
+DataA = Train.set
+DataB = Test.set
+
 Fit01 = neuralnet::neuralnet(resp ~.,
-                             Train.set,
-                             hidden=3,                # use c(5,5) for two layers
+                             DataA,
+                             hidden=3,
                              learningrate=1e-2,
                              act.fct=sigmoid,
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
+
+summary(Fit01)
 # plot(Fit01)  # Use only if NN is small enough (hidden <10)
 
 #--- Get training / validation fit
-Train.fitted = predict(Fit01, newdata=Train.set, type="vector")
-Test.fitted  = predict(Fit01, newdata=Test.set,  type="vector")
+Train.fitted = predict(Fit01, newdata=DataA, type="vector")
+Test.fitted  = predict(Fit01, newdata=DataB, type="vector")
 
 #--- Plot Y vs Yhat
-plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
-lines(Test.fitted,  as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+plot( Train.fitted, as.matrix(DataA$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+lines(Test.fitted,  as.matrix(DataB$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
 library(caret)            # install.packages("caret")
-FinalFitDiagnosis <- data.frame(
-  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
-  tr.Rsquare  = caret::R2(Train.fitted,           Train.resp),
-  val.RMSE  = caret::RMSE(Test.fitted,  as.matrix(Test.resp)),
-  val.Rsquare = caret::R2(Test.fitted,            Test.resp)
+FitDiagnosis <- data.frame(
+  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(DataA$resp)),
+  tr.Rsquare  = caret::R2(Train.fitted,           DataA$resp),
+  val.RMSE  = caret::RMSE(Test.fitted,  as.matrix(DataB$resp)),
+  val.Rsquare = caret::R2(Test.fitted,            DataB$resp)
 )
-FinalFitDiagnosis
+FitDiagnosis
 
 ##
 ##  To compare val.RMSE with other models, you need to UNscale Test.fitted.
@@ -266,20 +284,25 @@ FinalFitDiagnosis
 ##  other that of other models.
 ##
 
-Train.fitted.unscaled <- Boston.means$resp[1] + Train.fitted*Boston.SDs$resp[1]
-Train.resp.unscaled   <- Boston.means$resp[1] + Train.resp * Boston.SDs$resp[1]
-Test.fitted.unscaled  <- Boston.means$resp[1] + Test.fitted* Boston.SDs$resp[1]
-Test.resp.unscaled    <- Boston.means$resp[1] + Test.resp  * Boston.SDs$resp[1]
+Train.fitted = predict(Fit01, newdata=DataA, type="vector")
+Test.fitted = predict(Fit01, newdata=DataB, type="vector")
+Train.resp = DataA$resp
+Test.resp = DataB$resp
+
+Train.fitted.unscaled <- Boston.means$resp[1] + Train.fitted * Boston.SDs$resp[1]
+Train.resp.unscaled   <- Boston.means$resp[1] + Train.resp   * Boston.SDs$resp[1]
+Test.fitted.unscaled  <- Boston.means$resp[1] + Test.fitted  * Boston.SDs$resp[1]
+Test.resp.unscaled    <- Boston.means$resp[1] + Test.resp    * Boston.SDs$resp[1]
 
 plot( Train.fitted.unscaled, as.matrix(Train.resp.unscaled), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
 lines(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
 library(caret)            # install.packages("caret")
-FinalFitDiagnosis <- data.frame(
+FitDiagnosis <- data.frame(
   tr.RMSE   = caret::RMSE(Train.fitted.unscaled, as.matrix(Train.resp.unscaled)),
   tr.Rsquare  = caret::R2(Train.fitted.unscaled,           Train.resp.unscaled),
   val.RMSE  = caret::RMSE(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled)),
   val.Rsquare = caret::R2(Test.fitted.unscaled,            Test.resp.unscaled)
 )
-FinalFitDiagnosis
+FitDiagnosis
