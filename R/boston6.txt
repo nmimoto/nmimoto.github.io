@@ -269,7 +269,7 @@ Train.fitted = predict(Fit01, newdata=DataA, type="vector")
 Test.fitted  = predict(Fit01, newdata=DataB, type="vector")
 
 #--- Plot Y vs Yhat
-plot( Train.fitted, as.matrix(DataA$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+plot( Train.fitted, as.matrix(DataA$resp), xlab="Fitted", ylab="Actual",main="Final Test.set Fit")
 lines(Test.fitted,  as.matrix(DataB$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
@@ -309,7 +309,7 @@ Train.resp.unscaled   <- Boston.means$resp[1] + Train.resp   * Boston.SDs$resp[1
 Test.fitted.unscaled  <- Boston.means$resp[1] + Test.fitted  * Boston.SDs$resp[1]
 Test.resp.unscaled    <- Boston.means$resp[1] + Test.resp    * Boston.SDs$resp[1]
 
-plot( Train.fitted.unscaled, as.matrix(Train.resp.unscaled), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+plot( Train.fitted.unscaled, as.matrix(Train.resp.unscaled), xlab="Fitted", ylab="Actual",main="Final Test.set fit - Unscaled")
 lines(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
