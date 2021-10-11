@@ -234,10 +234,9 @@ Av.CVFitDiagnosis
 
   ##
   ##  Av. val.RMSE is the summary for how good this model is fitting over all CV
-  ##     (Hint: try hidden= 3, 6, 10 to see how tr.RMSE vs valRMSE picture changes)
-  ##  You can also use A. vsl.Rsquares.  Both of them does not have penalty over
-  ##  number of parameters in the model.
-
+  ##     (try hidden= 3, 6, 10 to see how tr.RMSE vs valRMSE picture changes)
+  ##  You can also use Av. val.Rsquares.  Both of them does not have penalty over number of parameters in the model.
+  ##
 
 
 
