@@ -190,16 +190,16 @@ library(neuralnet)            # install.packages("neuralnet")
 sigmoid <- function(x) 1 / (1 + exp(-x))
 
 layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
-FitDiagnosis <- numeric(0)
+CVFitDiagnosis <- numeric(0)
 for (k in 1:5) {
 
   DataA = CV.train[[k]]
   DataB = CV.valid[[k]]
 
-  Fit01 = neuralnet::neuralnet(resp ~.,
+  Fit01 = neuralnet::neuralnet(resp ~.,            # <===== Try using different set of columns here
                              DataA,
-                             hidden=10,
-                             learningrate=1e-2,
+                             hidden=5,             # <===== Try different num of nodes here
+                             learningrate=1e-2,    # <===== For numerical problem try changing number here
                              act.fct=sigmoid,
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
@@ -216,16 +216,16 @@ for (k in 1:5) {
     abline(0,1)
 
     library(caret)            # install.packages("caret")
-    FitDiagnosis1 <- data.frame(
+    CVFitDiagnosis1 <- data.frame(
         tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(DataA$resp)),
         tr.Rsquare  = caret::R2(Train.fitted,           DataA$resp),
         val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(DataB$resp)),
         val.Rsquare = caret::R2(Valid.fitted,           DataB$resp)
     )
-    FitDiagnosis <- rbind(FitDiagnosis, FitDiagnosis1)
+    CVFitDiagnosis <- rbind(FitDiagnosis, FitDiagnosis1)
 }
 layout(1)
-FitDiagnosis
+CVFitDiagnosis
 Av.FitDiagnosis = apply(CVFitDiagnosis, 2, mean)
 Av.FitDiagnosis
 
