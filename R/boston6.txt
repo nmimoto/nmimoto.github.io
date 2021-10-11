@@ -222,12 +222,12 @@ for (k in 1:5) {
         val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(DataB$resp)),
         val.Rsquare = caret::R2(Valid.fitted,           DataB$resp)
     )
-    CVFitDiagnosis <- rbind(FitDiagnosis, FitDiagnosis1)
+    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
 }
 layout(1)
 CVFitDiagnosis
-Av.FitDiagnosis = apply(CVFitDiagnosis, 2, mean)
-Av.FitDiagnosis
+Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
+Av.CVFitDiagnosis
 
   ##
   ##  Av. val.RMSE is the summary for how good this model is fitting over all CV
