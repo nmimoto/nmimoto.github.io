@@ -196,9 +196,10 @@ for (k in 1:5) {
   DataA = CV.train[[k]]
   DataB = CV.valid[[k]]
 
+  set.seed(my.seed)
   Fit01 = neuralnet::neuralnet(resp ~.,            # <===== Try using different set of columns here
                              DataA,
-                             hidden=5,             # <===== Try different num of nodes here
+                             hidden=3,             # <===== Try different num of nodes here
                              learningrate=1e-2,    # <===== For numerical problem try changing number here
                              act.fct=sigmoid,
                              linear.output=TRUE)
@@ -249,6 +250,7 @@ sigmoid <- function(x) 1 / (1 + exp(-x))
 DataA = Train.set
 DataB = Test.set
 
+set.seed(my.seed)
 Fit01 = neuralnet::neuralnet(resp ~.,
                              DataA,
                              hidden=3,
@@ -270,18 +272,29 @@ lines(Test.fitted,  as.matrix(DataB$resp), type="p", xlab="Fitted", ylab="Actual
 abline(0,1)
 
 library(caret)            # install.packages("caret")
-FitDiagnosis <- data.frame(
-  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(DataA$resp)),
-  tr.Rsquare  = caret::R2(Train.fitted,           DataA$resp),
-  val.RMSE  = caret::RMSE(Test.fitted,  as.matrix(DataB$resp)),
-  val.Rsquare = caret::R2(Test.fitted,            DataB$resp)
+FinalFitDiagnosis <- data.frame(
+  tr.RMSE   = caret::RMSE(Train.fitted,  as.matrix(DataA$resp)),
+  tr.Rsquare  = caret::R2(Train.fitted,            DataA$resp),
+  test.RMSE  = caret::RMSE(Test.fitted,  as.matrix(DataB$resp)),
+  test.Rsquare = caret::R2(Test.fitted,            DataB$resp)
 )
-FitDiagnosis
+FinalFitDiagnosis
+
+## Compare to 
+CVFitDiagnosis
+Av.CVFitDiagnosis
+
 
 ##
-##  To compare val.RMSE with other models, you need to UNscale Test.fitted.
-##  Sinc Rsquare is unit-invariant, you can compare val.Rsquare with
-##  other that of other models.
+##  Use test.RMSE or test.Rsquare as summary of the model fit.  These numbers does not have penalty for having more parameters.  
+##
+
+
+##------------------------
+## 3. unscaling the fitted response to compare RMSE
+##
+##  To compare test.RMSE with other models, you need to UNscale Test.fitted.
+##  Sinc Rsquare is unit-invariant, you can compare test.Rsquare with other models directly.
 ##
 
 Train.fitted = predict(Fit01, newdata=DataA, type="vector")
@@ -299,10 +312,15 @@ lines(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled), type="p", xlab="Fitt
 abline(0,1)
 
 library(caret)            # install.packages("caret")
-FitDiagnosis <- data.frame(
+FinalFitDiagnosis.unsc <- data.frame(
   tr.RMSE   = caret::RMSE(Train.fitted.unscaled, as.matrix(Train.resp.unscaled)),
   tr.Rsquare  = caret::R2(Train.fitted.unscaled,           Train.resp.unscaled),
-  val.RMSE  = caret::RMSE(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled)),
-  val.Rsquare = caret::R2(Test.fitted.unscaled,            Test.resp.unscaled)
+  test.RMSE  = caret::RMSE(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled)),
+  test.Rsquare = caret::R2(Test.fitted.unscaled,            Test.resp.unscaled)
 )
-FitDiagnosis
+FinalFitDiagnosis.unsc
+
+
+##
+##  Use test.RMSE or test.Rsquare as summary of the model fit.  These numbers does not have penalty for having more parameters.  
+##
