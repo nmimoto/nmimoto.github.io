@@ -176,6 +176,8 @@ CVFitDiagnosis
   ##  Try Fit01 with Boston3.
   ##  Try Fit01 with hidden=5, c(5,5).
   ##  Try Fit01 with linear output=FALSE
+  ##  Try running above couple of times with same setting. 
+  ##        You get slightly diffrent number due to random starting point for parameters.
   ##
 
 
