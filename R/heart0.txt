@@ -1,0 +1,117 @@
+###
+###
+###  Heart - Prelim  ver 0.0.1
+###
+###
+####################################################
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Heart <- read_csv("https://nmimoto.github.io/datasets/heart.csv")
+Heart
+
+print(Heart, n=100)        # if you want to see more rows
+print(Heart, width=1000)   # if you want to see more cols
+names(Heart)
+
+  # 1  index
+  # 2  Age
+  # 3  Sex
+  # 4  ChestPain   (Qualitative)
+  # 5  RestBP
+  # 6  Chol
+  # 7  Fbs
+  # 8  RestECG
+  # 9  MaxHR
+  # 10 ExAng
+  # 11 Oldpeak
+  # 12 Slope
+  # 13 Ca
+  # 14 Thal     (Thalium stress test)   Qualitative
+  # 15 AHD      Yes/No based on an angiographic test  Qualitative <-- Response
+
+
+#- Histogram of the respoonse variable
+table(Heart$AHD)
+
+
+# Rename medv column as resp.
+Heart2 <- Heart %>%
+              select(-"index")  %>%             # remove col named "index"
+              rename(resp=AHD) %>%             # rename the column
+              relocate(resp) %>%               # move "resp" to 1st column
+              mutate(resp=as.factor(resp)) %>%
+              mutate(ChestPain=as.factor(ChestPain)) %>%
+    mutate(Thal=as.factor(Thal)) %>%
+    mutate(Sex=as.factor(Sex)) %>%
+    mutate(Fbs=as.factor(Fbs)) %>%
+    mutate(RestECG=as.factor(RestECG)) %>%
+    mutate(ExAng=as.factor(ExAng))
+print(Heart2, width=1000)
+
+table(Heart2$resp)    # note that first level is "No"
+
+
+
+
+
+#-------------------------------------------------
+###--- 1. Routine Exploratory Analysis (class of resp should be "dbl")
+Orig <- Heart2
+resp.col.name <- "resp"
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  dim(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
+
+
+  ##----------
+  ##- Correlation Check
+
+  # Pick columns that are numeric
+  library(corrplot)    # install.packages("corrplot")
+    Orig_num <- Orig %>% select_if(is.numeric)
+    cor(Orig_num)
+    corrplot::corrplot(cor(Orig_num))
+    corrplot::corrplot(cor(Orig_num), method="number")
+
+
+  ##----------
+  ##- Visualization
+
+  # pairs(Orig) equivalent
+  library(GGally)      # install.packages("GGally")
+    GGally::ggpairs(Orig[, c(2:7,   1)], aes(color=resp, alpha=1))
+    GGally::ggpairs(Orig[, c(8:14,  1)], aes(color=resp, alpha=1))
+
+
+  ###----------
+  ###- Chi-sq test of association for each column
+
+  # Pick columns that has more than 1 unique value
+  list_cols <- Orig %>% summarise_all(function(x) length(unique(x))) %>%
+        gather() %>% filter(value>1) %>% pull(key)
+
+  # Apply chisq.test to those columns
+  ChiSq.pval <- Orig %>% select(list_cols) %>%
+        summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+
+  ChiSq.pval <- Orig %>% summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+  ChiSq.pval
+  barplot(t(t(as.matrix(ChiSq.pval))), las=2, cex.names=1,
+          main="p-values from Chi-sq test of association")
+  abline(h=.05, col='red')
+
+  which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
+  list_cols[which(ChiSq.pval < .05)]  # Top list of 'important' variables
+
+  which(ChiSq.pval > .6)              # Col num of variables w >.6 p-value
+  list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
+
+### End of Routine Exploratory Analysis.
