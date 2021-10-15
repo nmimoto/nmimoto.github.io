@@ -54,6 +54,7 @@ is.data.frame(Boston)     # it's still data.frame too
 
 Boston                    # only first 10 rows will print
 print(Boston, n=100)      # if you want to see more rows
+print(Boston, width=1000) # if you want to see more cols
 
 # fix(Boston)   # spreadsheet view NOT RECOMMENDED. CLOSE TO MOVE FORWARD.
 
