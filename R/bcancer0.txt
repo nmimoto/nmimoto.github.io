@@ -1,0 +1,129 @@
+###
+###
+###  BCancer - Prelim  ver 0.0.1
+###
+###
+####################################################
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+BCancer <- read_csv("https://nmimoto.github.io/datasets/bcancer.csv")
+BCancer
+
+print(BCancer, n=100)  # if you want to see more rows
+
+  #  569 × 32
+  #  1  id
+  #  2  diagnosis     <--- Response Variable. M=malignant, B=benign
+  #  3  mean_radius (mean of distances from center to points on the perimeter)
+  #  4  mean_texture
+  #  5  mean_perimeter
+  #  6  mean_area
+  #  7  mean_smoothness
+  #  8  mean_compactness
+  #  9  mean_concavity
+  #  10 mean_concave_points
+  #  11 mean_symmetry
+  #  12 mean_fractal dimension
+  #  13 radius_error
+  #  14 texture_error          (standard deviation of gray-scale values)
+  #  15 perimeter_error
+  #  16 area_error
+  #  17 smoothness_error  (local variation in radius lengths)
+  #  18 compactness_error      (perimeter^2 / area - 1.0)
+  #  19 concavity_error  (severity of concave portions of the contour)
+  #  20 concave_points_error   (number of concave portions of the contour)
+  #  21 symmetry_error
+  #  22 fractal_dimension_error   ("coastline approximation" - 1)
+  #  23 worst_radius
+  #  24 worst_texture
+  #  25 worst_perimeter
+  #  26 worst_area
+  #  27 worst_smoothness
+  #  28 worst_compactness
+  #  29 worst_concavity
+  #  30 worst_concave_points
+  #  31 worst_symmetry
+  #  32 worst_fractal_dimension
+
+
+#- Histogram of the respoonse variable
+table(BCancer$diagnosis)
+
+
+# Rename medv column as resp.
+BCancer2 <- BCancer %>%
+              rename(resp=diagnosis) %>%             # rename the column
+              relocate(resp) %>%                       # move "resp" to 1st column
+              mutate(resp=ifelse(resp=="M", "Yes", "No")) %>%    # change M/B to Yes/No
+              mutate(resp=as.factor(resp))
+BCancer2
+
+table(BCancer2$resp)    # note that first level is "No"
+
+
+
+
+
+#-------------------------------------------------
+###--- 1. Routine Exploratory Analysis (class of resp should be "dbl")
+Orig <- BCancer2
+resp.col.name <- "resp"
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  # Orig <- Orig %>% na.omit()
+  # dim(Orig)
+
+
+  ##----------
+  ##- Correlation Check
+
+  # Pick columns that are numeric
+  library(corrplot)    # install.packages("corrplot")
+    Orig_num <- Orig %>% select_if(is.numeric)
+    cor(Orig_num)
+    corrplot::corrplot(cor(Orig_num))
+    corrplot::corrplot(cor(Orig_num), method="number")
+
+
+  ##----------
+  ##- Visualization
+
+  # pairs(Orig) equivalent
+  library(GGally)      # install.packages("GGally")
+    GGally::ggpairs(Orig[, c(2:7,   1)], aes(color=resp, alpha=1))
+    GGally::ggpairs(Orig[, c(8:13,  1)], aes(color=resp, alpha=1))
+    GGally::ggpairs(Orig[, c(14:19, 1)], aes(color=resp, alpha=1))
+    GGally::ggpairs(Orig[, c(20:25, 1)], aes(color=resp, alpha=1))
+    GGally::ggpairs(Orig[, c(26:32, 1)], aes(color=resp, alpha=1))
+
+  ###----------
+  ###- Chi-sq test of association for each column
+
+  # Pick columns that has more than 1 unique value
+  list_cols <- Orig %>% summarise_all(function(x) length(unique(x))) %>%
+        gather() %>% filter(value>1) %>% pull(key)
+
+  # Apply chisq.test to those columns
+  ChiSq.pval <- Orig %>% select(list_cols) %>%
+        summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+
+
+  ChiSq.pval <- Orig %>% summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+  ChiSq.pval
+  barplot(t(t(as.matrix(ChiSq.pval))), las=2, cex.names=1,
+          main="p-values from Chi-sq test of association")
+  abline(h=.05, col='red')
+
+  which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
+  list_cols[which(ChiSq.pval < .05)]  # Top list of 'important' variables
+
+  which(ChiSq.pval > .6)              # Col num of variables w >.6 p-value
+  list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
+
+### End of Routine Exploratory Analysis.
