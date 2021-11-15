@@ -1,6 +1,6 @@
 ###
 ###
-###  Heart - Prelim  ver 0.0.1
+###  Heart - Prelim  ver 0.0.2
 ###
 ###
 ####################################################
@@ -32,33 +32,34 @@ names(Heart)
   # 14 Thal     (Thalium stress test)   Qualitative
   # 15 AHD      Yes/No based on an angiographic test  Qualitative <-- Response
 
-
-#- Histogram of the respoonse variable
+#- table of the respoonse variable
 table(Heart$AHD)
 
+###
+### column "AHD" is the respoinse variable.
+###
 
 # Rename medv column as resp.
 Heart2 <- Heart %>%
-              select(-"index")  %>%             # remove col named "index"
-              rename(resp=AHD) %>%             # rename the column
-              relocate(resp) %>%               # move "resp" to 1st column
-              mutate(resp=as.factor(resp)) %>%
-              mutate(ChestPain=as.factor(ChestPain)) %>%
-    mutate(Thal=as.factor(Thal)) %>%
-    mutate(Sex=as.factor(Sex)) %>%
-    mutate(Fbs=as.factor(Fbs)) %>%
-    mutate(RestECG=as.factor(RestECG)) %>%
-    mutate(ExAng=as.factor(ExAng))
+    select(-"index")  %>%            # remove col named "index"
+    rename(resp=AHD) %>%             # rename the column
+    relocate(resp) %>%               # move "resp" to 1st column
+    mutate(resp=as.factor(resp),     # Turn these columns to <factor> instead of <double>
+           ChestPain=as.factor(ChestPain),
+           Thal=as.factor(Thal),
+           Sex=as.factor(Sex),
+           Fbs=as.factor(Fbs),
+           RestECG=as.factor(RestECG),
+           ExAng=as.factor(ExAng))
+
 print(Heart2, width=1000)
 
 table(Heart2$resp)    # note that first level is "No"
 
 
 
-
-
 #-------------------------------------------------
-###--- 1. Routine Exploratory Analysis (class of resp should be "dbl")
+###--- 1. Routine Exploratory Analysis (class of resp should be <fct>)
 Orig <- Heart2
 resp.col.name <- "resp"
 
