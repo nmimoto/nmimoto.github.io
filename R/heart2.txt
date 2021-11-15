@@ -3,43 +3,75 @@
 ###  Heart Data - Decision Tree (Classification)
 ###               with Bagging, Random Forest, and Boosting
 ###
+###  ver 0.0.2
 ####################################################
 
 
+###-------------------------------------------------------
+###--- 0. Preliminary
 
-###--- 1. Preliminary
+# Using Heart2 from https://nmimoto.github.io/R/heart0.txt
 library(tidyverse)
-Heart <- read_csv(file="http://faculty.marshall.usc.edu/gareth-james/ISL/Heart.csv")
-                # read_csv(file="https://nmimoto.github.io/datasets/Heart.csv")
-Heart
+Heart <- read_csv(file="https://nmimoto.github.io/datasets/heart.csv")
 
-#- Change class of ChestPain and Thal to factor. 
-#- Rename AHD as resp. 
-Heart2 <- Heart %>% select(-"X1")
-Heart2 <- Heart2 %>% mutate( ChestPain=as.factor(ChestPain),
-                             Thal=as.factor(Thal),
-                             resp=as.factor(AHD))
-#- Remove N/A in data 
-sum(is.na(Heart2))    # check for NA in data
-Heart2 <- Heart2 %>% na.omit()
-Heart2
-  # 297 x 15
+# Rename medv column as resp.
+Heart2 <- Heart %>%
+    select(-"index")  %>%            # remove col named "index"
+    rename(resp=AHD) %>%             # rename the column
+    relocate(resp) %>%               # move "resp" to 1st column
+    mutate(resp=as.factor(resp),     # Turn these columns to <factor> instead of <double>
+           ChestPain=as.factor(ChestPain),
+           Thal=as.factor(Thal),
+           Sex=as.factor(Sex),
+           Fbs=as.factor(Fbs),
+           RestECG=as.factor(RestECG),
+           ExAng=as.factor(ExAng))
 
-## Response column should have name "resp", and be a factor of 
-## "No" and "Yes", in that order. Don't confuse with ("no" and "yes").
-## Check with:  
-## levels(Heart2$resp)
-## [1] "No"  "Yes"
+print(Heart2, width=1000)
+table(Heart2$resp)    # note that first level is "No"
+
+#1  resp        <fct> Used to be "AHD".  Yes/No based on an angiographic test  Qualitative <-- Response
+#2  Age         <dbl>
+#3  Sex         <fct>
+#4  ChestPain   <fct>
+#5  RestBP      <dbl>
+#6  Chol        <dbl>
+#7  Fbs         <fct>
+#8  RestECG     <fct>
+#9  MaxHR       <dbl>
+#10 ExAng       <fct>
+#11 Oldpeak     <dbl>
+#12 Slope       <dbl>
+#13 Ca          <dbl>
+#14 Thal        <fct> (Thalium stress test)   Qualitative
+
+# Low p-value from Chi-sq test of association
+#  3 4 8 10 11 12 13 14
+#  "Sex" "ChestPain" "RestECG" "ExAng" "Oldpeak" "Slope" "Ca" "Thal"
+# High p-value from Chi-sq test of association
+#  7
+#  "Fbs"
+
+# need to remove rows with NA.
+Orig <- Heart2
+
+#- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  dim(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
-###-----------------------------------
-###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Heart2               # Entire Data set (have to be tibble)
+###--------------------------------------------------------------------
+###--- 2. Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Orig                 # Entire Data set (have to be data.frame)
 train.size <- 250            # num of rows for training set
-test.size <- 47              # num of rows for testing set
+test.size <-  47             # num of rows for testing set
 resp.col.name <- "resp"      # name of response column
 num.folds <- 5               # k for k-fold CV
-my.seed <- 7211              # give a seed
+my.seed <- 7211             # give a seed
 
     #---
     set.seed(my.seed)
@@ -74,12 +106,12 @@ my.seed <- 7211              # give a seed
 
 
 
-    
+
 
 ###-------------------------------------------------
-###--- 1. Decision Tree (Grow and Prune using tree())
+###--- 3. Decision Tree (Grow and Prune using tree())
 
-#--- Growing the tree
+#--- Growing the tree with Train.set
 library(tree)
 tree1 = tree(resp~., Train.set)
 summary(tree1)
@@ -103,7 +135,7 @@ plot(cv.for.pruning$k, cv.for.pruning$dev, type="b")
 
 cv.for.pruning
 
-#- We conclude that it's better to purne at 7 nodes. 
+#- We conclude that it's better to purne at 7 nodes.
 prune1 = prune.tree(tree1, best=7)  # specify 7-node tree
 plot(prune1)
 text(prune1, pretty=0, cex=1)
@@ -115,14 +147,14 @@ threshold <- .5
 
     #------------------
     #- Training Confusion Matrix
-    Train.prob0 = predict(Chosen.model, type="vector") 
+    Train.prob0 = predict(Chosen.model, type="vector")
     Train.prob  = Train.prob0[,"Yes"]
     Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
     CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
     CM.train
 
     #- Testing Confusion Matrix
-    Test.prob0 = predict(Chosen.model, Test.set, type="vector") 
+    Test.prob0 = predict(Chosen.model, Test.set, type="vector")
     Test.prob = Test.prob0[,"Yes"]
     Test.pred = ifelse(Test.prob > threshold, "Yes", "No")
     CM.test <- caret::confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
@@ -150,14 +182,14 @@ threshold <- .5
 
 
 
-    
-    
-    
-    
-    
+
+
+
+
+
 (Under Construction Below)
-    
-    
+
+
 
 ###-------------------------------------------------
 ###--- 3. Bagging
@@ -178,14 +210,14 @@ threshold <- .5
 
     #------------------
     #- Training Confusion Matrix
-    Train.prob0 = predict(Chosen.model, type="vector") 
+    Train.prob0 = predict(Chosen.model, type="vector")
     Train.prob  = Train.prob0[,"Yes"]
     Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
     CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
     CM.train
 
     #- Testing Confusion Matrix
-    Test.prob0 = predict(Chosen.model, Test.set, type="vector") 
+    Test.prob0 = predict(Chosen.model, Test.set, type="vector")
     Test.prob = Test.prob0[,"Yes"]
     Test.pred = ifelse(Test.prob > threshold, "Yes", "No")
     CM.test <- caret::confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
@@ -211,7 +243,7 @@ threshold <- .5
 
     c(auc.train, auc.test)
 
-    
+
 
 
 
@@ -261,9 +293,9 @@ Test.pred=predict(treeBT01, newdata=Test.set, n.trees=5000)
 
 
 
-    
-    
-    
+
+
+
 
 
 
@@ -285,9 +317,9 @@ threshold.list = seq(0.01,.99,.01)    # grid for threshold
 cost=0
 library(caret)      # for confusionMatrix
 for (i in 1:length(threshold.list)){
-  
+
   threshold = threshold.list[i]
-  
+
   #- Check the training set accuracy
   Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
   CM.test  <- confusionMatrix(factor(Test.pred),
@@ -297,7 +329,7 @@ for (i in 1:length(threshold.list)){
   TN = CM.test$table[1,1]   # True  Neg
   FP = CM.test$table[2,1]   # False Pos
   FN = CM.test$table[1,2]   # False Neg
-  
+
   cost[i] = sum(c(TP, TN, FP, FN) * cost.list)
 }
 plot(threshold.list, cost, xlab="threshold")
@@ -306,8 +338,3 @@ cost.list
 which.min(cost)
 min(cost)
 threshold.list[which.min(cost)]
-
-
-
-
-
