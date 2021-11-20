@@ -79,3 +79,8 @@ All feature values are recoded with four significant digits.
 8. Missing attribute values: none
 
 9. Class distribution: 357 benign, 212 malignant
+
+----------
+library(tidyverse)
+DF <- read_csv("https://nmimoto.github.io/datasets/bcancer.csv")
+DF
