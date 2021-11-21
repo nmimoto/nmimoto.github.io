@@ -35,3 +35,10 @@ Harrison, D. and Rubinfeld, D.L. (1978) Hedonic prices and the demand for clean 
 Belsley D.A., Kuh, E. and Welsch, R.E. (1980) Regression Diagnostics. Identifying Influential Data and Sources of Collinearity. New York: Wiley.
 
 [Package MASS version 7.3-54 Index]
+
+
+
+----------
+library(MASS)   # install.packages("MASS") if not installed yet.
+Boston          
+?Boston         
