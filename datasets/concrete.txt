@@ -41,3 +41,9 @@ Fine             (component 7) Fine Aggregate     -- quantitative -- kg in a m3 
 Age                                               -- quantitative -- Day (1~365)
 CCS              Concrete compressive strength    -- quantitative -- MPa -- response variable
 
+
+
+----------
+library(tidyverse)
+DF <- read.csv("https://nmimoto.github.io/datasets/concrete.csv")
+DF
