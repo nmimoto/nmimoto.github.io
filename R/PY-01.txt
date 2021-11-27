@@ -5,16 +5,13 @@
 ###
 ##################################################
 
+
+conda create --prefix /opt/anaconda3/envs/EmacsEnv python=3.8
+
 (go to dir that has requirements.txt in it)
-
-conda create --name EmacsEnv python=3.6
-
 conda activate EmacsEnv
-
 pip  install -r requirements.txt
-
 conda deactivate
-
 
 
 conda list
