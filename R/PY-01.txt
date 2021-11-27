@@ -16,6 +16,9 @@ conda deactivate
 
 conda list
 
+#-- Create requirements.txt from conda using pip
+https://stackoverflow.com/questions/50777849/from-conda-create-requirements-txt-for-pip3
+
 
 
 Emacs
