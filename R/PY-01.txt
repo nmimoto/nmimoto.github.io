@@ -31,7 +31,7 @@ print(os.getcwd())   # get wd
 os.listdir("materials")
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-
+os.chdir("C:/Users/nmimoto/Desktop/Foler1")
 
 
 
