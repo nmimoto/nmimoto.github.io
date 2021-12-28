@@ -54,6 +54,11 @@ Boston3
   #14 lstat   (dbl)
 
 
+###
+###  For Regularlization Method, Data should be standardized. 
+###
+
+
 
 
 ###-------------------------------------------------
