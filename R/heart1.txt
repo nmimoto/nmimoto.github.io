@@ -99,20 +99,43 @@ lines(Train.set$RestBP[ix_yes], Train.set$Chol[ix_yes], col="red", type="p")
 
 
 ###-------------------------------------------------
-###--- 3. Logistic Regression
+###--- 3. Decision Tree (Grow and Prune using tree())
 
-###--------------------
-###--- 3.a Logistic Regression for 1 fold
-k=1
-Fit01 <- glm(resp ~. , family=binomial, data=CV.train[[k]] )
+#--- Growing the tree with Train.set
+library(tree)
+tree1 = tree(resp~., Train.set)
+summary(tree1)
+tree1
 
-#- Extract fitted response (training)
-Train.prob =predict(Fit01, type ="response")  # fitted responses
-#- Predict in Validation Set
-Valid.prob = predict(Fit01, newdata=CV.valid[[k]], type="response")
+plot(tree1)
+text(tree1, pretty=0, cex=1)
 
-#- Pick a threshold
-threshold = .5
+
+#--- Pruning the tree
+set.seed(my.seed)
+cv.for.pruning = cv.tree(tree1, FUN=prune.misclass, K=5)   #5-fold CV
+     #use FUN= prune.tree if you are doing regression tree
+cv.for.pruning
+
+names(cv.for.pruning)   
+# size, dev, k, method
+
+plot(cv.for.pruning$size, cv.for.pruning$dev, type="b")
+plot(cv.for.pruning$k, cv.for.pruning$dev, type="b")
+# size is the number of terminal nodes
+# dev is the Av. CV error rate
+# k is the pruning parameter (alpha)
+
+
+# We conclude that it's better to purne at 7 nodes.
+prune1 = prune.tree(tree1, best=7)  # specify 7-node tree
+plot(prune1)
+text(prune1, pretty=0, cex=1)
+
+
+#- Pick a threshold and visualize fit
+Chosen.model <- prune1   # results from CV tuning
+threshold <- .5
 
     #- Check the training set accuracy
     library(caret)
