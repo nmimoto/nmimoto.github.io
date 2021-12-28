@@ -1,8 +1,8 @@
 ###
 ###
-###  Heart - Prelim  ver 0.0.2
+###  Heart - Preliminary Analysis
 ###
-###
+###  ver 0.0.3
 ####################################################
 
 
@@ -116,3 +116,15 @@ resp.col.name <- "resp"
   list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
 
 ### End of Routine Exploratory Analysis.
+
+
+# which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
+# [1]  1  3  4  8 10 11 12 13 14
+# Top list of 'important' variables
+# [1] "resp"      "Sex"       "ChestPain" "RestECG"   "ExAng"     "Oldpeak"
+# [7] "Slope"     "Ca"        "Thal"
+
+# which(ChiSq.pval > .6)              # Col num of variables w >.6 p-value
+# [1] 7
+# list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
+# [1] "Fbs"
