@@ -1,10 +1,8 @@
-####
 ###
 ###  Heart Data - Logistic Regression
 ###
-###    ver 0.0.2
+###    ver 0.0.3
 ####################################################
-
 
 ###-------------------------------------------------------
 ###--- 0. Preliminary
@@ -29,20 +27,6 @@ Heart2 <- Heart %>%
 print(Heart2, width=1000)
 table(Heart2$resp)    # note that first level is "No"
 
-#1  resp        <fct> Used to be "AHD".  Yes/No based on an angiographic test  Qualitative <-- Response
-#2  Age         <dbl>
-#3  Sex         <fct>
-#4  ChestPain   <fct>
-#5  RestBP      <dbl>
-#6  Chol        <dbl>
-#7  Fbs         <fct>
-#8  RestECG     <fct>
-#9  MaxHR       <dbl>
-#10 ExAng       <fct>
-#11 Oldpeak     <dbl>
-#12 Slope       <dbl>
-#13 Ca          <dbl>
-#14 Thal        <fct> (Thalium stress test)   Qualitative
 
 # Low p-value from Chi-sq test of association
 #  3 4 8 10 11 12 13 14
@@ -107,7 +91,7 @@ my.seed <- 7211             # give a seed
 # Visualization doesn't help much here
 ix_no = (Train.set$resp=="No")
 ix_yes = (Train.set$resp=="Yes")
-plot(Train.set$RestBP[ix_no], Train.set$Chol[ix_no])
+plot(Train.set$RestBP[ix_no], Train.set$Chol[ix_no], xlab="RestBp", ylab="Chol")
 lines(Train.set$RestBP[ix_yes], Train.set$Chol[ix_yes], col="red", type="p")
 
 
@@ -115,21 +99,7 @@ lines(Train.set$RestBP[ix_yes], Train.set$Chol[ix_yes], col="red", type="p")
 
 
 ###-------------------------------------------------
-###--- 3. Polynomial Regression using 5-fold CV (X=lstat only)
-# deg.poly   1 to 10
-# CV fold k  1 to 5
-
-
-#--- plot Training and Test for visualization
-fold = 2
-plot(CV.train[[fold]]$Chol,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response")
-lines(CV.valid[[fold]]$Chol, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
-
-#--- Logistic regression if all Train.set is used
-Fit00 <- glm(resp ~. , family=binomial, data=Train.set )
-summary(Fit00)
-
-
+###--- 3. Logistic Regression
 
 ###--------------------
 ###--- 3.a Logistic Regression for 1 fold
@@ -138,8 +108,6 @@ Fit01 <- glm(resp ~. , family=binomial, data=CV.train[[k]] )
 
 #- Extract fitted response (training)
 Train.prob =predict(Fit01, type ="response")  # fitted responses
-head(Train.prob)                             # see first few
-                                             # Fit01$fitted  will do the same
 #- Predict in Validation Set
 Valid.prob = predict(Fit01, newdata=CV.valid[[k]], type="response")
 
@@ -183,20 +151,15 @@ threshold = .5
         text(.2, .2, paste("AUC=",round(auc.valid, 3)))
     layout(1)
 
-###--- Plot the fitted curve for visualization
-plot(CV.train[[k]]$RestBP,  (CV.train[[k]]$resp=="Yes"), xlab="RestBP", ylab="AHD")
-lines(CV.train[[k]]$RestBP, Fit01$fitted, lwd=2, col="red", type="p")
 
 ###
-### Now change k , (resp ~.) model and run again
+### Now we need to change k from 1-5and run again.
 ###
-### Fit01 <- glm(resp ~ . ,                                family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol ,                          family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol -Age,                      family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol -Age,                      family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol -Age -Fbs,                 family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol -Age -Fbs -ExAng,          family=binomial, CV.train[[k]])
-### Fit01 <- glm(resp ~ . -Chol -Age -Fbs -ExAng -RestECG, family=binomial, CV.train[[k]])
+
+
+###--- Plot the fitted curve for visualization (not useful)
+plot(CV.train[[k]]$RestBP,  (CV.train[[k]]$resp=="Yes"), xlab="RestBP", ylab="AHD")
+lines(CV.train[[k]]$RestBP, Fit01$fitted, lwd=2, col="red", type="p")
 
 
 
@@ -204,33 +167,27 @@ lines(CV.train[[k]]$RestBP, Fit01$fitted, lwd=2, col="red", type="p")
 
 ###--------------------
 ###--- 3.b Logistic Regression for all folds k=1:5
-AUCs <- MSE.valid <- matrix(0, 5, 6)
-colnames(AUCs) = c("Train Senstvy", "Train Spcfcty", "Train AUC", "Valid Senstvy", "Valid Spcfcty", "Valid AUC")
+AUCs <- MSE.valid <- matrix(0, 5, 2)
+colnames(AUCs) = c("Train AUC", "Valid AUC")
 for (k in 1:5) {
 
-    Fit01 <- glm(resp ~. , family=binomial, data=CV.train[[k]])
+    Fit01 <- glm(resp ~. , family=binomial, data=CV.train[[k]])     # <----- Change model here
 
     #- Extract fitted response (training)
     Train.prob =predict(Fit01, type ="response")  # fitted responses
     #- Predict in Validation Set
     Valid.prob = predict(Fit01, newdata=CV.valid[[k]], type="response")
 
-    #- Pick a threshold
-    threshold = .5
 
     #- Check the training set accuracy
     library(caret)
     Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
     Valid.pred = ifelse(Valid.prob > threshold, "Yes", "No")
-    CM.train <- confusionMatrix(factor(Train.pred),  factor(as.matrix(CV.train.resp[[k]])), positive="Yes")
-    CM.valid  <- confusionMatrix(factor(Valid.pred), factor(as.matrix(CV.valid.resp[[k]])), positive="Yes")
+    #CM.train <- confusionMatrix(factor(Train.pred),  factor(as.matrix(CV.train.resp[[k]])), positive="Yes")
+    #CM.valid  <- confusionMatrix(factor(Valid.pred), factor(as.matrix(CV.valid.resp[[k]])), positive="Yes")
 
-    AUCs[k,] <- round(c(CM.train[["byClass"]][["Sensitivity"]],
-                  CM.train[["byClass"]][["Specificity"]],
-                  auc(factor(as.matrix(CV.train.resp[[k]])), Train.prob, levels=c("No", "Yes")),
-                  CM.valid[["byClass"]][["Sensitivity"]],
-                  CM.valid[["byClass"]][["Specificity"]],
-                  auc.valid = auc(factor(as.matrix(CV.valid.resp[[k]])), Valid.prob, levels=c("No", "Yes"))), 4)
+    AUCs[k,] <- round(c(auc(factor(as.matrix(CV.train.resp[[k]])), Train.prob, levels=c("No", "Yes")),
+                        auc(factor(as.matrix(CV.valid.resp[[k]])), Valid.prob, levels=c("No", "Yes"))), 4)
 
 }
 AUCs
@@ -238,11 +195,10 @@ AUCs
 Av.AUCs = apply(AUCs, 2, mean)
 Av.AUCs
 
-###
-###   Make decision about best model to use from the Av Valid AUC
-###
 
-
+###
+###   Make decision about best model based on Av Valid AUC
+###
 
 
 
@@ -250,19 +206,16 @@ Av.AUCs
 ###-----------------------------------------------------------
 ###--- 4. Final Fit with Logistic Regression for Training Set (No CV. Just Training vs Test)
 
-## [ Train.set 400     ]     [Test.set 106]
-## [80][80][80][80][80]
-
-## Suppose (resp ~ . -Chol -Age -Fbs -ExAng -RestECG) model was best from (3)
+## [ Train.set 250     ]     [Test.set 47]
+## [50][50][50][50][50]
 
 Fit01 <- glm(resp ~ . -Chol -Age -Fbs -ExAng -RestECG, family=binomial, data=Train.set)
 
 #- Extract fitted response (training)
 Train.prob =predict(Fit01, type ="response")  # fitted responses
-head(Train.prob)                             # see first few
-                                             # Fit01$fitted  will do the same
 #- Predict in Validation Set
 Test.prob = predict(Fit01, newdata=Test.set, type="response")
+
 
 #- Pick a threshold
 threshold = .5
@@ -272,7 +225,7 @@ threshold = .5
     Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
     Test.pred  = ifelse(Test.prob > threshold, "Yes", "No")
     CM.train <- confusionMatrix(factor(Train.pred),  factor(as.matrix(Train.resp)), positive="Yes")
-    CM.valid  <- confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
+    CM.test  <- confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
 
     CM.train[["byClass"]][["Sensitivity"]] # Pick out sensitivity
     CM.train[["byClass"]][["Specificity"]] # Pick out specificity
