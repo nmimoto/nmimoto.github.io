@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <link rel="icon"
+          type="image/png"
+          href="favicon.png">
+
+    <head>  <!--html/head/ ----------------------------------------------->
+        <title>477/577 TimeSrs</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" type="text/css" href="style-title.css">
+        <link rel="stylesheet" type="text/css" href="style-boxes.css">
+        <link rel="stylesheet" type="text/css" href="style-tree.css">
+        <link rel="stylesheet" type="text/css" href="style-footnote.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- MathJax -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script type="text/javascript" id="MathJax-script" async
+                src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+        <style>
+         :root{
+             --fontBody: Arial Black;
+             --fontBoxH: Sans-Serif;
+             --fontBox:  Sans-Serif;
+
+             --BGoutside:          #f0f7ec; /* Gainsboro; */
+             --BGbox1:             #003554; /* Prussian Blue */
+             --BGfootnoteR:        #333333;
+             --fontcolTitle:       Black;
+             --fontcolBody:        White;      /*   when not defined */
+             --fontcolBox:         #EEF8FF; /* Alice Blue */
+             --fontcolLink:        Gray;
+             --fontcolLinkHover:   White;
+             --fontcolLinkActive:  White;
+             --fontcolLinkVisited: #D35400;
+
+             --fsizeTitleH1: 40px;
+             --fsizeTitleH2: 35px;
+             --fsizeTitle:   18px;
+             --fsizeBoxH1:   20px;
+             --fsizeBox:     16px;
+             --opac:         .97;
+
+             /* used in style-tree */
+             --fontTriangle: Black;
+             --BGopentree: SeaGreen;
+         }
+         .bigcontainer {
+             background-image: url("bg-.jpg");
+         }
+        </style>
+    </head>
+    <!-- TWO COLUMN TEMPLATE
+         /* bigcontainer           */
+         /*     container          */
+         /*         /titleR/       */
+         /*         /row/boxLEFT/  */
+         /*             /boxRIGHT/ */
+         /*         /row/boxLEFT/  */
+         /*             /boxRIGHT/ */
+         /*         /footnoteL/    */
+         /*         /footnoteR/    */
+    -->
+
+    <body>
+        <!-- /body/container/ --------------------------------------------------------->
+        <div class="bigcontainer">
+            <div class="container">
+
+                <!------------------------------->
+                <div class="titleRone">
+                    <h1>Fall 2022</h1>
+                    <h2>STAT 477/577</h2>
+                    <h2>Time Series Analysis</h2>
+                    Department of Statistics<br>
+                    University of Akron
+                </div>
+
+                <!------------------------------->
+                <div class="row">
+                    <!------------------>
+                    <div class="boxLEFT">
+                        <h1>0. Intro</h1>
+                        <ul>
+                            <li><a href="https://nmimoto.github.io/IntroR/">w1. Intro to R Webpage</a></li>
+                        </ul>
+
+                        <h1>1. Autocorrelation </h1>
+                        <ul>
+                            <li><a href="W2A.html">w2a. Random Sample vs TS</a></li>
+                            <li><a href="W2B.html">w2b. ACVF and ACF</a></li>
+                            <li><a href="W3A.html">w3a. Cov and Cor Review</a></li>
+                            <li><a href="W3B.html">w3b. Stationarity</a></li>
+                            <li><a href="W3C.html">w3c. Testing Mean</a></li>
+                            <li><a href="W4A.html">w4a. Deterministic and Random Trend</a></li>
+                            <li><a href="W4B.html">w4b. Filters to Reveal Trend</a></li>
+                        </ul>
+
+                        <h1>2. Autoregressive Model </h1>
+                        <ul>
+                            <li><a href="W4C.html">w4c. AR(1)</a></li>
+                            <li><a href="TS-Lec22.html">w5. AR(p)</a></li>
+                            <li><a href="TS-Lec23.html">w5. Fitting AR(p)</a></li>
+                            <li><a href="TS-Lec24.html">w5. Fitting AR(p) 2</a></li>
+                            <li><a href="TS-Lec25.html">w6. Forecasting AR(p)</a></li>
+                        </ul>
+
+                        <h1>3. Residual Analysis </h1>
+                        <ul>
+                            <li><a href="TS-Lec31.html">w6. Randomness.tests</a></li>
+                            <li><a href="TS-Lec32.html">w6. Fitting AR(p) Recap</a></li>
+                            <li><a href="InClass-A2.pdf">w7. Assignment 2</a></li>
+                            <li><a href="InClass-A2-Sol.nb.html"> &nbsp;&nbsp;&nbsp;&nbsp;  --- Sample Sol  </a></li>
+                        </ul>
+
+                        <a href="ModelingSummary.pdf"><h1>Modeling Guideline</h1></a><br>
+
+                        <h1>4. Moving Average Model </h1>
+                        <ul>
+                            <li><a href="TS-Lec41.html">w8. MA(q) model</a></li>
+                        </ul>
+
+                        <h1>5. ARMA Model</h1>
+                        <ul>
+                            <li><a href="TS-Lec51.html">w8. (5-1) ARMA(p,q)</a></li>
+                            <li><a href="TS-Lec52.html">w8. (5-2) Parameter Estimation of ARMA</a></li>
+                            <li><a href="TS-Lec53.html">w8. (5-3) Finite Sample Property of MLE</a></li>
+                            <li><a href="TS-Lec54.html">w9. (5-4) Forecasting ARMA</a></li>
+                            <li><a href="TS-Lec55.html">w9. (5-5) Power Transformation</a></li>
+                        </ul>
+
+                        <h1>6. ARIMA Model</h1>
+                        <ul>
+                            <li><a href="TS-Lec61.html">w9. &nbsp; (6-1) Modeling Non-stationary TS</a></li>
+                            <li><a href="TS-Lec62.html">w9. &nbsp; (6-2) Box-Jenkins Differencing</a></li>
+                            <li><a href="TS-Lec63.html">w10. &nbsp; (6-3) ARIMA Model Selection</a></li>
+                            <li><a href="TS-Lec64.html">w10 &nbsp; (6-4) ARIMA Forecasting</a></li>
+                            <li><a href="TS-Lec65.html">w11. (6-5) Forecasting with Linear Trend</a></li>
+                            <li><a href="InClass-A3.pdf">w11. Assignment 3</a></li>
+                            <li><a href="InClass-A3-Sol.pdf">--- A3 Sam Solution</a></li>
+                            <li><a href="InClass-A3-Sol.pdf">--- A3 Sam Solution B (SARIMA)</a></li>
+                        </ul>
+
+                        <h1>7. Seasonal ARIMA </h1>
+                        <ul>
+                            <li><a href="TS-Lec71.html">w12. (7-1) Seasonality</a></li>
+                            <li><a href="TS-Lec72.html">w12. (7-2) Seasona ARIMA</a></li>
+                            <li><a href="TS-Lec73.html">w12. (7-3) Checks for SARIMA</a></li>
+                            <li><a href="TS-Lec74.html">w12. (7-4) Forecasting sARIMA</a></li>
+                            <li><a href="InClass-A4.pdf">Assignment 4</a></li>
+                            <li><a href="InClass-0-Sol.pdf"> Sample Solution to In-Class Assignment 4</a></li>
+                        </ul>
+
+                        <h1>8. Cointegration </h1>
+                        <ul>
+                            <li><a href="TS-Lec81.html">w13. (8-1) Cointegraton</a></li>
+                        </ul>
+
+                        <h1>9. GARCH Model </h1>
+                        <ul>
+                            <li><a href="TS-Lec91.html">w13. (9-1) GARCH model</a></li>
+                            <li><a href="TS-Lec92.html">w13. (9-2) Forecasting Sigma</a></li>
+                            <li><a href="TS-Lec93.html">w14. (9-3) ARMA-GARCH</a></li>
+                        </ul>
+                    </div>
+
+                    <!------------------>
+                    <div class="boxRIGHT">
+                        <h1>Textbooks</h1>
+                        <ul>
+                            <li><a href="http://www.amazon.com/Time-Analysis-Applications-Springer-Statistics/dp/B00DS96KPO/ref=sr_1_9?ie=UTF8&qid=1421070565&sr=8-9&keywords=cryer+time+series">Cryer 2ed. (Main Textbook)</a></li>
+                            <li><a href="http://ebooks.ohiolink.edu/xtf-ebc/view?docId=tei/sv/9780387759593/9780387759593.xml;query=Cryer;brand=default">&nbsp;-- Library Copy</a></li>
+                            <li><a href="http://library.uakron.edu/record=b3987335~S24">Shumway 3ed.</a></li>
+                            <li><a href="http://library.uakron.edu/record=b3987335~S24">&nbsp;-- Library Copy</a></li>
+                            <li><a href="https://www.stat.pitt.edu/stoffer/tsa4/">&nbsp;-- Book webpage</a></li>
+                            <li><a href="http://library.uakron.edu/record=b3396003~S24">Cowpertwait</a></li>
+                            <li><a href="http://library.uakron.edu/record=b3396003~S24">&nbsp;-- Library Copy</a></li>
+                            <li><a href="https://otexts.org/fpp2/">Hyndman 2ed. (2018)</a></li>
+                            <li><a href="https://nwfsc-timeseries.github.io/atsa-labs/">Holmes (2020)</a></li>
+                            <li><a href="https://www.amazon.com/Forecasting-Time-Regression-CD-ROM/dp/0534409776">Bowerman</a></li>
+                            <li><a href="http://www.amazon.com/Introduction-Series-Forecasting-Springer-Statistics/dp/0387953515">Brockwell and Davis (2002)</a></li>
+                            <li><a href="https://www.amazon.com/Time-Theory-Methods-Springer-Statistics/dp/1441903194/ref=pd_sbs_14_4/132-8111621-1420511?_encoding=UTF8&pd_rd_i=1441903194&pd_rd_r=3a077fd4-f14e-4964-8e84-db238b8268ce&pd_rd_w=oHR4w&pd_rd_wg=m76cy&pf_rd_p=c565d2a4-ebf7-4125-8048-300a86735fd9&pf_rd_r=MV2WGC8MR1C9ZBPHN01N&psc=1&refRID=MV2WGC8MR1C9ZBPHN01N">Brockwell and Davis (1991)</a></li>
+                        </ul>
+
+                        <h1>R resources</h1>
+                        <ul>
+                            <li><a href="https://nmimoto.github.io/R/TS-00.txt">Basic functions</a></li>
+                            <li><a href="https://nmimoto.github.io/R/TS-02.txt">ARIMA functions</a></li>
+
+                            <li><a href="https://nmimoto.github.io/R/index.html">R resource page</a></li>
+
+                            <li><a href="https://www.rdocumentation.org">R documentation</a></li>
+                            <li><a href="http://cran.case.edu/web/views/">R task views</a></li>
+                            <li><a href="https://nmimoto.github.io/datasets/index.html">Dataset page</a></li>
+                        </ul>
+
+                        <h1>Final Project</h1>
+                        <ul>
+                            <li><a href="TS-Project.txt">Sp 2020 Instructions</a></li>
+                        </ul>
+
+                        <h1>Time Series Data Site</h1>
+                        <ul>
+                            <li><a href="https://www.quandl.com/">Quandl</a></li>
+                            <li><a href="http://robjhyndman.com/TSDL/">Time Series Data Library</a></li>
+                            <li><a href="http://finance.yahoo.com/">Yahoo! Finance</a></li>
+                            <li><a href="http://waterdata.usgs.gov/nwis/rt">USGA Water Data</a></li>
+                            <li><a href="https://community.alteryx.com/t5/Weekly-Challenge/bd-p/weeklychallenge">Alteryx community</a></li>
+                        </ul>
+
+                        <h1>Data on this website</h1>
+                        <ul>
+                            <li><a href="TS-datalist.txt">Data List</a></li>
+                        </ul>
+
+                        <h1>  Other Examples </h1>
+                        <ul>
+                            <li><a href="http://robjhyndman.com/papers/peak-electricity-demand/">Electricity demand forecasting</a></li>
+                            <li><a href="http://robjhyndman.com/papers/stochastic-population-forecasts/">Population forecasting</a></li>
+                            <li><a href="http://www.patspapers.com/blog/item/what_if_everybody_flushed_at_once_Edmonton_water_gold_medal_hockey_game/">Water consumption in Canada</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!------------------------------->
+                <div class="footnoteL">
+                </div>
+
+                <!------------------------------->
+                <div class="footnoteR">
+                    <a href="https://nmimoto.github.io/">Home</a>
+                    &nbsp;
+                    <a href="https://github.com/nmimoto/nmimoto.github.io/tree/master/477">Git</a>
+                </div>
+
+                <div class="clr"></div> <!-- Stop box blelow from coming up -->
+
+            </div><!-- End of /Body/container -->
+        </div><!-- End of /Body/bigcontainer -->
+
+        <!-- /Body/TreeCollapsibleJava/ -->
+        <script>
+         debugger;
+         console.log('wow');
+         var toggler = document.querySelectorAll(".rootTree");
+         Array.from(toggler).forEach(item => {
+             item.addEventListener("click", () => {
+                 item.parentElement .querySelector(".children") .classList.toggle("active");
+                 item.classList.toggle("rootTree-down");  }); });
+        </script>
+    </body>
+</html>
