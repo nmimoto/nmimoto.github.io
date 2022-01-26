@@ -1,114 +1,220 @@
-<!-- IntroR.html -->
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!DOCTYPE html>
+<html>
+    <link rel="icon"
+          type="image/png"
+          href="favicon.png">
 
-<HTML>
-  <link rel="icon" 
-        type="image/png" 
-        href="/~nmimoto/favicon.png">
-  <HEAD>
-    <TITLE> Intro to R </TITLE>
-  </HEAD>
+    <head>  <!--html/head/ ----------------------------------------------->
+        <title>One Column</title>
+        <link rel="stylesheet" type="text/css" href="style/style.css">
+        <link rel="stylesheet" type="text/css" href="style/style-title.css">
+        <link rel="stylesheet" type="text/css" href="style/style-boxes.css">
+        <link rel="stylesheet" type="text/css" href="style/style-tree.css">
+        <link rel="stylesheet" type="text/css" href="style/style-footnote.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- MathJax -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script type="text/javascript" id="MathJax-script" async
+                src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+        <style>
+         :root{
+             <!-------------------------------------------------------->
+             --fontTitle: Arial Black;
+             --fontBody:  Arial Black;
+             --fontBoxH:  Arial Black;
+             --fontBox:   Arial Black;
 
-  <STYLE> 
-    body {
-      background-color: #f0f7ec;
-      font: 14px Verdana Black, sans-serif;
-      text-align: center;
-    }
-    table.center {
-      margin-left:auto; 
-      margin-right:auto;
-    }
-    <!-- a {text-decoration:none} //--> 
-  </STYLE>  
+             --BGoutside:          #FFFBFE;   /* Snow */
+             --BGbox1:             #58A4B0;   /* Cadet Blue */
+             --BGfootnoteR:        #333333;
+             --fontcolTitle:       #24272B;   /* Raisin Black */
+             --fontcolBody:        White;     /*   when not defined */
+             --fontcolBox:         #EEF8FF;   /* Alice Blue */
+             --fontcolLink:        #D1F5FF;   /* Light Cyan */
+             --fontcolLinkHover:   White;
+             --fontcolLinkActive:  #EEF8FF;   /* Alice Blue */
+             --fontcolLinkVisited: #8FE388;   /* Light Green */
 
-  <BODY  bgcolor="black" link="gray"  text="navy"  vlink="#D35400" >
+             --fsizeTitleH1: 40px;
+             --fsizeTitleH2: 20px;
+             --fsizeTitle:   18px;
+             --fsizeBoxH1:   25px;
+             --fsizeBox:     15px;
+             --opac:         .97;
 
-    <!--- Table 1 ----------------------------------------------------------------------------------------------------------------------------------->
-    <table class="center">
-      <td width=800 align=right valign=top>
-        <br><br> 
-        <p>
-          <font face="Arial Black" color="Black" size="7" >
-            
-            <br>
-            
-          </font>
-          <font face="Arial Black" color="#21618C" size="6">  
-            Intro to R/R-studio <br> 
-          </font>
-          <font face="Arial Black" color="#21618C" size="3"> 
-            Dept of Statistics <br>
-            University of Akron <br>
-          </font>
+             /* used in style-tree */
+             --fontTriangle: #24272B;   /* Raisin Black */
+             --BGopentree:   #3BBAAD;   /* Light Sea Green */
+         }
+         .bigcontainer {
+             background-image: url("bg-.jpg");
+         }
+        </style>
+    </head>
+    <!-- ONE COLUMN w TREE
+         /* bigcontainer           */
+         /*     container          */
+         /*         /titleR/       */
+         /*         /boxONE/       */
+         /*         /boxONE/       */
+         /*         /boxONE/       */
+         /*         /footnoteL/    */
+         /*         /footnoteR/    */
+         /*         */
+         /*         */
+    -->
+    <body>
+        <!-- /body/container/ --------------------------------------------------------->
+        <div class="bigcontainer">
+            <div class="container">
 
-        </p>
-      </td>
-    </table>
-    
-    
-    <!--- Table 2 ------------------------------------------------------------------------------------------------------------------->
-    <table bgcolor="#2C3E50" class="center">
-      
-      <!-- T2-Col 0 ------------------------------------------------>
-      <td width=190  align=left valign=top><br>
-      </td>
-      
-      <!-- T2-Col 1 ------------------------------------------------>
-      <td width=640  align=left valign=top><br>
-        
-        <p><font face="Arial Black" color="white" size=5>  Getting Started </font><br>
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd1.html">  1. How to Install R/R-studio      </a></font><br>         
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd2.html">  2. Getting Started with R         </a></font><br>  
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd3.html">  3. Packages and Working Directry  </a></font><br>    
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd4.html">  4. Three Ways to Load Data        </a></font><br>
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd5.html">  5. Basic Calculation with Vectors </a></font><br>
-           <font face="Arial Black" color="white" size=3> <a href="IntroR-rmd6.html">  6. Plotting with Base Function    </a></font><br>   
-          <!-- <ul> <font size=3> <a href="484Syllabus - Fall20.pdf">   484 Syllabus  </a><br> </font> </ul> --> 
-        </p>        
+                <!--------------------------------------->
+                <div class="titleRone">
+                    <h1> Intro to R/R-studio </h1>
+                    Department of Statistics <br>
+                    University of Akron
+                </div>
 
-        <br><br>
-        
-        <p><font face="Arial Black" color="white" size=5>  Tutorials </font><br> 
-          <font face="Arial Black" color="white" size=3> <a href="484Syllabus - Fall20.pdf">  Dataframe Manipulation with dplyr </a> <br>
-          <font face="Arial Black" color="white" size=3> <a href="484Syllabus - Fall20.pdf">  Visualization with ggplot2        </a> <br>
-          <font face="Arial Black" color="white" size=3> <a href="484Syllabus - Fall20.pdf">  Linear Regression                 </a> <br>
-          </font>            
-        </p>        
+                <!--------------------------------------->
+                <div class="boxONE">
+                    <h1>Getting Started</h1>
+                    <ul>
+                        <li><a href="IntroR-rmd1.html">1. How to Install R/R-studio      </a></li>
+                        <li><a href="IntroR-rmd2.html">2. Getting Started with R         </a></li>
+                        <li><a href="IntroR-rmd3.html">3. Packages and Working Directry  </a></li>
+                        <li><a href="IntroR-rmd4.html">4. Three Ways to Load Data        </a></li>
+                        <li><a href="IntroR-rmd5.html">5. Basic Calculation with Vectors </a></li>
+                        <li><a href="IntroR-rmd6.html">6. Plotting with Base Function    </a></li>
+                    </ul>
+                </div>
 
+                <!-------------------------------------->
+                <div class="boxONE">
+                    <h1>Tutorials</h1>
+                    <ul>
+                        <li><a href="484Syllabus - Fall20.pdf">  Dataframe Manipulation with dplyr </a></li>
+                        <li><a href="484Syllabus - Fall20.pdf">  Visualization with ggplot2        </a></li>
+                        <li><a href="484Syllabus - Fall20.pdf">  Linear Regression                 </a></li>
+                    </ul>
+                </div>
 
-        <br><br><br>
+                <!-------------------------------------->
+                <div class="boxONE">
+                    <h1>Cheat Sheets</h1>
+                    Click below to open.
+                    <ul>
+                        <li><span class="rootTree"> Tree One Top Level </span>
+                            <ul class="children">
+                                <li><span class="terminalTree">
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                </span></li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                            <br><br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><span class="rootTree"> Tree Two Top level </span>
+                            <ul class="children">
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            <br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            <br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            <br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            <br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                                <li><span class="rootTree">Tree Level 2 w entry</span>
+                                    <ul class="children">
+                                        <li><span class="terminalTree"> In Span Section3.1
+                                            <br>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                                        </span></li>
+                                    </ul>
+                                </li>
+                            </ul> <!--/C1-->
+                        </li> <!--/L1-->
+                    </ul>
+                </div>
 
-      </td>  <!-- End T1-C1 -->
-    </table> <!-- End T1 -->
+                <!-- /Body/container/float-box/ --------------------------------------------------------->
+                <div class="footnoteL">
+                </div>
 
+                <!-- /Body/container/float-box/ --------------------------------------------------------->
+                <div class="footnoteR">
+                    <a href="https://nmimoto.github.io/">Home</a>
+                    &nbsp;
+                    <a href="https://github.com/nmimoto/nmimoto.github.io/tree/master/IntroR">Git</a>
+                </div>
 
-  <!-- Foot note --------------------------------------------------------------------------------------------------------------------------------------->
-  <table bgcolor="#2C3E50" class="center">
+                <div class="clr"></div>  <!-- Stop box blelow from coming up -->
 
-      <td width=834 align=right valign=bottom><br> 
-        <a href="https://nmimoto.github.io/"> Home </a> &#149 
-        <a href="https://github.com/nmimoto/nmimoto.github.io/tree/master/IntroR">  Git &nbsp&nbsp </a> 
-        <hr size="1">
-        <br>
-      </td>
+            </div><!-- End of /Body/container -->
+        </div><!-- End of /Body/bigcontainer -->
 
-  </table>
-    
-    
-    <!-- Tracking code from Google Analytics -------------------------------------------------->
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-26835183-1']);
-      _gaq.push(['_trackPageview']);
-      
-      (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
-    
-    
-  </body>
-</HTML>
+        <!-- /Body/TreeCollapsibleJava/ -->
+        <script>
+         debugger;
+         console.log('wow');
+         var toggler = document.querySelectorAll(".rootTree");
+         Array.from(toggler).forEach(item => {
+             item.addEventListener("click", () => {
+                 item.parentElement .querySelector(".children") .classList.toggle("active");
+                 item.classList.toggle("rootTree-down");  }); });
+        </script>
+    </body>
+</html>
