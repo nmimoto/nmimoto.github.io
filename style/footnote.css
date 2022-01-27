@@ -1,0 +1,19 @@
+/* Footnote Stylling ver 0.0.1 --------------------------*/
+.footnoteL{
+    float: left;
+    width: 70%;
+    padding: 15px 20px 15px 40px;        /* Top, Right, Bottom, Left */
+    margin:  0px 0px 40px 0px;
+}
+.footnoteR{
+    background-color: var(--BGfootnoteR);
+    color: var(--fontcolBox);
+    float: right;
+    text-align: right;
+    width: 30%;
+    padding: 15px 20px 15px 20px;        /* Top, Right, Bottom, Left */
+    margin:  0px 0px 100px 0px;           /* Top, Right, Bottom, Left */
+}
+.clr{
+    clear: both;
+}
