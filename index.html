@@ -6,11 +6,11 @@
 
     <head>  <!--html/head/ ----------------------------------------------->
         <title>Mimoto - UAkron</title>
-        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/style.css">
-        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/title.css">
-        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/boxes.css">
-        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/tree.css">
-        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/footnote.css">
+        <link rel="stylesheet" type="text/css" href="style/style.css">
+        <link rel="stylesheet" type="text/css" href="style/title.css">
+        <link rel="stylesheet" type="text/css" href="style/boxes.css">
+        <link rel="stylesheet" type="text/css" href="style/tree.css">
+        <link rel="stylesheet" type="text/css" href="style/footnote.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- MathJax -->
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -58,8 +58,6 @@
              #ccdbdc;   /* Light Gray */
              #8C2155;    /* Jazzberry Jam */
 
-             <h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-             <img height=170 src="NaoMimoto6.jpg" border=0></h3>
 
              */
              <!-------------------------------------------------------->
@@ -67,6 +65,8 @@
              --fontBody:  Arial Black;
              --fontBoxH:  Arial Black;
              --fontBox:   Arial Black;
+
+             --botpadBoxH1: 10px;
 
              --BGoutside:          #FFFBFE;   /* Snow */
              --BGbox1:             #007EA7;   /* CG BLue */
@@ -115,36 +115,38 @@
             <div class="container">
 
                 <!-- 1st row of box ----------------->
-                <div class="titleRone">
-                    <h1>Nao Mimoto</h1>
-                    <h2>Associate Professor</h2>
-                    <h2><a href="https://www.uakron.edu/statistics/">Department of Statistics</a></h2>
-                    <h2><a href="https://www.uakron.edu/">University of Akron</a></h2>
-                    CAS413<br>
-                    nmimoto@uakron.edu<br>
-                    (330)972-8011
+                <div class="row">
+                    <div class="titleL">
+                        <img height=150 src="NaoMimoto6.jpg" border=0>
+                    </div>
+                    <div class="titleR">
+                        <h1>Nao Mimoto</h1>
+                        <h2>Associate Professor</h2>
+                        <h2><a href="https://www.uakron.edu/statistics/">Department of Statistics</a></h2>
+                        <h2><a href="https://www.uakron.edu/">University of Akron</a></h2>
+                        CAS413<br>nmimoto@uakron.edu<br>(330)972-8011
+                    </div>
                 </div>
 
                 <!-- 2nd row of box ----------------->
                 <div class="row">
                     <div class="boxLEFT">
-                        <h2>Teaching</h2>
+                        <h1>Teaching</h1>
                         <ul>
-                            <li> <a href="477/index.html">STAT 477/577 &nbsp; Time Series Analysis</a></li>
-                            <li> <a href="484/index.html">STAT 489/589 &nbsp; Machine Learning</a></li>
+                            <li><a href="477/index.html">STAT 477/577 &nbsp; Time Series Analysis</a></li>
+                            <li><a href="484/index.html">STAT 489/589 &nbsp; Machine Learning</a></li>
                             <br>
-                            <li> <a href="">STAT 471/571 &nbsp; Intro to Act Sci</a></li>
-                            <li> <a href="">STAT 472/572 &nbsp; Actuarial Models</a></li>
+                            <li><a href="">STAT 471/571 &nbsp; Intro to Act Sci</a></li>
+                            <li><a href="">STAT 472/572 &nbsp; Actuarial Models</a></li>
                             <br>
-                            <li> <a href="">STAT 451/551 &nbsp; Thoretical Stats I</a></li>
-                            <li> <a href="">Thoretical Stats II</a></li>
+                            <li><a href="">STAT 451/551 &nbsp; Thoretical Stats I</a></li>
                             <br>
-                            <li> <a href="">STAT 461/561 &nbsp; Applied Statistics</a></li>
-                            <li> <a href="">STAT 650  &nbsp; Stochastic Processes</a></li>
+                            <li><a href="">STAT 461/561 &nbsp; Applied Statistics</a></li>
+                            <li><a href="">STAT 650  &nbsp; Stochastic Processes</a></li>
                         </ul>
                     </div>
                     <div class="boxRIGHT">
-                        <h2>Resources</h2>
+                        <h1>Resources</h1>
                         <ul>
                             <li><a href="IntroR/">Intro to R/R-studio</a></li>
                             <li><a href="datasets/">Datasets</a></li>
@@ -158,18 +160,18 @@
                 <!-- 3rd row of box ----------------->
                 <div class="row">
                     <div class="boxLEFT">
-                        <h2>Research Interests</h2>
+                        <h1>Research Interests</h1>
                         <ul>
                             <li> Machine Learning / GAN</li>
                             <li> Risk Modeling / Actuarial Sicence</li>
                             <li> Time Series Analysis</li>
                             <li> Stochastic Modeling</li>
                             <br>
-                            <li><a href="pages/files/Mimoto_CV.pdf"> Curriculum Vitae </a></li>
+                            <li><a href="https://www.uakron.edu/statistics/faculty-staff/bio-detail.dot?u=279805">Curriculum Vita</a></li>
                         </ul>
                     </div>
                     <div class="boxRIGHT">
-                        <h2>Other Links</h2>
+                        <h1>Other Links</h1>
                         <ul>
                             <li> <a href="http://www.amstat.org/">American Statistical Association</a></li>
                             <li> <a href="https://www.soa.org/">Society of Actuaries</a></li>
@@ -181,11 +183,10 @@
                 <!-- /Body/container/float-box/ --------------------------------------------------------->
                 <div class="footnoteL">
                     <a href="http://outlook.com/owa/uanet.edu">UAeml</a>
-                    &#149 <a href="http://www.uakron.edu/c">dotCMS</a>
                     &#149 <a href="https://brightspace.uakron.edu/">Brtsp</a>
-                    &#149 <a href="https://my.uakron.edu/psp/portprodg/EMPLOYEE/CS/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL">MyAk</a>
                     &#149 <a href="http://www.ohiolink.edu/">OhioLink</a>
                     &#149 <a href="http://www.uakron.edu/libraries/">Lib</a>
+                    &#149 <a href="http://www.uakron.edu/c">dotCMS</a>
                 </div>
 
                 <!-- /Body/container/float-box/ --------------------------------------------------------->
