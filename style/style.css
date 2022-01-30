@@ -1,4 +1,3 @@
-/* ver 0.0.1 --------------------------*/
 body{
     background-color: var(--BGoutside);
     color:  var(--fontcolBody);
@@ -24,6 +23,7 @@ body{
 }
 .row {
     display: flex;
+    margin: 0px;
 }
 /* Link Stylling --------------------------*/
 a{

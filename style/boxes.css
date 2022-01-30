@@ -1,4 +1,3 @@
-/* Box Stylling ver 0.0.1 --------------------------*/
 .boxLEFT{
     flex: 50%;
     background-color: var(--BGbox1);
@@ -11,7 +10,10 @@
 }
 .boxLEFT h1{
     font-family: var(--fontBoxH);
-    padding: 20px 0 0px 0;
+    padding-top: 20px;
+    padding-right: 0px;
+    padding-bottom: var(--botpadBoxH1);
+    padding-left: 0px;
     margin: 0;
     font-size: var(--fsizeBoxH1);
 }
@@ -37,7 +39,10 @@
 }
 .boxRIGHT h1{
     font-family: var(--fontBoxH);
-    padding: 20px 0 0px 0;
+    padding-top: 20px;
+    padding-right: 0px;
+    padding-bottom: var(--botpadBoxH1);
+    padding-left: 0px;
     margin: 0;
     font-size: var(--fsizeBoxH1);
 }
@@ -64,7 +69,10 @@
 .boxONE h1{
     margin: 0;
     font-family: var(--fontBoxH);
-    padding: 30px 0px 5px 0px;
+    padding-top: 30px;
+    padding-right: 0px;
+    padding-bottom: var(--botpadBoxH1);
+    padding-left: 0px;
     font-size: var(--fsizeBoxH1);
 }
 .boxONE ul{

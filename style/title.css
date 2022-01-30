@@ -1,30 +1,35 @@
-/* Title Stylling ver 0.0.1 --------------------------*/
 .titleL{
     flex: 50%;
     text-align: center;
-    background-color: var(--BGbox1);
-    padding: 30px 0px 20px 0px;        /* Top, Right, Bottom, Left */
-    margin:  0px 0px 20px 0px;
-    opacity: .95;
+    /* background-color: var(--BGbox1); */
+    padding: 40px 0px 0px 0px;        /* Top, Right, Bottom, Left */
+    margin:  0px 0px 0px 0px;
+    opacity: 1;
 }
 /* --------------------------*/
 .titleR{
+    flex: 50%;
     text-align: right;
-    font-family: var(--fontTitle);
-    color:   var(--fontcolTitle);
     font-size: var(--fsizeTitle);
-    background-color: var(--BGbox1);
-    padding: 25px 20px 20px 0px;        /* Top, Right, Bottom, Left */
-    margin:  0px 0px 20px 0px;
-    opacity: .95;
+    color:   var(--fontcolTitle);
+    /* background-color: var(--BGbox1); */
+    padding: 25px 0px 0px 0px;        /* Top, Right, Bottom, Left */
+    margin:  0px 0px 0px 0px;
+    opacity: 1;
 }
 .titleR h1{
     font-size: var(--fsizeTitleH1);
-    text-align: right;  padding: 0px;  margin: 0px;  line-height: 1;
+    text-align: right;
+    padding: 0px 0px 5px 0px;
+    margin: 0px;
+    line-height: 1;
 }
 .titleR h2{
     font-size: var(--fsizeTitleH2);
-    text-align: right;  padding: 0px;  margin: 5px;  line-height: 1.4;
+    text-align: right;
+    padding: 0px;
+    margin: 0px;
+    line-height: 1;
 }
 /* --------------------------*/
 .titleRone{
@@ -32,7 +37,7 @@
     font-size: var(--fsizeTitle);
     color:   var(--fontcolTitle);
     padding: 25px 0px 0px 0px;        /* Top, Right, Bottom, Left */
-    opacity: .95;
+    opacity: 1;
 }
 .titleRone h1{
     font-size: var(--fsizeTitleH1);
