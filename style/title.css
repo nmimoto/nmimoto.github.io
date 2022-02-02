@@ -31,6 +31,13 @@
     margin: 0px;
     line-height: 1;
 }
+.titleR a{
+    text-decoration: none;
+    color: var(--fontcolLinkTitle);
+}
+.titleR a:visited{
+    color: var(--fontcolLinkVisited);
+}
 /* --------------------------*/
 .titleRone{
     text-align: right;
