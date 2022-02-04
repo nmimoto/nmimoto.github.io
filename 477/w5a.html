@@ -1589,8 +1589,8 @@ highlight="kate"
 <!--
 -->
 <p><br><br></p>
-<div id="causal-representation-of-ar1" class="section level2">
-<h2>1. Causal Representation of AR(1)</h2>
+<div id="characteristic-polinomal" class="section level2">
+<h2>1. Characteristic Polinomal</h2>
 <p><br></p>
 <div id="alternative-notation-for-ar1" class="section level3">
 <h3>Alternative Notation for AR(1)</h3>
@@ -1607,70 +1607,103 @@ highlight="kate"
   B X_t = X_{t-1}.
 \]</span> <br></p>
 </div>
-<div id="causal-representation-for-ar1" class="section level3">
-<h3>Causal Representation for AR(1)</h3>
+<div id="arp-process" class="section level3">
+<h3>AR(p) process</h3>
+<p>Autoregressive process of order <span class="math inline">\(p\)</span> is <span class="math display">\[
+  X_t  - \phi_1 X_{t-1} - \phi_2 X_{t-2} - \cdots - \phi_p X_{t-p}
+  \hspace3mm = \hspace3mm \epsilon_t,  \\ \\
+  \mbox{ where } \epsilon_t \sim WN(0,\sigma^2)
+\]</span> and <span class="math inline">\(\phi_1, \ldots, \phi_p\)</span> is real valued constant.</p>
+<p>Alternative notation using characteristic polynomial is, <span class="math display">\[
+  \underbrace{ (1 - \phi_1 B - \phi_2 B^2 - \cdots - \phi_p B^p) }_{\Phi(B) }
+  \,  X_t \hspace3mm = \hspace3mm \epsilon_t. \\\\\\
+  \Phi(B) \hspace3mm X_t \hspace3mm = \hspace3mm \epsilon_t.
+\]</span> <br><br></p>
+</div>
+</div>
+<div id="causal-representation" class="section level2">
+<h2>2. Causal Representation</h2>
+<p><br></p>
+<div id="for-ar1" class="section level3">
+<h3>For AR(1)</h3>
 <p>If AR(1) representation is <span class="math display">\[
   X_t \hspace3mm = \hspace3mm  \phi X_{t-1} + \epsilon_t,
 \]</span> then I can write the same thing for yesterday, <span class="math display">\[
-  X_{t-1} \hspace3mm = \hspace3mm  \phi X_{t-2} + e_{t-1}
+  X_{t-1} \hspace3mm = \hspace3mm  \phi X_{t-2} + \epsilon_{t-1}
 \]</span></p>
 <p>Now combining the two, I can write <span class="math display">\[
   \begin{align}
   X_t &amp;\hspace3mm = \hspace3mm  \phi \, X_{t-1} + \epsilon_t \\ \\
-      &amp;\hspace3mm = \hspace3mm  \phi \big\{\phi X_{t-2} + e_{t-1} \big\} + \epsilon_t \\ \\
-      &amp;\hspace3mm = \hspace3mm  \phi^2 X_{t-2} + \hspace3mm  \phi  e_{t-1} + \epsilon_t
+      &amp;\hspace3mm = \hspace3mm  \phi \big\{\phi X_{t-2} + \epsilon_{t-1} \big\} + \epsilon_t \\ \\
+      &amp;\hspace3mm = \hspace3mm  \phi^2 X_{t-2} + \hspace3mm  \phi  \epsilon_{t-1} + \epsilon_t
   \end{align}
 \]</span></p>
 <p><br></p>
 <p>Do it again, this time for <span class="math inline">\(X_{t-2}\)</span> and we get <span class="math display">\[
   \begin{align}
   X_t
-  &amp;\hspace3mm = \hspace3mm  \phi^2 X_{t-2} \hspace3mm + \hspace3mm \phi \, e_{t-1} + \epsilon_t \\ \\
-  &amp;\hspace3mm = \hspace3mm  \phi^2 \big(\phi  X_{t-3} + e_{t-2} \big) \hspace3mm + \hspace3mm \phi \, e_{t-1} + \epsilon_t \\ \\
+  &amp;\hspace3mm = \hspace3mm  \phi^2 X_{t-2} \hspace3mm + \hspace3mm \phi \, \epsilon_{t-1} + \epsilon_t \\ \\
+  &amp;\hspace3mm = \hspace3mm  \phi^2 \big(\phi  X_{t-3} + \epsilon_{t-2} \big) \hspace3mm + \hspace3mm \phi \, \epsilon_{t-1} + \epsilon_t \\ \\
   &amp;\hspace3mm = \hspace3mm  \phi^3 X_{t-3} \hspace3mm + \hspace3mm \phi^2
-  \, e_{t-2}  + \phi e_{t-1}  + \epsilon_t
+  \, \epsilon_{t-2}  + \phi \epsilon_{t-1}  + \epsilon_t
   \end{align}
   \]</span></p>
 <p>We can keep doing this, and get <span class="math display">\[
   X_t
   \hspace3mm = \hspace3mm  \phi^k X_{t-k}
   \hspace3mm + \hspace3mm\phi^{k-1} e_{t-(k-1)}
-  \hspace3mm + \hspace3mm \cdots \hspace3mm + \hspace3mm \phi \, e_{t-1}
+  \hspace3mm + \hspace3mm \cdots \hspace3mm + \hspace3mm \phi \, \epsilon_{t-1}
   \hspace3mm + \hspace3mm \epsilon_t
 \]</span></p>
 <p>If <span class="math inline">\(|\phi|&lt;1\)</span>, then letting <span class="math inline">\(k \to \infty\)</span> will yield <span class="math display">\[
-  X_t \hspace3mm = \hspace3mm \epsilon_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
-  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{i} \, e_{t-i}
+  X_t \hspace3mm = \hspace3mm \epsilon_t + \phi \epsilon_{t-1}  + \phi^2 \epsilon_{t-2}  + \cdots
+  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{i} \, \epsilon_{t-i}
 \]</span></p>
 <p>So here’s <strong>causal representation</strong> for AR(1) process <span class="math display">\[
   X_t
-  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{i} \, e_{t-i}
-  \hspace3mm = \hspace3mm  e_t + \phi \, e_{t-1}  + \phi^2 \, e_{t-2}  + \cdots
+  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{i} \, \epsilon_{t-i}
+  \hspace3mm = \hspace3mm  \epsilon_t + \phi \, \epsilon_{t-1}  + \phi^2 \, \epsilon_{t-2}  + \cdots
 \]</span></p>
 <p>This is called <strong>causal representation</strong> because we can write <span class="math inline">\(Y_t\)</span> as infinite sum of <strong>past</strong> errors (innovations). <br></p>
 </div>
 <div id="get-mean-of-ar1-using-causal-representation" class="section level3">
 <h3>Get Mean of AR(1) using Causal Representation</h3>
 <p>Now it is easy to see that mean of AR(1) <span class="math display">\[
-  E(X_t) \hspace3mm = \hspace3mm  \sum_{i=0}^\infty \phi^{i} \, E( e_{t-i} )
+  E(X_t) \hspace3mm = \hspace3mm  \sum_{i=0}^\infty \phi^{i} \, E( \epsilon_{t-i} )
   \hspace3mm = \hspace3mm 0
 \]</span></p>
-<p>Recall <span class="math inline">\(e_t\)</span> are White Noise with mean 0 and variance <span class="math inline">\(\sigma\)</span>.</p>
+<p>Recall <span class="math inline">\(\epsilon_t\)</span> are White Noise with mean 0 and variance <span class="math inline">\(\sigma\)</span>.</p>
 <p>Or often, we assume <span class="math display">\[
-  e_t \sim N(0,\sigma^2)
+  \epsilon_t \sim N(0,\sigma^2)
 \]</span> <br></p>
 </div>
-<div id="causal-representation-and-characteristic-polynomial" class="section level3">
-<h3>Causal Representation and Characteristic Polynomial</h3>
+<div id="get-var-with-causal-representation" class="section level3">
+<h3>Get Var with Causal Representation</h3>
+<p>So if you write AR(1) in causal way, <span class="math display">\[
+  X_t = \sum_{i=0}^\infty \phi^{i} \, \epsilon_{t-i},
+\]</span></p>
+<p>Then we can calculate variance as <span class="math display">\[
+\begin{align}
+  \mbox{Var}(X_t) \hspace3mm = \hspace3mm
+  \mbox{Var } \Big[ \sum_{i=0}^\infty \phi^i  \, \epsilon_{t-i}\Big]
+  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \mbox{Var}\big[\phi^i \, \epsilon_{t-i}\big]
+  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{2i} \mbox{Var}(\epsilon_{t-i})
+  \hspace3mm = \hspace3mm \sigma^2 \sum_{i=0}^\infty \phi^{2i}
+\end{align}
+\]</span> This does not converge unless <span class="math inline">\(|\phi|&lt;1\)</span>.</p>
+<p>When it does converge, the variance is <span class="math inline">\(\sigma^2/(1-\phi^2)\)</span>. <br></p>
+</div>
+<div id="when-char.-poly.-can-be-written-with-causal-rep" class="section level3">
+<h3>When Char. Poly. can be written with Causal Rep?</h3>
 <p>Recall yet another way to write AR(1), <span class="math display">\[
-  (1-\phi B) \, X_t \hspace3mm = \hspace3mm  e_t.
+  (1-\phi B) \, X_t \hspace3mm = \hspace3mm  \epsilon_t.
 \]</span></p>
 <p>This means that we can write <span class="math display">\[
-  X_t \hspace3mm = \hspace3mm \frac{1}{(1-\phi \, B)}  \, e_t.
+  X_t \hspace3mm = \hspace3mm \frac{1}{(1-\phi \, B)}  \, \epsilon_t.
 \]</span></p>
 <p>Compare this with Causal representation <span class="math display">\[
-  X_t \hspace3mm = \hspace3mm e_t + \phi \, e_{t-1}  + \phi^2 \, e_{t-2}  + \cdots
-  \hspace3mm = \hspace3mm 1+\phi B+ \phi^2 B^2 + \cdots  \, e_t
+  X_t \hspace3mm = \hspace3mm \epsilon_t + \phi \, \epsilon_{t-1}  + \phi^2 \, \epsilon_{t-2}  + \cdots
+  \hspace3mm = \hspace3mm 1+\phi B+ \phi^2 B^2 + \cdots  \, \epsilon_t
 \]</span></p>
 <p>So we have the equivalence on the right hand side, <span class="math display">\[
   \frac{1}{(1-\phi B)}
@@ -1681,34 +1714,28 @@ highlight="kate"
 \]</span></p>
 <p>Note that the condition for the geometiric series is <span class="math display">\[
   |x| &lt; 1 \hspace10mm \mbox{ or } \hspace10mm |\phi| &lt;1
-\]</span> Which is same as the <strong>causal (stationary) condition</strong>. <br></p>
-</div>
-<div id="another-look-at-causal-condition" class="section level3">
-<h3>Another look at Causal Condition</h3>
-<p>So if you write AR(1) in causal way, <span class="math display">\[
-  X_t = \sum_{i=0}^\infty \phi^{i} \, e_{t-i},
-\]</span></p>
-<p>Then we can calculate variance as <span class="math display">\[
-\begin{align}
-  \mbox{Var}(X_t) \hspace3mm = \hspace3mm
-  \mbox{Var } \Big[ \sum_{i=0}^\infty \phi^i  \, e_{t-i}\Big]
-  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \mbox{Var}\big[\phi^i \, e_{t-i}\big]
-  \hspace3mm = \hspace3mm \sum_{i=0}^\infty \phi^{2i} \mbox{Var}(e_{t-i})
-  \hspace3mm = \hspace3mm \sigma^2 \sum_{i=0}^\infty \phi^{2i}
-\end{align}
-\]</span> This does not converge unless <span class="math inline">\(|\phi|&lt;1\)</span>.</p>
-<p>When it does converge, the variance is <span class="math inline">\(\sigma^2/(1-\phi^2)\)</span>. <br></p>
-</div>
-<div id="causal-condition-of-ar1" class="section level3">
-<h3>Causal Condition of AR(1)</h3>
-<p>We can represent AR(1) in causal representation only when <span class="math inline">\(|\phi|&lt;1\)</span>. <span class="math display">\[
-X_t \hspace3mm = \hspace3mm e_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
-\]</span></p>
-<p>When AR(1) has <span class="math inline">\(|\phi|&gt;1\)</span>, and if you represent that with past errors, then it is called explosive process, and it’s not stationary.</p>
-<p>When AR(1) has <span class="math inline">\(|\phi|&gt;1\)</span>, <span class="math inline">\(Y_t\)</span> can be written as infinite sum of future errors, and it is a unique stationary solution to AR(1) equation.</p>
-<p>When <span class="math inline">\(|\phi|=1\)</span>, then there is no stationary solution. What is the other name of <span class="math inline">\(Y_t\)</span> when <span class="math inline">\(\phi=1\)</span>?</p>
-<p>We will assume that all AR process we deal with are causal.</p>
-<p>If AR process is not causal, then it can be re-written as causal process with different innovations. (Prob 3.8). <!---
+\]</span> Which is same as the <strong>causal (stationary) condition</strong>. <!---
+Causal Condition of AR(1)
+
+We can represent AR(1) in causal representation only when $|\phi|<1$.
+$$
+X_t \hspace3mm = \hspace3mm \epsilon_t + \phi \epsilon_{t-1}  + \phi^2 \epsilon_{t-2}  + \cdots
+$$
+
+When AR(1) has $|\phi|>1$, and if you represent that with past errors, then
+ it is called explosive process, and it's not stationary.
+
+When AR(1) has $|\phi|>1$, $Y_t$ can be written as infinite sum of future errors, and
+it is a unique stationary solution to AR(1) equation.
+
+When $|\phi|=1$, then there is no stationary solution.
+What is the other name of $Y_t$ when $\phi=1$?
+
+We will assume that all AR process we deal with are causal.
+
+If AR process is not causal, then it can be re-written as causal process with
+different innovations.  (Prob 3.8).
+
 % \subsubsection*{When AR(1) is not Causal}
 % If $|\phi|>1$, then we write the equation for $t+1$, and
 % $$
@@ -1727,39 +1754,20 @@ X_t \hspace3mm = \hspace3mm e_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
 % If $|\phi|=1$, then there is no stationary solution. (Prob 2.8).
 %
 % If $|\phi|>1$, then the AR1 can be rewritten with $|\ph|<1$ with different innovations.  (Prob 3.8).
----> <br><br></p>
+---> <br></p>
 </div>
-</div>
-<div id="arp-processes" class="section level2">
-<h2>2. AR(p) processes</h2>
-<p>Autoregressive process of order <span class="math inline">\(p\)</span> is <span class="math display">\[
-  X_t  - \phi_1 X_{t-1} - \phi_2 X_{t-2} - \cdots - \phi _p X_{t-p}
-  \hspace3mm = \hspace3mm e_t,  \\ \\
-  \mbox{ where } e_t \sim WN(0,\sigma^2)
-\]</span> and <span class="math inline">\(\phi_1, \ldots, \phi_p\)</span> is real valued constant.</p>
-<p>Alternative notation using characteristic polynomial is, <span class="math display">\[
-  \underbrace{ (1 - \phi_1 B - \phi_2 B^2 - \cdots - \phi_p B^p) }_{\Phi(B) }
-  \,  X_t \hspace3mm = \hspace3mm e_t. \\\\
-  \Phi(B) \hspace3mm X_t \hspace3mm = \hspace3mm e_t.
-\]</span> <br></p>
 <div id="writing-arp-in-causal-rep." class="section level3">
 <h3>Writing AR(p) in Causal Rep.</h3>
 <p>Using the characteristic polynomial, <span class="math display">\[
-  \Phi(B)  \, X_t \hspace3mm = \hspace3mm e_t \\ \\
-  X_t \hspace3mm = \hspace3mm \frac{1}{\Phi(B)} \,\, e_t
-  \]</span></p>
-<p>So if we could write AR(p) as causal, <span class="math display">\[
-  X_t
-  \begin{align}
-  \hspace3mm = \hspace3mm \psi_0 + \psi_1 e_t + \psi_2 e_{t-2} + \psi_3 e_{t-3} + \cdots \\
-  \hspace3mm = \hspace3mm (\psi_0 + \psi_1 B + \psi_2 B^2 + \psi_3 B^3 + \cdots)  \,\, e_t
-  \end{align}
-  \]</span></p>
-<p>That means we must be able to write polynomial as <span class="math display">\[
-  \frac{1}{\big(1 - \phi_1 z - \phi_2 z^2 - \cdots - \phi_p z^p\big) }
-  \hspace3mm = \hspace3mm  \psi_0 + \psi_1 z + \psi_2 z^2 + \psi_3 z^3 + \cdots
-  \]</span></p>
-<p>When can we do this? <br></p>
+  \Phi(B)  \, X_t \hspace3mm = \hspace3mm \epsilon_t \\ \\
+  X_t \hspace3mm = \hspace3mm \frac{1}{\Phi(B)} \,\, \epsilon_t
+  \]</span> That means we must be able to write polynomial as <span class="math display">\[
+  \frac{1}{\big(1 - \phi_1 B - \phi_2 B^2 - \cdots - \phi_p B^p\big) }
+  \hspace3mm = \hspace3mm  
+  \big(
+    \psi_0 + \psi_1 B + \psi_2 B^2 + \psi_3 B^3 + \cdots
+  \big) 
+  \]</span> When can we do this? <br></p>
 </div>
 <div id="causal-condition-for-arp" class="section level3">
 <h3>Causal Condition for AR(p)</h3>
@@ -1772,13 +1780,14 @@ X_t \hspace3mm = \hspace3mm e_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
 <p>We have seen that causal condition for AR(1) was <span class="math inline">\(|\phi|&lt;1\)</span>.</p>
 <p>This was because polynomial <span class="math display">\[
   \Phi(z) \hspace3mm = \hspace3mm  (1-\phi z)
-\]</span> will have root inside the unit circle if <span class="math inline">\(|\phi|&gt;1\)</span>.</p>
-<p>AR(p) will admit the causal representation if the characteristic polynomial <span class="math display">\[
-  \Phi(z) \hspace3mm = \hspace3mm  1 + \phi_1 z + \phi_2 z^2 + \phi_3 z^3 + \cdots + \phi_p z^p
-\]</span> has all the roots outside of the unit circle. Causal representation will ensure stationarity. <br></p>
+\]</span> will have root inside the unit circle if <span class="math inline">\(|\phi|&gt;1\)</span>. <br><br></p>
 </div>
-<div id="example-checking-causality-1" class="section level3">
-<h3>Example: Checking Causality 1</h3>
+</div>
+<div id="examples" class="section level2">
+<h2>3. Examples</h2>
+<p><br></p>
+<div id="ex-checking-causality-1" class="section level3">
+<h3>Ex: Checking Causality 1</h3>
 <p>Check to see of AR(2) model, <span class="math display">\[
   Y_t \hspace3mm = \hspace3mm  .4 Y_{t-1} - .3Y_{t-2}  + e_{t}
 \]</span> is causal (stationary).</p>
@@ -1793,30 +1802,30 @@ X_t \hspace3mm = \hspace3mm e_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
 \]</span> So the roots are outside the complex unit circle. Thus this AR(2) is causal.</p>
 <p><img src="data:image/jpeg;base64,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" /> <br></p>
 </div>
-<div id="example-checking-causality-2" class="section level3">
-<h3>Example: Checking Causality 2</h3>
+<div id="ex-checking-causality-2" class="section level3">
+<h3>Ex: Checking Causality 2</h3>
 <p>Check to see of AR(2) model, <span class="math display">\[
   Y_t = -.7 Y_{t-1} - .6Y_{t-2}  + e_{t}
 \]</span> is causal or not.</p>
 <p>We have to look at the root of <span class="math display">\[
   \Phi(z) = 1 + .7z + .6z^2,
 \]</span> which has roots $-.583 1.15 i $.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">  z &lt;-<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,.<span class="dv">7</span>,.<span class="dv">6</span>))   <span class="co"># find root of 1+.7z+.6z^2</span></a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">  z =<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,.<span class="dv">7</span>,.<span class="dv">6</span>))   <span class="co"># find root of 1+.7z+.6z^2</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">  z                           <span class="co">#- see the root</span></a></code></pre></div>
 <pre><code>## [1] -0.583333+1.15169i -0.583333-1.15169i</code></pre>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">  <span class="kw">Mod</span>(z)                      <span class="co">#- Distance from origin</span></a></code></pre></div>
 <pre><code>## [1] 1.290994 1.290994</code></pre>
 <p>They are at at distance <span class="math inline">\(\sqrt{(-.583)^2+(1.15i)^2} = 1.29\)</span> from origin. Therefore, this AR(2) is causal. <br></p>
 </div>
-<div id="example-checking-causality-3" class="section level3">
-<h3>Example: Checking Causality 3</h3>
+<div id="ex-checking-causality-3" class="section level3">
+<h3>Ex: Checking Causality 3</h3>
 <p>Given <span class="math display">\[
   X_t = .7 X_{t-1} + .6 X_{t-2}  + e_{t},
   \]</span> Check the causality.</p>
 <p>we look at the root of <span class="math display">\[
   \Phi(z) = 1 - .7z - .6z^2,
   \]</span></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">  z &lt;-<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span>.<span class="dv">7</span>,<span class="op">-</span>.<span class="dv">6</span>))</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">  z =<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span>.<span class="dv">7</span>,<span class="op">-</span>.<span class="dv">6</span>))</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">  z</a></code></pre></div>
 <pre><code>## [1]  0.8333333+0i -2.0000000+0i</code></pre>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">  <span class="kw">Mod</span>(z)</a></code></pre></div>
@@ -1831,24 +1840,20 @@ X_t \hspace3mm = \hspace3mm e_t + \phi e_{t-1}  + \phi^2 e_{t-2}  + \cdots
 <ul>
 <li><p>AR(<span class="math inline">\(p\)</span>) is defined as <span class="math display">\[
 X_t  - \phi_1 X_{t-1} - \phi_2 X_{t-2} - \cdots - \phi_p X_{t-p}
-\hspace3mm = \hspace3mm  e_t,  \\
+\hspace3mm = \hspace3mm  \epsilon_t,  \\
 (1 - \phi_1 B - \phi_2 B^2 - \cdots - \phi_p B^p) \,  X_t
-\hspace3mm = \hspace3mm  e_t. \\
-\Phi(B) \hspace2mm X_t \hspace3mm = \hspace3mm  e_t.
-\]</span> where <span class="math inline">\(\phi_1, \ldots, \phi_p\)</span> is real valued constant, and <span class="math inline">\(e_t \sim WN(0,\sigma^2)\)</span>.</p></li>
+\hspace3mm = \hspace3mm  \epsilon_t. \\
+\Phi(B) \hspace2mm X_t \hspace3mm = \hspace3mm  \epsilon_t.
+\]</span> where <span class="math inline">\(\phi_1, \ldots, \phi_p\)</span> is real valued constant, and <span class="math inline">\(\epsilon_t \sim WN(0,\sigma^2)\)</span>.</p></li>
 <li><p>AR(<span class="math inline">\(p\)</span>) can be written in causal representation, <span class="math display">\[
-X_t = \sum_{i=0}^\infty \phi^{i} \, e_{t-i},
+X_t = \sum_{i=0}^\infty \phi^{i} \, \epsilon_{t-i},
 \]</span> when its characteristic polynomial <span class="math inline">\(\Phi(z)\)</span> has all the roots <strong>outside</strong> of the unit circle on the imaginary plane.</p></li>
 </ul>
 <p>When the AR(<span class="math inline">\(p\)</span>) can be written as causal process, then it is stationary.</p>
 <p>You can use <strong>polyroot()</strong> function in R to calculate the roots of polynomial, and **Mod()* to calculate their distance from the origin.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">  z &lt;-<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,.<span class="dv">7</span>,.<span class="dv">6</span>))   <span class="co"># find root of 1+.7z+.6z^2</span></a>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">  z =<span class="st"> </span><span class="kw">polyroot</span>(<span class="kw">c</span>(<span class="dv">1</span>,.<span class="dv">7</span>,.<span class="dv">6</span>))   <span class="co"># find root of 1+.7z+.6z^2</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">  z                           <span class="co"># see the root</span></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3">  <span class="kw">Mod</span>(z)                      <span class="co"># Distance from origin</span></a></code></pre></div>
-<ul>
-<li></li>
-<li></li>
-</ul>
 </div>
 <!-- endofyank -->
 <p><br><br><br><br><br></p>
