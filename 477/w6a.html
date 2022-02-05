@@ -395,22 +395,25 @@ highlight="kate"
 <h3>AIC Simulation Study</h3>
 <p>If we use AIC all the time, what is the probability we end up with correct <span class="math inline">\(p\)</span>?</p>
 <p>Set <span class="math inline">\(p=2\)</span>. Generate simulated AR(2). Use <strong>auto.arima(Y)</strong> and search for best <span class="math inline">\(p\)</span> by using Minimum AIC. Repeat 1000 times. How many time do we end up with right <span class="math inline">\(p\)</span>?</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(forecast)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#- Simulation Study of choosing p by AIC</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  Result <span class="ot">=</span> <span class="dv">0</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>){</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    X    <span class="ot">=</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(.<span class="dv">6</span>, .<span class="dv">3</span>) ), <span class="dv">100</span> )  <span class="sc">+</span> <span class="fl">8.5</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Fit7 <span class="ot">=</span> <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)        <span class="co"># find AR(p) by AIC</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    Result[i] <span class="ot">=</span> <span class="fu">length</span>(Fit7<span class="sc">$</span>model<span class="sc">$</span>phi)        <span class="co"># save value of p chosen</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(Result, <span class="dv">100</span>)                       <span class="co"># first 100 p</span></span></code></pre></div>
-<pre><code>##   [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 1 2 2 2 2 2 2 2 2 1 2 2
-##  [31] 5 2 2 2 2 2 1 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2
-##  [61] 2 2 5 2 2 2 2 2 1 2 2 3 2 2 2 2 2 3 2 1 3 1 2 2 1 2 2 3 2 2
-##  [91] 1 1 3 2 4 2 2 1 2 2</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(Result<span class="sc">==</span><span class="dv">2</span>)                         <span class="co"># propotion of times p=2</span></span></code></pre></div>
-<pre><code>## [1] 0.786</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(forecast)</span></code></pre></div>
+<pre><code>## Warning: package &#39;forecast&#39; was built under R version 4.1.2</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">#- Simulation Study of choosing p by AIC</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  Result <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>){</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    X    <span class="ot">=</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(.<span class="dv">6</span>, .<span class="dv">3</span>) ), <span class="dv">100</span> )  <span class="sc">+</span> <span class="fl">8.5</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    Fit7 <span class="ot">=</span> <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)        <span class="co"># find AR(p) by AIC</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    Result[i] <span class="ot">=</span> <span class="fu">length</span>(Fit7<span class="sc">$</span>model<span class="sc">$</span>phi)        <span class="co"># save value of p chosen</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(Result, <span class="dv">100</span>)                       <span class="co"># first 100 p</span></span></code></pre></div>
+<pre><code>##   [1] 3 2 1 2 3 2 1 3 2 2 2 2 1 2 2 3 1 2 4 2 2 3 3 2 3 1 2 3 2 2
+##  [31] 2 3 2 2 2 2 2 2 2 2 2 2 2 1 2 1 2 3 2 2 2 2 1 2 2 2 1 2 2 2
+##  [61] 2 2 1 1 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 1 2 2 1 1 2 2
+##  [91] 2 2 2 3 2 5 2 2 2 2</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(Result<span class="sc">==</span><span class="dv">2</span>)                         <span class="co"># propotion of times p=2</span></span></code></pre></div>
+<pre><code>## [1] 0.765</code></pre>
 <p><br><br></p>
 </div>
 </div>
@@ -425,19 +428,19 @@ highlight="kate"
 <li><p>Use <strong>ar(Y)</strong> and search for best <span class="math inline">\(p\)</span> by using Minimum AIC.</p></li>
 <li><p>Repeat 1000 times. How many time do we end up with right <span class="math inline">\(p\)</span>?</p></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1532</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#- Run until p=3 comes out</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span>){</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    X    <span class="ot">=</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(.<span class="dv">6</span>, .<span class="dv">3</span>) ), <span class="dv">100</span> )  <span class="sc">+</span> <span class="fl">8.5</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    Fit7 <span class="ot">=</span> <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)        <span class="co"># find AR(p) by AIC</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    Result <span class="ot">=</span> <span class="fu">length</span>(Fit7<span class="sc">$</span>model<span class="sc">$</span>phi)           <span class="co"># save value of p chosen</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Result<span class="sc">==</span><span class="dv">3</span>){</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)   <span class="co"># search for best p by AIC</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1532</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#- Run until p=3 comes out</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span>){</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    X    <span class="ot">=</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(.<span class="dv">6</span>, .<span class="dv">3</span>) ), <span class="dv">100</span> )  <span class="sc">+</span> <span class="fl">8.5</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    Fit7 <span class="ot">=</span> <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)        <span class="co"># find AR(p) by AIC</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    Result <span class="ot">=</span> <span class="fu">length</span>(Fit7<span class="sc">$</span>model<span class="sc">$</span>phi)           <span class="co"># save value of p chosen</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Result<span class="sc">==</span><span class="dv">3</span>){</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)   <span class="co"># search for best p by AIC</span></span></code></pre></div>
 <pre><code>## Series: X 
 ## ARIMA(3,0,0) with non-zero mean 
 ## 
@@ -448,7 +451,7 @@ highlight="kate"
 ## 
 ## sigma^2 = 0.9548:  log likelihood = -138.39
 ## AIC=286.79   AICc=287.43   BIC=299.82</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Arima</span>(X, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>))      <span class="co"># fit AR(2)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Arima</span>(X, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>))      <span class="co"># fit AR(2)</span></span></code></pre></div>
 <pre><code>## Series: X 
 ## ARIMA(2,0,0) with non-zero mean 
 ## 
@@ -459,40 +462,6 @@ highlight="kate"
 ## 
 ## sigma^2 = 0.9818:  log likelihood = -140.26
 ## AIC=288.52   AICc=288.94   BIC=298.94</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">327</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#- Run until p=1 comes out</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span>){</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    X    <span class="ot">=</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(.<span class="dv">6</span>, .<span class="dv">3</span>) ), <span class="dv">100</span> )  <span class="sc">+</span> <span class="fl">8.5</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    Fit7 <span class="ot">=</span> <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)        <span class="co"># find AR(p) by AIC</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    Result <span class="ot">=</span> <span class="fu">length</span>(Fit7<span class="sc">$</span>model<span class="sc">$</span>phi)           <span class="co"># save value of p chosen</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Result<span class="sc">==</span><span class="dv">1</span>){</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">auto.arima</span>(X, <span class="at">d=</span><span class="dv">0</span>, <span class="at">max.q=</span><span class="dv">0</span>)   <span class="co"># search for best p by AIC</span></span></code></pre></div>
-<pre><code>## Series: X 
-## ARIMA(1,0,0) with non-zero mean 
-## 
-## Coefficients:
-##          ar1    mean
-##       0.8574  7.7734
-## s.e.  0.0509  0.6059
-## 
-## sigma^2 = 0.8386:  log likelihood = -132.74
-## AIC=271.49   AICc=271.74   BIC=279.3</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Arima</span>(X, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>))      <span class="co"># fit AR(1)</span></span></code></pre></div>
-<pre><code>## Series: X 
-## ARIMA(2,0,0) with non-zero mean 
-## 
-## Coefficients:
-##          ar1     ar2    mean
-##       0.7898  0.0789  7.8064
-## s.e.  0.1002  0.1009  0.6520
-## 
-## sigma^2 = 0.8419:  log likelihood = -132.44
-## AIC=272.88   AICc=273.3   BIC=283.3</code></pre>
 <p><br><br></p>
 </div>
 </div>
