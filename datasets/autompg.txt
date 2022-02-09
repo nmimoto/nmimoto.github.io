@@ -16,7 +16,7 @@ x7: No. of transmission speeds
 x8: Overall length (inches)
 x9: Width (inches)
 x10: Weight (pounds)
-x11: Type of transmission (A—automatic, M—manual)
+x11: Type of transmission (Aâ€”automatic, Mâ€”manual)
 
 
 
