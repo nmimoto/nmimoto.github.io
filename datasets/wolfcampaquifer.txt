@@ -9,7 +9,7 @@ obtained at 85 locations by drilling a narrow pipe through the aquifer.
 
 Data Description
 ----------------------------
-Piezometric head measurements taken at the Wolfcamp Aquifer, Texas, USA. See Cressie (1993, p.212–214) for description of the scientific problem and the data. 
+Piezometric head measurements taken at the Wolfcamp Aquifer, Texas, USA. See Cressie (1993, p.212â€“214) for description of the scientific problem and the data. 
 Original data were converted to SI units: coordinates are given in kilometers and pressure heads measures are in kilometers above the sea level.
 X = Horizontal distance in kilometers from one location (an arbitrary point).
 Y = Vertical distance in kilometers from one location (an arbitrary point).
