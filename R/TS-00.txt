@@ -251,7 +251,7 @@ Rolling1step.forecast <- function(Y,
     #- Plot the prediction result with original data
     layout(matrix(c(1,1,1,1,1,1,2,3,4), 3, 3, byrow=TRUE))    # 3 plots at once
     
-    plot(  Y,        type="n", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)")  
+    plot(  Y,        type="n", ylab="", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)")  
     lines( Y1,       type="o") 
     lines( Y2,       type="o", col="red")
     lines( Yhat,     type="o", col="blue")
@@ -259,9 +259,10 @@ Rolling1step.forecast <- function(Y,
     lines( Yhat.CIl, type="l", col="gray30", lty=2)
     
     # - Plot the prediction error
-    plot( (window.size+1):length(Y), Pred.error, type="o", main="Prediction Error (Red-Blue)" ) 
+    plot( (window.size+1):length(Y), Pred.error, type="o", xlab="", main="Prediction Error (Red-Blue)" ) 
     abline(h=0, lty=2)
-    acf(Pred.error)
+    
+    acf(Pred.error, main="ACF of Pred.error")
     layout(1)                    # reset the layout
   }
   
