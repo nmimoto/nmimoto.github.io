@@ -175,7 +175,8 @@ KStest <- function(X) {
 
 
 
-#--- Rolling 1-step version 2022.1 ---------------------------
+
+#--- Rolling 1-step version 2022.2 ---------------------------
 Rolling1step.forecast <- function(Y,
                                   window.size,
                                   Arima.order,
@@ -184,77 +185,79 @@ Rolling1step.forecast <- function(Y,
                                   lambda=NULL,           # NULL=no transformaton. 0=Log
                                   xreg=NULL,             # NULL=regression.  TRUE=Linear Trend is present
                                   seasonal=c(0,0,0),     # seasonal component
-                                  show_plot=TRUE
-                                  ){
-
-
-    library(forecast)
-    # take xreg=FALSE/NULL as xreg=NULL
-    if (is.null(xreg)==1 || xreg==0){ xreg = NULL }
+                                  show_plot=TRUE){
   
-    Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
-    for (i in 1:(length(Y)-window.size)) {
-      
-      
-      if (is.null(xreg)){ xreg=NULL } else { xreg=time(Y[i:(i+window.size-1)]) }
-      
-      # Use Arima() with given options
-      Fit00 <- tryCatch(
-                     Arima( Y[i:(i+window.size-1)],
-                       order=Arima.order,
-                       include.mean = include.mean,
-                       include.drift = include.drift,
-                       lambda = lambda,
-                       seasonal = seasonal, 
-                       xreg=xreg), 
-                     error = function(ss){
-                       cat(paste("    i=",i,"  MLE-CSS failed.  Using CSS.\n"))
-                       return(
-                         Arima( Y[i:(i+window.size-1)],
-                         order=Arima.order,
-                         include.mean = include.mean,
-                         include.drift = include.drift,
-                         lambda = lambda,
-                         seasonal = seasonal,
-                         xreg=xreg,
-                         method="CSS") ) } )
-
-      # Model one step forecast  
-      if (is.null(xreg)){ 
-          Y.h  <- forecast(Fit00, 1)
-      } else {
-          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))
-      }
-      Yhat[i]     <- Y.h$mean
-      Yhat.CIu[i] <- Y.h$lower[2]
-      Yhat.CIl[i] <- Y.h$upper[2]     
-    }
+  
+  library(forecast)
+  # take xreg=FALSE/NULL as xreg=NULL
+  if (is.null(xreg)==1 || xreg==0){ xreg = NULL }
+  
+  Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
+  for (i in 1:(length(Y)-window.size)) {
     
-    # Yhat starts at window.size+1 up to length(Y)
-    Yhat     = ts(Yhat,     start=time(Y)[window.size+1], freq=frequency(Y))
-    Yhat.CIu = ts(Yhat.CIu, start=time(Y)[window.size+1], freq=frequency(Y))
-    Yhat.CIl = ts(Yhat.CIl, start=time(Y)[window.size+1], freq=frequency(Y))
-    Y1 = window(Y, end=time(Y)[window.size],     freq=frequency(Y))
-    Y2 = window(Y, start=time(Y)[window.size+1], freq=frequency(Y))
-
-    #- Calculate prediction performance
-    Pred.error = Y2 - Yhat
-    Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
-    cat(paste("\nLast ", (length(Y)-window.size), " obs fit retrospectively\n    with Rolling 1-step prediction"))
-    cat(paste("\n  Average prediction error: ", round(mean(Pred.error), 4)))
-    cat(paste("\n  root Mean Squared Error:  ", round(Pred.rMSE, 4)), "\n\n\n")
-
+    
+    if (is.null(xreg)){ xreg=NULL } else { xreg=time(Y[i:(i+window.size-1)]) }
+    
+    # Use Arima() with given options
+    Fit00 <- tryCatch(
+      Arima( Y[i:(i+window.size-1)],
+             order=Arima.order,
+             include.mean = include.mean,
+             include.drift = include.drift,
+             lambda = lambda,
+             seasonal = seasonal, 
+             xreg=xreg), 
+      error = function(ss){
+        cat(paste("    i=",i,"  MLE-CSS failed.  Using CSS.\n"))
+        return(
+          Arima( Y[i:(i+window.size-1)],
+                 order=Arima.order,
+                 include.mean = include.mean,
+                 include.drift = include.drift,
+                 lambda = lambda,
+                 seasonal = seasonal,
+                 xreg=xreg,
+                 method="CSS") ) } )
+    
+    # Model one step forecast  
+    if (is.null(xreg)){ 
+      Y.h  <- forecast(Fit00, 1)
+    } else {
+      Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))
+    }
+    Yhat[i]     <- Y.h$mean
+    Yhat.CIu[i] <- Y.h$lower[2]
+    Yhat.CIl[i] <- Y.h$upper[2]     
+  }
+  
+  # Yhat starts at window.size+1 up to length(Y)
+  Yhat     = ts(Yhat,     start=time(Y)[window.size+1], freq=frequency(Y))
+  Yhat.CIu = ts(Yhat.CIu, start=time(Y)[window.size+1], freq=frequency(Y))
+  Yhat.CIl = ts(Yhat.CIl, start=time(Y)[window.size+1], freq=frequency(Y))
+  Y1 = window(Y, end=time(Y)[window.size],     freq=frequency(Y))
+  Y2 = window(Y, start=time(Y)[window.size+1], freq=frequency(Y))
+  
+  #- Calculate prediction performance
+  Pred.error = Y2 - Yhat
+  Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
+  
+  cat(paste("\n  Total length",length(Y),", window size",window.size,".\n  Last", 
+            (length(Y)-window.size), "obs fit retrospectively with Rolling 1-step\n", 
+            "     prediction using same order and fized window size.\n"))
+  cat(paste("\n  Average Prediction Error: ", round(mean(Pred.error), 4)))
+  cat(paste("\n  root Mean Squared Error of Prediction:  ", round(Pred.rMSE, 4)), "\n\n")
+  
   if (show_plot) {
     #- Plot the prediction result with original data
     layout(matrix(c(1,1,1,1,1,1,2,3,4), 3, 3, byrow=TRUE))    # 3 plots at once
-
-    plot(  Y,  type="n")
-    lines( Y1, type="o", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)" )  
+    
+    plot(  Y,        type="n", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)")  
+    lines( Y1,       type="o") 
     lines( Y2,       type="o", col="red")
     lines( Yhat,     type="o", col="blue")
     lines( Yhat.CIu, type="l", col="gray30", lty=2)
     lines( Yhat.CIl, type="l", col="gray30", lty=2)
-
+    
     # - Plot the prediction error
     plot( (window.size+1):length(Y), Pred.error, type="o", main="Prediction Error (Red-Blue)" ) 
     abline(h=0, lty=2)
@@ -264,113 +267,17 @@ Rolling1step.forecast <- function(Y,
   
   P <- matrix(c(round(mean(Pred.error), 4), round(Pred.rMSE, 4)), 1, 2)
   colnames(P) <- c("mean pred error","rMSE") 
-  return(P)
-
+  output = list(Actual=Y2, Predicted=Yhat)
+  return(output)
+  
 }
+
 
 # Example of how to use it
+# Pred = Rolling1step.forecast(Y, window.size=50, Arima.order=c(1,0,1), include.mean=TRUE)
+# Pred
 #
-#  #- Set options 
-#  Y <- Oil                   # Original data
-#  window.size <- 200         # Window size for estimation
-#  Arima.order <- c(0,1,1)    # Arima(p,d,q) order
-#  pred.plot   <- TRUE        # do you want plot at end? 
-#
-#  #- set Arima() options: 
-#  include.mean = TRUE        #
-#  include.drift = FALSE      #
-#  lambda   = NULL            # NULL=no transformaton. 0=Log
-#  xreg     = NULL            # set to TRUE if Linear Trend is present
-#  seasonal = c(0, 0, 0)      # seasonal component
-#
-#  #- then use the function 
-#  Rolling1step.forecast(Y, window.size, Arima.order, pred.plot, 
-#                        include.mean, include.drift, lambda, xreg, seasonal)
+####################
 
-
-
-
-
-
-
-
-
-
-#--- Rolling 1-step old version ---------------------------
-Rolling1step.forecast.old <- function(Y, window.size, Arima.order, pred.plot,
-                        include.mean, include.drift, lambda, xreg, seasonal){
-
-    library(forecast)
- 
-    Yhat  <- Yhat.CIu <- Yhat.CIl <- 0        # initialize what needs to be saved
-    for (i in 1:(length(Y)-window.size)) {
-      # Use Arima() with given options
-
-      # Model Estimation 
-      if (xreg){
-          #- When Linear Trend is Present
-          Fit00 <- Arima( Y[i:(i+window.size-1)],
-                          order=Arima.order,
-                          include.mean = include.mean,
-                          include.drift = include.drift,
-                          lambda = lambda,
-                          seasonal = seasonal,
-                          xreg=time(Y[i:(i+window.size-1)]))
-          Y.h  <- forecast(Fit00, 1, xreg=last(time(Y[i:(i+window.size-1)]))+1/frequency(Y))       # one step prediction
-          
-      } else {
-          #- When Linear Trend is Not Present
-          Fit00 <- Arima( Y[i:(i+window.size-1)],
-                          order=Arima.order,
-                          include.mean = include.mean,
-                          include.drift = include.drift,
-                          lambda = lambda,
-                          seasonal = seasonal)
-      
-          Y.h  <- forecast(Fit00, 1)       # one step prediction
-      }
-      Yhat[i]     <- Y.h$mean
-      Yhat.CIu[i] <- Y.h$lower[2]
-      Yhat.CIl[i] <- Y.h$upper[2]     
-
-    }
-    
-    # Yhat starts at window.size+1 up to length(Y)
-    Yhat     = ts(Yhat,     start=time(Y)[window.size+1], freq=frequency(Y))
-    Yhat.CIu = ts(Yhat.CIu, start=time(Y)[window.size+1], freq=frequency(Y))
-    Yhat.CIl = ts(Yhat.CIl, start=time(Y)[window.size+1], freq=frequency(Y))
-    Y1 = window(Y, end=time(Y)[window.size],     freq=frequency(Y))
-    Y2 = window(Y, start=time(Y)[window.size+1], freq=frequency(Y))
-
-    #- Calculate prediction performance
-    Pred.error = Y2 - Yhat
-    Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
-    cat(paste("\nLast ", (length(Y)-window.size), " obs fit retrospectively\n    with Rolling 1-step prediction"))
-    cat(paste("\n  Average prediction error: ", round(mean(Pred.error), 4)))
-    cat(paste("\n  root Mean Squared Error:  ", round(Pred.rMSE, 4)), "\n\n\n")
-
-  if (pred.plot) {
-    #- Plot the prediction result with original data
-    layout(matrix(c(1,1,1,1,1,1,2,3,4), 3, 3, byrow=TRUE))    # 3 plots at once
-
-    plot(  Y,  type="n")
-    lines( Y1, type="o", main="Rolling 1-step prediction (Red=Actual, Blue=Prediction)" )  
-    lines( Y2,       type="o", col="red")
-    lines( Yhat,     type="o", col="blue")
-    lines( Yhat.CIu, type="l", col="gray30", lty=2)
-    lines( Yhat.CIl, type="l", col="gray30", lty=2)
-
-    # - Plot the prediction error
-    plot( (window.size+1):length(Y), Pred.error, type="o", main="Prediction Error (Red-Blue)" ) 
-    abline(h=0, lty=2)
-    acf(Pred.error)
-    layout(1)                    # reset the layout
-  }
-  
-  P <- matrix(c(round(mean(Pred.error), 4), round(Pred.rMSE, 4)), 1, 2)
-  colnames(P) <- c("mean pred error","rMSE") 
-  return(P)
-
-}
 
 
