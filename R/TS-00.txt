@@ -176,7 +176,7 @@ KStest <- function(X) {
 
 
 
-#--- Rolling 1-step version 2022.2 ---------------------------
+#--- Rolling 1-step version 2022.3 ---------------------------
 Rolling1step.forecast <- function(Y,
                                   window.size,
                                   Arima.order,
@@ -271,6 +271,7 @@ Rolling1step.forecast <- function(Y,
   output = list(Actual=Y2, Predicted=Yhat)
   return(output)
   
+  # Rolling 1-step version 2022.3
 }
 
 
