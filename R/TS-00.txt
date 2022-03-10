@@ -242,7 +242,7 @@ Rolling1step.forecast <- function(Y,
   Pred.rMSE =  sqrt(  mean( (Pred.error)^2 ) )     # prediction root Mean Squared Error
   
   cat(paste("\n  Total length",length(Y),", window size",window.size,".\n  Last", 
-            (length(Y)-window.size), "obs fit retrospectively with Rolling 1-step\n", 
+            (length(Y)-window.size), "obs retrospectively forecasted with Rolling 1-step\n", 
             "     prediction using same order and fized window size.\n"))
   cat(paste("\n  Average Prediction Error: ", round(mean(Pred.error), 4)))
   cat(paste("\n  root Mean Squared Error of Prediction:  ", round(Pred.rMSE, 4)), "\n\n")
