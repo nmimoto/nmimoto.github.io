@@ -333,8 +333,8 @@ div.tocify {
 <!--------------------------------------------------------------------->
 <!--
   library(rmarkdown)
-  render("/Users/nmimoto/Dropbox/GARAGE/477/tmp__lecno-rmd.Rmd", html_document(toc=TRUE,
-                           toc_float=TRUE,
+  render("", html_document(toc=TRUE,
+       /Users/nmimoto/Dropbox/GARAGE/477/tmp__lecno-rmd.Rmd                    toc_float=TRUE,
                            toc_depth=2,
                            theme="readable",
                            highlight="tango" ))
@@ -566,17 +566,17 @@ highlight="kate"
   X_t &amp;= \phi_1 X_{t-1} + \epsilon_t + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2} \\
   \epsilon_t &amp;\sim WN(0,\sigma^2)
 \end{align*}\]</span></p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>  Fit3b</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>  Fit3c</span></code></pre></div>
 <pre><code>## Series: Lake 
-## ARIMA(1,1,2) 
+## ARIMA(1,1,2) with drift 
 ## 
 ## Coefficients:
-##          ar1      ma1      ma2
-##       0.6385  -0.5349  -0.3514
-## s.e.  0.1345   0.1445   0.1055
+##          ar1      ma1      ma2    drift
+##       0.6911  -0.6271  -0.3729  -0.0241
+## s.e.  0.0956   0.1251   0.1157   0.0100
 ## 
-## sigma^2 = 0.4812:  log likelihood = -99.88
-## AIC=207.76   AICc=208.2   BIC=218.02</code></pre>
+## sigma^2 = 0.4663:  log likelihood = -99
+## AIC=208.01   AICc=208.67   BIC=220.83</code></pre>
 <p><br><br></p>
 </div>
 </div>
@@ -646,17 +646,17 @@ highlight="kate"
 ## 
 ## sigma^2 = 0.4612:  log likelihood = -98.66
 ## AIC=207.33   AICc=207.98   BIC=220.2</code></pre>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>  Fit3</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>  Fit3c</span></code></pre></div>
 <pre><code>## Series: Lake 
-## ARIMA(1,1,2) 
+## ARIMA(1,1,2) with drift 
 ## 
 ## Coefficients:
-##          ar1      ma1      ma2
-##       0.6385  -0.5349  -0.3514
-## s.e.  0.1345   0.1445   0.1055
+##          ar1      ma1      ma2    drift
+##       0.6911  -0.6271  -0.3729  -0.0241
+## s.e.  0.0956   0.1251   0.1157   0.0100
 ## 
-## sigma^2 = 0.4812:  log likelihood = -99.88
-## AIC=207.76   AICc=208.2   BIC=218.02</code></pre>
+## sigma^2 = 0.4663:  log likelihood = -99
+## AIC=208.01   AICc=208.67   BIC=220.83</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>  Fit4</span></code></pre></div>
 <pre><code>## Series: Lake 
 ## ARIMA(0,1,0) 
@@ -670,16 +670,13 @@ highlight="kate"
 <ul>
 <li><p>Model (1): ARIMA(1,0,1) with mean is fitting adequately. This suggests that Lake is stationary (at constant mean) without any transformation.</p>
 <p><span class="math display">\[{\large   Y_t \hspace{3mm} = \hspace{3mm} \mu + X_t, \hspace{10mm} X_t \mbox{ is ARMA(1,1)} }\]</span></p></li>
-<li><p>Model (2): ARIMA(1,0,1) with linear trend is fitting adequately. Intercept and slope are significant.</p>
+<li><p>Model (2): ARIMA(1,0,1) with linear trend is fitting adequately. Intercept and slope are significant. However, the regression residuals are deemed non-stationary by ADF test.</p>
 <p><span class="math display">\[{\large   Y_t \hspace{3mm} = \hspace{3mm} a + bt + X_t, \hspace{10mm} X_t \mbox{ is ARMA(1,1)}  }\]</span></p></li>
 <li><p>Model (3): ARIMA(1,1,2) with drift is fitting adequately. Drift is significant, and same as the slope in (b).</p>
 <p><span class="math display">\[{\large   \bigtriangledown Y_t = Y_t - Y_{t-1} = b + X_t, \hspace{10mm} X_t \mbox{ is ARMA(1,2)} }\]</span></p></li>
 <li><p>Model (4): ARIMA(0,1,0) is fitting adequately. This suggests that Lake is RW w/o drift.</p>
 <p><span class="math display">\[{\large   \bigtriangledown Y_t = Y_t - Y_{t-1} = X_t = \epsilon_t \hspace{10mm} \epsilon_t \mbox{ is ARMA(0,0) = WN} }\]</span></p></li>
-<li><p>Model (2) and (3) are concluding the same model, but (2) retains more information.</p></li>
-<li><p>Model (1) will be the same as (2) if slope was 0. But slope in (2) is significant.</p></li>
-<li><p>Model (4) will be the same model as (3) if ARMA parameters were 0, but ARMA parameters in (c) are significant.</p></li>
-<li><p>Model (2) is the best candidate. <!-- endofyank --> <br><br><br><br><br></p></li>
+<li><p>Model (3) is the best candidate. <!-- endofyank --> <br><br><br><br><br></p></li>
 </ul>
 </body>
 <!--------------------------------------------------------------------->
