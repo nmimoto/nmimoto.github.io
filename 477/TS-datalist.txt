@@ -438,11 +438,11 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(D1, type='o')
 
 
-#[Snow]-----------------------------------------------------------------------
+#[Snow 63]-----------------------------------------------------------------------
 #  Annual snowfall in Buffalo, 1910-1972.
 #  From Time Series Data Library
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/Snow.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/snow.csv")
     D1 <- ts(D[,2], start=c(1910,1), freq=1)
     plot(D1, type='o')
 
@@ -455,55 +455,55 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(D1, type='o')
 
 
-#[gtemp]-----------------------------------------------------------------------
+#[gtemp 130]-----------------------------------------------------------------------
 #  Global temparature data from Shumway
 #  package(astsa)
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/gtemp.txt")
+    D  <- read.csv("https://nmimoto.github.io/datasets/gtemp.csv")
     D1 <- ts(D, start=c(1880), freq=1)
     plot(D1, type='o')
 
 
-#[Temp]-----------------------------------------------------------------------
+#[Temp 3650]-----------------------------------------------------------------------
 #  Daily maximum temperatures in Melbourne, Australia, 1981-1990
 #  From Time Series Data Library
 
-    D <- read.csv("https://nmimoto.github.io/datasets/Temp.csv")
-    D1 <- ts(D, start=c(1,1), freq=1)
+    D <- read.csv("https://nmimoto.github.io/datasets/temp.csv")
+    D1 <- ts(D[,2], start=c(1,1), freq=1)
     plot(D1, type='o')
 
 
-#[Temp2]-----------------------------------------------------------------------
+#[Temp2 1461]-----------------------------------------------------------------------
 #  Mean daily temperature, Fisher River near Dallas, Jan 01, 1988 to Dec 31, 1991
 #  From Time Series Data Library
 
-    D <- read.csv("https://nmimoto.github.io/datasets/Temp2.csv")
-    D1 <- ts(D, start=c(1,1), freq=1)
+    D <- read.csv("https://nmimoto.github.io/datasets/temp2.csv")
+    D1 <- ts(D[,2], start=c(1,1), freq=1)
     plot(D1, type='o')
 
 
-#[Rhine]-----------------------------------------------------------------------
+#[Rhine 150]-----------------------------------------------------------------------
 #  Rhine River near basle, Switzerland, 1807 to 1957
 #  From Time Series Data Library
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/Rhine.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/rhine.csv")
     D1 <- ts(D[,2], start=c(1807,1), freq=1)
     plot(D1, type='o')
 
 
-#[erie]-----------------------------------------------------------------------
+#[Erie 601]-----------------------------------------------------------------------
 #  Monthly Lake Erie Levels 1921 – 1970,
 
     D <- read.csv("https://nmimoto.github.io/datasets/erie.csv", header=T)
-    D1 <- ts(D, start=c(1,1), freq=1)
+    D1 <- ts(D[,2], start=c(1921,1), freq=12)
     plot(D1, type='o')
 
 
-#[clear]-----------------------------------------------------------------------
+#[clear 600]-----------------------------------------------------------------------
 #  Monthly riverflow in cms, Clear water River at kamiah, Idaho, 1911 - 1965
 
     D <- read.csv("https://nmimoto.github.io/datasets/clear.csv", header=T)
-    D1 <- ts(D, start=c(1,1), freq=1)
+    D1 <- ts(D[,2], start=c(1911,1), freq=12)
     plot(D1, type='o')
 
 
