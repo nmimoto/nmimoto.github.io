@@ -68,7 +68,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
     plot(D1, type='o')
 
 
-#[Trade]-----------------------------------------------------------------------
+#[Trade 4x46]-----------------------------------------------------------------------
 #  US Trade in Goods and Services Balance of Payments (BOP) Basis. 
 #  Value in millions of 2000 dollars 1960-2005
 #  From Time Series Data Library
@@ -470,7 +470,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  From Time Series Data Library
 
     D <- read.csv("https://nmimoto.github.io/datasets/temp.csv")
-    D1 <- ts(D[,2], start=c(1,1), freq=1)
+    D1 <- ts(D[,2], start=c(1,1), freq=7)
     plot(D1, type='o')
 
 
