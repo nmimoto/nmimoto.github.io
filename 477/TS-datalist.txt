@@ -73,8 +73,9 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  Value in millions of 2000 dollars 1960-2005
 #  From Time Series Data Library
 
-    D <- read.csv("https://nmimoto.github.io/datasets/Trade.csv")
-    D1 <- ts(D[,2:5], start=1960, freq=1)
+    D <- read.csv("https://nmimoto.github.io/datasets/trade.csv")
+    D1 <- ts(D[,2], start=1960, freq=1)
+    D2 <- ts(D[,3], start=1960, freq=1)
     plot(D1, type='o')
 
 
@@ -171,7 +172,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  Monthly production of raw steel in Australia: thousand tonnes. Jan 1956 to Nov 1993
 #  From Time Series Data Library
 
-    D <- read.csv("https://nmimoto.github.io/datasets/Steel.csv")
+    D <- read.csv("https://nmimoto.github.io/datasets/steel.csv")
     D1 <- ts(D[,2], start=c(1956,1), freq=12)
     plot(D1, type='o')
 
@@ -252,7 +253,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  Monthly total number of pigs slaughtered in Victoria. Jan 1980 – August 1995
 #  From Time Series Data Library
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/Pigs.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/pigs.csv")
     D1 <- ts(D[,2], start=c(1980, 8), freq=12)
     plot(D1, type='o')
 
@@ -275,7 +276,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  Daily Sales data with leading indicator given by Box and Jenkins (1976), p. 537.
 #  LS2.tsm from Brockwell and Davis (2002)
 
-    D  <- read.table("https://nmimoto.github.io/datasets/LS2.csv", header=T)
+    D  <- read.table("https://nmimoto.github.io/datasets/ls2.csv", header=T)
     A <- ts(D$A, start=c(1,1), freq=1)
     B <- ts(D$B, start=c(1,1), freq=1)
 
@@ -424,7 +425,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #[FraizierMonthly]-----------------------------------------------------------------------
 #  Monthly Discharge data of Fraizier river
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/Frazier.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/frazier.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
     plot(D1, type='o')
 
@@ -433,7 +434,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #  Boise River near Twin Springs, Idaho, Oct. 1912 ? Sep. 1960
 #  From Time Series Data Library
 
-    D <- read.csv("https://nmimoto.github.io/datasets/Boise.csv")
+    D <- read.csv("https://nmimoto.github.io/datasets/boise.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
     plot(D1, type='o')
 
