@@ -21,7 +21,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #[SPY]-----------------------------------------------------------------------
 #  Daily Price of S&P500 ETF (SPY) from Jan 02 2000 to Dec 31 2014
 
-  D <- read.csv("https://nmimoto.github.io/datasets/SPY.csv", header=T)
+  D <- read.csv("https://nmimoto.github.io/datasets/spy.csv", header=T)
   head(D)
   X <- ts(D[,8], start=1)
   plot(X)
@@ -63,7 +63,7 @@ source('https://nmimoto.github.io/R/TS-00.txt')
 #[SP100]-----------------------------------------------------------------------
 #  SP100.TSM from Brockwell and Davis (2002)
 
-    D  <- read.csv("https://nmimoto.github.io/datasets/SP100.csv")
+    D  <- read.csv("https://nmimoto.github.io/datasets/sp100.csv")
     D1 <- ts(D, start=c(1,1), freq=1)
     plot(D1, type='o')
 
