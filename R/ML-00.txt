@@ -1,0 +1,48 @@
+library(MASS)        # install.packages('MASS')
+library(tidyverse)   # install.packages('tidyverse')
+
+### 1. --- Divide Dataset to Training and Testing and Set up k fold CV
+#  Orig <- Boston               # Entire Data set (have to be data.frame)
+#  train.size <- 400            # num of rows for training set
+#  test.size <- 106             # num of rows for testing set
+#  resp.col.name <- "medv"      # name of response column
+#  num.folds <- 5               # k for k-fold CV
+#  my.seed <- 4234              # give a seed
+
+
+    #---
+    set.seed(my.seed)
+    ix = sample(1:nrow(Orig))
+    Orig2 = Orig[ix, ]
+    Train.set  = Orig2[1:train.size, ]
+    Train.resp = Orig2[1:train.size, resp.col.name]
+    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
+    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
+
+    # K-fold Cross Validation
+    library(cvTools)     # install.packages("cvTools")
+    set.seed(my.seed)
+    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
+
+    CV.train      = list(Train.set[ folds$which!=1, ])
+    CV.train.resp = list(Train.resp[folds$which!=1,1])
+    CV.valid      = list(Train.set[ folds$which==1, ])
+    CV.valid.resp = list(Train.resp[folds$which==1,1])
+
+    for (k in 2:num.folds) {
+        CV.train[[k]]      = Train.set[ folds$which!=k, ]
+        CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
+        CV.valid[[k]]      = Train.set[ folds$which==k, ]
+        CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+    }
+
+
+# Output (all data.frame):
+#   Train.set
+#     Train.resp
+#   Test.set
+#     Test.resp
+#   CV.train[[k]]
+#     CV.train.resp[[k]]
+#   CV.valid[[k]]
+#     CV.valid.resp[[k]]
