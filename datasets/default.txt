@@ -1,0 +1,17 @@
+Default is a dataset that is in ISLR package
+
+
+library(ISLR)    # install.packages("ISLR")
+data(Default)    # see the data
+Default
+
+?Default  # see explanation for variables
+
+#  A data frame with 10000 observations on the following 4 variables.
+#
+# 1 default (factor)  A factor with levels No and Yes indicating whether the customer defaulted on their debt
+# 2 student (factor)  A factor with levels No and Yes indicating whether the customer is a student
+# 3 balance (numeric) The average balance that the customer has remaining on their credit card after making their monthly payment
+# 4 income  (numeric) Income of customer
+#
+# column "default" is the respoinse variable.
