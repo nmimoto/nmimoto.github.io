@@ -1,16 +1,20 @@
 library(MASS)        # install.packages('MASS')
 library(tidyverse)   # install.packages('tidyverse')
 
-### 1. --- Divide Dataset to Training and Testing and Set up k fold CV
-#  Orig <- Boston               # Entire Data set (have to be data.frame)
-#  train.size <- 400            # num of rows for training set
-#  test.size <- 106             # num of rows for testing set
-#  resp.col.name <- "medv"      # name of response column
-#  num.folds <- 5               # k for k-fold CV
-#  my.seed <- 4234              # give a seed
 
+###-------------------------------------------------------
+###--- 1. Data Separation (Copied from Rtut-CV)
 
-    #---
+### --- Divide Dataset to Training and Testing and Set up k fold CV
+# Orig <- Default2             # Entire Data set (have to be data.frame)
+# train.size <- 8500           # num of rows for training set
+# test.size <- 1500            # num of rows for testing set
+# my.seed <- 8346              # give a seed
+
+    #---AAAA---
+    resp.col.name <- "resp"   # name of response column
+    num.folds <- 5               # k for k-fold CV
+
     set.seed(my.seed)
     ix = sample(1:nrow(Orig))
     Orig2 = Orig[ix, ]
@@ -30,19 +34,23 @@ library(tidyverse)   # install.packages('tidyverse')
     CV.valid.resp = list(Train.resp[folds$which==1,1])
 
     for (k in 2:num.folds) {
-        CV.train[[k]]      = Train.set[ folds$which!=k, ]
-        CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
-        CV.valid[[k]]      = Train.set[ folds$which==k, ]
-        CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+      CV.train[[k]]      = Train.set[ folds$which!=k, ]
+      CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
+      CV.valid[[k]]      = Train.set[ folds$which==k, ]
+      CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
     }
+    #---BBBB---
 
+###  Line below will replace above chunk (#---AAAA to #---BBBB)
+###  source('https://nmimoto.github.io/R/ML-00.txt')
+###
 
-# Output (all data.frame):
-#   Train.set
-#     Train.resp
-#   Test.set
-#     Test.resp
-#   CV.train[[k]]
-#     CV.train.resp[[k]]
-#   CV.valid[[k]]
-#     CV.valid.resp[[k]]
+    # Output (all data.frame):
+    #   Train.set
+    #   Train.resp
+    #   Test.set
+    #   Test.resp
+    #   CV.train[[k]]
+    #   CV.train.resp[[k]]
+    #   CV.valid[[k]]
+    #   CV.valid.resp[[k]]
