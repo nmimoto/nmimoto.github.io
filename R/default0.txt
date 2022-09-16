@@ -1,16 +1,17 @@
 ###
 ###
-###  Default - Prelim  ver 0.0.1
-###
+###  Default - Preliminary Analysis
+###                      ver 0.0.4
 ###
 ####################################################
 
 
+
 #-------------------------------------------------
 ###--- 0. Preliminary
-library(ISLR)   # install.packages("ISLR")
-data(Default)    # see the data
-Default          # another way to see the data
+library(ISLR)    # install.packages('ISLR', repos='https://cran.case.edu/')
+head(Default)    # see the data
+dim(Default)
 
 ?Default  # see explanation for variables
 
@@ -35,14 +36,43 @@ Default
 class(Default)
 print(Default, n=100)      # if you want to see more rows
 
-# table of the respoonse variable
-table(Default$default)
+# table of columns
+table(Default$default)     # Note that this is No/Yes instead of YES/no
+table(Default$student)
 
 
-Default2 <- Default %>% 
+Default2 <- Default %>%
               rename(resp=default) %>%     # Rename "default" column as "resp"
               relocate(resp)               # move "resp" columnm to 1st
 Default2
+
+
+#-------------------------------------------------
+###--- 0.5 Preliminary Plots
+Default
+student
+Default$student
+
+attach(Default)
+# Back to Default data (not Default2)
+plot(balance, default)
+plot(default, balance, xlab="Default", ylab="Balance")
+
+plot(income, default)
+plot(default, income, xlab="Default", ylab="Income")
+
+plot(student, default, ylab="Default", xlab="Student")
+plot(default, student, xlab="Default", ylab="Student")
+
+
+plot(balance, income, col=ifelse((default=="Yes"), "red", "blue"),
+                      pch=ifelse((default=="Yes"), 4, 3))
+lines(balance[default=="Yes"], income[default=="Yes"], col="red",
+      pch=4, type="p")
+
+
+
+
 
 
 
@@ -57,8 +87,9 @@ resp.col.name <- "resp"
   summary(Orig)
   sum(is.na(Orig))
   # If there is na in the data, run below
-  # Orig <- Orig %>% na.omit()
-  # dim(Orig)
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
   ##----------
@@ -78,7 +109,7 @@ resp.col.name <- "resp"
   # pairs(Orig) equivalent
   library(GGally)      # install.packages("GGally")
     GGally::ggpairs(Orig[, c(2:4, 1)], aes(color=resp, alpha=1))
-  
+
 
   ###----------
   ###- Chi-sq test of association for each column

@@ -1,8 +1,8 @@
 ###
 ###
 ###  Heart - Preliminary Analysis
+###                               ver 0.0.4
 ###
-###  ver 0.0.3
 ####################################################
 
 
@@ -12,25 +12,40 @@ library(tidyverse)
 Heart <- read_csv("https://nmimoto.github.io/datasets/heart.csv")
 Heart
 
+class(Heart)               # it's already tibble
 print(Heart, n=100)        # if you want to see more rows
 print(Heart, width=1000)   # if you want to see more cols
 names(Heart)
 
-  # 1  index
-  # 2  Age
-  # 3  Sex
-  # 4  ChestPain   (Qualitative)
-  # 5  RestBP
-  # 6  Chol
-  # 7  Fbs
-  # 8  RestECG
-  # 9  MaxHR
-  # 10 ExAng
-  # 11 Oldpeak
-  # 12 Slope
-  # 13 Ca
-  # 14 Thal     (Thalium stress test)   Qualitative
-  # 15 AHD      Yes/No based on an angiographic test  Qualitative <-- Response
+
+#  #0  "X1"         index
+#  #1  "Age"        age in years
+#  #2  "Sex"        (Qualitative) sex (1 = male; 0 = female)
+#  #3  "ChestPain"  (Qualitative) chest pain type
+#                      -- Value 1: typical angina
+#                      -- Value 2: atypical angina
+#                      -- Value 3: non-anginal pain
+#                      -- Value 4: asymptomatic
+#  #4  "RestBP"     resting blood pressure (in mm Hg on admission to the hospital)
+#  #5  "Chol"       serum cholestoral in mg/dl
+#  #6  "Fbs"        (Qualitative) fasting blood sugar > 120 mg/dl (1 = true; 0 = false)
+#  #7  "RestECG"    (Qualitative) resting electrocardiographic results
+#                       -- Value 0: normal
+#                       -- Value 1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV)
+#                       -- Value 2: showing probable or definite left ventricular hypertrophy by Estes' criteria
+#  #8  "MaxHR"      maximum heart rate achieved
+#  #9  "ExAng"      (Qualitative) exercise induced angina (1 = yes; 0 = no)
+#  #10 "Oldpeak"    oldpeak = ST depression induced by exercise relative to rest
+#  #11 "Slope"      the slope of the peak exercise ST segment
+#  #12 "Ca"         number of major vessels (0-3) colored by flourosopy
+#  #13 "Thal"       (Qualitative) Thalium stress test
+#                     3 = normal; 6 = fixed defect; 7 = reversable defect
+#  #14 "AHD"        (Qualitative)(Response) Yes/No based on an angiographic test
+#                       diagnosis of heart disease (angiographic disease status)
+#                       -- Value 0: < 50% diameter narrowing
+#                       -- Value 1: > 50% diameter narrowing
+#                       (in any major vessel: attributes 59 through 68 are vessels)
+
 
 #- table of the respoonse variable
 table(Heart$AHD)
@@ -39,18 +54,24 @@ table(Heart$AHD)
 ### column "AHD" is the respoinse variable.
 ###
 
+print(Heart2, width=1000)
+
 # Rename medv column as resp.
 Heart2 <- Heart %>%
-    select(-"index")  %>%            # remove col named "index"
+    select(-"index") %>%             # remove col named "index"
     rename(resp=AHD) %>%             # rename the column
-    relocate(resp) %>%               # move "resp" to 1st column
-    mutate(resp=as.factor(resp),     # Turn these columns to <factor> instead of <double>
-           ChestPain=as.factor(ChestPain),
-           Thal=as.factor(Thal),
-           Sex=as.factor(Sex),
-           Fbs=as.factor(Fbs),
-           RestECG=as.factor(RestECG),
-           ExAng=as.factor(ExAng))
+    relocate(resp)                   # move "resp" to 1st column
+
+print(Heart2, width=1000)
+
+Heart2 <- Heart2 %>%
+    mutate(resp     = as.factor(resp),        # Turn these columns to <factor> instead of <double>
+           Sex      = as.factor(Sex),
+           ChestPain= as.factor(ChestPain),
+           Fbs      = as.factor(Fbs),
+           RestECG  = as.factor(RestECG)),
+           ExAng    = as.factor(ExAng),
+           Thal     = as.factor(Thal))
 
 print(Heart2, width=1000)
 
@@ -68,6 +89,7 @@ resp.col.name <- "resp"
   dim(Orig)
   sum(is.na(Orig))
   # If there is na in the data, run below
+  dim(Orig)
   Orig <- Orig %>% na.omit()
   dim(Orig)
 
