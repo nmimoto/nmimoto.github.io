@@ -3,6 +3,13 @@
 ###                              ver 0.0.4
 ###
 ####################################################
+###--- 0. Preliminary
+###--- 1. Data Separation (Copied from Rtut-CV)
+###--- 2. Logistic Regression with CV
+###--- 3. Final Training/Test fit using best model
+###--- 4. Determine the Best Threshold
+
+
 
 ###-------------------------------------------------------
 ###--- 0. Preliminary
@@ -45,7 +52,7 @@ Orig <- Heart2
 
 
 ###-------------------------------------------------------
-###--- 2. Data Separation (Copied from Rtut-CV)
+###--- 1. Data Separation (Copied from Rtut-CV)
 Orig <- Orig         # Entire Data set (have to be data.frame)
 train.size <- 250    #num of rows for training set
 test.size <-  47     # num of rows for testing set
@@ -77,7 +84,7 @@ lines(Train.set$RestBP[ix_yes], Train.set$Chol[ix_yes], col="red", type="p")
 
 
 ###-------------------------------------------------------
-###--- 4 Logistic Regression with CV
+###--- 2. Logistic Regression with CV
 
 AUCs <- MSE.valid <- matrix(0, 5, 2)
 colnames(AUCs) = c("Train AUC", "Valid AUC")
@@ -105,6 +112,7 @@ for (k in 1:5) {
 AUCs
 
 Av.AUCs = apply(AUCs, 2, mean)
+names(Av.AUCs) = c("Av.Train AUC", "Av.Valid AUC")
 Av.AUCs
 
 
@@ -114,10 +122,8 @@ Av.AUCs
 
 
 
-
-
 ###----------------------------
-###--- 5 Final Training/Test fit using best model
+###--- 3. Final Training/Test fit using best model
 
 ### Best model
 Fit03 <- glm(resp ~ .,  family=binomial, data=Train.set)
@@ -137,7 +143,7 @@ head(Test.prob)
 
 
 ###----------------------------
-#- 5.1a Output result for given threshold value
+#- 3a Output result for given threshold value
 threshold = .9   # pick a threshold
 
     #- Check the training set accuracy
@@ -167,7 +173,7 @@ threshold = .9   # pick a threshold
 
 
 ###----------------------------
-#- 5.1b Output ROC curve and AUC for all threshold
+#- 3b Output ROC curve and AUC for all threshold
 library(pROC)
     #- Training Set
     plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
@@ -186,6 +192,16 @@ library(pROC)
     c(auc.train, auc.test)
 
 
+
+layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+
+
 plot(AUCs[,2], col="red", ylim=c(.5,1))
 lines(AUCs[,1], type="p")
 abline(h=auc.test)
@@ -193,7 +209,7 @@ abline(h=auc.test)
 
 
 ###-------------------------------------------------------
-###--- 6 Determine the Best Threshold
+###--- 4. Determine the Best Threshold
 
 #--- Decide on Threshould penalty
 #cost.list = c(1,1,1,1)/4           # order of (TP, TN, FP, FN)

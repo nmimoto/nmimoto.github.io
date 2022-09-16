@@ -4,6 +4,14 @@
 ###                                      ver 0.0.4
 ###
 ####################################################
+###--- 0. Preliminary
+###--- 1. Data Separation (Copied from Rtut-CV)
+###--- 2. Logistic Regression on Training Set
+###--- 3. Logistic Regression with CV
+###--- 4. Final Training/Test fit using best model
+###--- 5. Determine the Best Threshold
+
+
 
 
 ###-------------------------------------------------------
@@ -97,11 +105,11 @@ my.seed <- 8346              # give a seed
 
 
 ###-------------------------------------------------------
-###--- 3 Logistic Regression on Training Set
+###--- 2. Logistic Regression on Training Set
 
 
 ###----------------------------
-###--- 3.1 Model1 Just balance
+###--- 2.1 Model1 Just balance
 Fit01 <- glm(resp ~ balance,  family=binomial, data=Train.set)
 summary(Fit01)
 
@@ -111,7 +119,7 @@ summary(Fit01)
 
 
 ###----------------------------
-###--- 3.2 Model2 All three
+###--- 2.2 Model2 All three
 Fit02 <- glm(resp ~ .,  family=binomial, data=Train.set)
 summary(Fit02)
 
@@ -125,7 +133,7 @@ summary(Fit02)$coef[,4]   # extract 4th column (P-value) of above
 
 
 ###----------------------------
-###--- 3.3 Model3 Remove income
+###--- 2.3 Model3 Remove income
 Fit03 <- glm(resp ~ balance + student,  family=binomial, data=Train.set)
 summary(Fit03)
 
@@ -146,7 +154,7 @@ summary(Fit03)
 
 
     ###----------------------------
-    #- 3.3a Output result for given threshold value
+    #- 2.3a Output result for given threshold value
     threshold = .9   # pick a threshold
 
     #- Check the training set accuracy
@@ -176,7 +184,7 @@ summary(Fit03)
 
 
     ###----------------------------
-    #- 3.4b Output ROC curve and AUC for all threshold
+    #- 2.3b Output ROC curve and AUC for all threshold
     library(pROC)
     #- Training Set
     plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
@@ -193,7 +201,7 @@ summary(Fit03)
 
 
 ###-------------------------------------------------------
-###--- 4 Logistic Regression with CV
+###--- 3. Logistic Regression with CV
 
 AUCs <- MSE.valid <- matrix(0, 5, 2)
 colnames(AUCs) = c("Train AUC", "Valid AUC")
@@ -221,6 +229,7 @@ for (k in 1:5) {
 AUCs
 
 Av.AUCs = apply(AUCs, 2, mean)
+names(Av.AUCs) = c("Av.Train AUC", "Av.Valid AUC")
 Av.AUCs
 
 
@@ -233,7 +242,7 @@ Av.AUCs
 
 
 ###----------------------------
-###--- 5 Final Training/Test fit using best model
+###--- 4. Final Training/Test fit using best model
 
 ### Best model
 Fit03 <- glm(resp ~ balance + student,  family=binomial, data=Train.set)
@@ -253,7 +262,7 @@ head(Test.prob)
 
 
 ###----------------------------
-#- 5.1a Output result for given threshold value
+#- 4a Output result for given threshold value
 threshold = .9   # pick a threshold
 
     #- Check the training set accuracy
@@ -283,7 +292,7 @@ threshold = .9   # pick a threshold
 
 
 ###----------------------------
-#- 5.1b Output ROC curve and AUC for all threshold
+#- 4b Output ROC curve and AUC for all threshold
 library(pROC)
     #- Training Set
     plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
@@ -306,7 +315,7 @@ library(pROC)
 
 
 ###-------------------------------------------------------
-###--- 6 Determine the Best Threshold
+###--- 5. Determine the Best Threshold
 
 #--- Decide on Threshould penalty
 #cost.list = c(1,1,1,1)/4           # order of (TP, TN, FP, FN)
