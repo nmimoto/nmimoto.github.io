@@ -37,7 +37,7 @@ class(Default)
 print(Default, n=100)      # if you want to see more rows
 
 # table of columns
-table(Default$default)
+table(Default$default)     # Note that this is No/Yes instead of YES/no
 table(Default$student)
 
 
@@ -45,6 +45,34 @@ Default2 <- Default %>%
               rename(resp=default) %>%     # Rename "default" column as "resp"
               relocate(resp)               # move "resp" columnm to 1st
 Default2
+
+
+#-------------------------------------------------
+###--- 0.5 Preliminary Plots
+Default
+student
+Default$student
+
+attach(Default)
+# Back to Default data (not Default2)
+plot(balance, default)
+plot(default, balance, xlab="Default", ylab="Balance")
+
+plot(income, default)
+plot(default, income, xlab="Default", ylab="Income")
+
+plot(student, default, ylab="Default", xlab="Student")
+plot(default, student, xlab="Default", ylab="Student")
+
+
+plot(balance, income, col=ifelse((default=="Yes"), "red", "blue"),
+                      pch=ifelse((default=="Yes"), 4, 3))
+lines(balance[default=="Yes"], income[default=="Yes"], col="red",
+      pch=4, type="p")
+
+
+
+
 
 
 
