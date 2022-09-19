@@ -69,7 +69,7 @@ Heart2 <- Heart2 %>%
            Sex      = as.factor(Sex),
            ChestPain= as.factor(ChestPain),
            Fbs      = as.factor(Fbs),
-           RestECG  = as.factor(RestECG)),
+           RestECG  = as.factor(RestECG),
            ExAng    = as.factor(ExAng),
            Thal     = as.factor(Thal))
 

@@ -206,6 +206,10 @@ plot(AUCs[,2], col="red", ylim=c(.5,1))
 lines(AUCs[,1], type="p")
 abline(h=auc.test)
 
+AUCs
+Av.AUCs
+c(auc.train, auc.test)
+
 
 
 ###-------------------------------------------------------
