@@ -50,48 +50,29 @@ Boston3
 
 
 ###-------------------------------------------------
-###--- 2. Data Separation (Copied from Rtut-CV)
+###--- 1. Data Separation (Copied from Rtut-CV)
 ### Divide Dataset to Training and Testing and Set up k fold CV
 Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
 test.size <- 106              # num of rows for testing set
-resp.col.name <- "resp"      # name of response column
-num.folds <- 5               # k for k-fold CV
 my.seed <- 3231              # give a seed
 
-# [ training 400     ]     [testing 106]
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# [ Train.set 400     ]     [Test.set 106]
 # [80][80][80][80][80]
 
-    #---
-    set.seed(my.seed)
-    ix = sample(1:nrow(Orig))
-    Orig2 = Orig[ix, ]
-    Train.set  = Orig2[1:train.size, ]
-    Train.resp = Orig2[1:train.size, resp.col.name]
-    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
-    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
 
-    # K-fold Cross Validation
-    library(cvTools)     # install.packages("cvTools")
-    set.seed(my.seed)
-    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
 
-    CV.train      = list(Train.set[ folds$which!=1, ])
-    CV.train.resp = list(Train.resp[folds$which!=1,1])
-    CV.valid      = list(Train.set[ folds$which==1, ])
-    CV.valid.resp = list(Train.resp[folds$which==1,1])
-
-    for (k in 2:num.folds) {
-        CV.train[[k]]      = Train.set[ folds$which!=k, ]
-        CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
-        CV.valid[[k]]      = Train.set[ folds$which==k, ]
-        CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
-    }
-# Output (all data.frame):
-#   Train.set   [400x14]   /  Train.resp  [400x1]
-#   Test.set    [106x14]   /  Test.resp   [106x1]
-#   CV.train[[k]]  /  CV.train.resp[[k]]    k goes from 1 to num.folds
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]    k goes from 1 to num.folds
 
 #--- plot Training and Test for visualization
 fold = 2
@@ -103,7 +84,7 @@ lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
 
 
 ###-------------------------------------------------
-###--- 1. Multiple Regression with all variables, no Cross Validation all data
+###--- 2. Multiple Regression with all variables, no Cross Validation all data
 Reg01 <- lm(medv ~ . , data=Boston)
 summary(Reg01)
 
@@ -167,10 +148,10 @@ summary(Reg03)
 
 
 ###-------------------------------------------------
-###--- 2. Multiple Regression with Cross Validation (use all columns)
+###--- 3. Multiple Regression with Cross Validation (use all columns)
 
 ##
-## 2a. Do it for 1 fold
+## Example for for 1 fold
 ##
 k=1  # CV fold number
 
@@ -198,14 +179,18 @@ Reg01 <- lm(resp ~., data=CV.train[[k]])
 
 
 
+
+###-------------------------------------------------
+###--- 4. Multiple Regression with CV (search for better model)
+
 ##
-## 2b. Make a loop over 5 CV folds
+##  Change the model and search for the better model
 ##
 layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
 CVFitDiagnosis <- numeric(0)
 for (k in 1:5) {
 
-  Reg01 <- lm(resp ~., data=CV.train[[k]])
+  Reg01 <- lm(resp ~. -chas, data=CV.train[[k]])      ## <====== Change the model here
   # summary(Reg01)
   # plot(Reg01)      # plots 4 diagnosis plots
 
@@ -220,10 +205,10 @@ for (k in 1:5) {
 
     library(caret)            # install.packages("caret")
     CVFitDiagnosis1 <- data.frame(
-      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
-      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
-      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+      tr.RMSE     = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
+      tr.Rsquare  = caret::R2(Train.fitted,             CV.train.resp[[k]]),
+      val.RMSE    = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.fitted,             CV.valid.resp[[k]])
     )
     CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
 }
@@ -233,6 +218,7 @@ CVFitDiagnosis
 
 Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
 Av.CVFitDiagnosis
+
 
 ##
 ##  Av. val.RMSE is the summary for how good this model is fitting over all CV
@@ -242,60 +228,16 @@ Av.CVFitDiagnosis
 
 
 
-
 ###-------------------------------------------------
-###--- 3. Multiple Regression with CV (search for better model)
-
-##
-##  Change the model and search for the better model
-##
-layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
-CVFitDiagnosis <- numeric(0)
-for (k in 1:5) {
-
-  Reg01 <- lm(resp ~., data=CV.train[[k]])      ## <====== Change the model here
-  # summary(Reg01)
-  # plot(Reg01)      # plots 4 diagnosis plots
-
-  #--- Get training / validation fit
-  Train.fitted = predict(Reg01, newdata=CV.train[[k]])
-  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
-
-    #--- Plot Y vs Yhat
-    plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual",main=paste("K=",k))
-    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
-    abline(0,1)
-
-    library(caret)            # install.packages("caret")
-    CVFitDiagnosis1 <- data.frame(
-      tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
-      tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
-      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
-    )
-    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
-}
-layout(1)
-
-CVFitDiagnosis
-
-Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
-Av.CVFitDiagnosis
-
-
-
-
-
-###-------------------------------------------------
-###--- 4. Final Fit with Train.set 
+###--- 5. Final Fit with Train.set
 
 ## [ Train.set 400     ]     [Test.set 106]
 ## [80][80][80][80][80]
 
 
-Reg01 <- lm(resp ~. -chas, data=Train.set)      ## <====== Best model you found in 3
-  # summary(Reg01)
-  # plot(Reg01)      # plots 4 diagnosis plots
+Reg01 <- lm(resp ~. -chas, data=Train.set)      ## <====== Best model you found in 4
+summary(Reg01)
+plot(Reg01)      # plots 4 diagnosis plots
 
 #--- Get training / validation fit
 Train.fitted = predict(Reg01, newdata=Train.set)
@@ -308,15 +250,13 @@ abline(0,1)
 
 library(caret)            # install.packages("caret")
 FinalFitDiagnosis <- data.frame(
-  tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
-  tr.Rsquare  = caret::R2(Train.fitted,           Train.resp),
-  test.RMSE  = caret::RMSE(Test.fitted, as.matrix(Test.resp)),
-  test.Rsquare = caret::R2(Test.fitted,           Test.resp)
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.fitted,  as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.fitted,            Test.resp)
 )
 FinalFitDiagnosis
 
-
-
 ##
-##  Use test.RMSE or test.Rsquare as summary of the model fit.  These numbers does not have penalty for having more parameters.  
+##  Use test.RMSE or test.Rsquare as summary of the model fit.  These numbers does not have penalty for having more parameters.
 ##
