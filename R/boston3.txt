@@ -1,8 +1,8 @@
 ###
 ###
 ###  Boston data (MASS) - Regularization: LASSO and Ridge Regression
-###                         with 5-fold Cross Validation
-###   ver 0.0.3
+###                         Training vs Testing only
+###   ver 0.0.4
 ###
 #################################################################
 
@@ -55,53 +55,33 @@ Boston3
 
 
 ###
-###  For Regularlization Method, Data should be standardized. 
+###  For Regularlization Method, Data should be standardized.
 ###
 
 
 
 
 ###-------------------------------------------------
-###--- 2. Data Separation (Copied from Rtut-CV)
+###--- 1. Data Separation (Copied from Rtut-CV)
 ### Divide Dataset to Training and Testing and Set up k fold CV
 Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
-test.size <- 106              # num of rows for testing set
-resp.col.name <- "resp"      # name of response column
-num.folds <- 5               # k for k-fold CV
-my.seed <- 3231               # give a seed
+test.size <- 106             # num of rows for testing set
+my.seed <- 4345              # give a seed
 
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
 
-    #---
-    set.seed(my.seed)
-    ix = sample(1:nrow(Orig))
-    Orig2 = Orig[ix, ]
-    Train.set  = Orig2[1:train.size, ]
-    Train.resp = Orig2[1:train.size, resp.col.name]
-    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
-    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
-
-    # K-fold Cross Validation
-    library(cvTools)     # install.packages("cvTools")
-    set.seed(my.seed)
-    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
-
-    CV.train      = list(Train.set[ folds$which!=1, ])
-    CV.train.resp = list(Train.resp[folds$which!=1,1])
-    CV.valid      = list(Train.set[ folds$which==1, ])
-    CV.valid.resp = list(Train.resp[folds$which==1,1])
-
-    for (k in 2:num.folds) {
-      CV.train[[k]]      = Train.set[ folds$which!=k, ]
-      CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
-      CV.valid[[k]]      = Train.set[ folds$which==k, ]
-      CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
-    }
 # Output (all data.frame):
 #   Train.set      /  Train.resp
 #   Test.set       /  Test.resp
 #   CV.train[[k]]  /  CV.train.resp[[k]]
 #   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# [ Train.set 400     ]     [Test.set 106]
+# [80][80][80][80][80]
 
 
 #--- plot Training and Test for visualization
@@ -132,12 +112,13 @@ OLS
 
 ###-------------------------------------------------
 ###--- 4. Lasso Regression (Entire Training set. Auto 5-fold CV)
-library(glmnet)          # install.packages("glmnet")
+library(glmnet)         # install.packages('glmnet', repos='https://cran.case.edu/')
 
 # Display the best lambda value
-x <- model.matrix(resp ~., Train.set)[,-1]
+x <- model.matrix(resp ~. , Train.set)[,-1]
 y <- Train.set$resp
 set.seed(my.seed)
+
 CV.for.lambda <- cv.glmnet(x, y, alpha = 1, nfolds=5)
 CV.for.lambda$lambda.min
 FitLasso <- glmnet(x, y, alpha = 1, lambda = CV.for.lambda$lambda.min)
@@ -161,9 +142,10 @@ LASSO
 ###--- 5. Ridge Regression (Entire Training set. Auto 5-fold CV)
 
 # Display the best lambda value
-x <- model.matrix(resp ~., Train.set)[,-1]
+x <- model.matrix(resp ~. , Train.set)[,-1]
 y <- Train.set$resp
 set.seed(my.seed)
+
 CV.for.lambda <- cv.glmnet(x, y, alpha = 0, nfolds=5)
 CV.for.lambda$lambda.min
 FitRidge <- glmnet(x, y, alpha = 0, lambda = CV.for.lambda$lambda.min)
