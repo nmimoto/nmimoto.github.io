@@ -1,7 +1,7 @@
 ###
 ###
-###  Boston - Prelim  ver 0.0.2
-###
+###  Boston - Prelim
+###   ver 0.0.4
 ###
 ####################################################
 
@@ -10,11 +10,7 @@
 ###--- 0. Preliminary
 library(MASS)   # install.packages("MASS")
 data(Boston)    # see the data
-Boston          # another way to see the data
-
-dim(Boston)
-head(Boston)    # see only first few rows
-names(Boston)   # list of column names
+head(Boston)    # another way to see the data
 
 ?Boston  # see explanation for variables
 
@@ -54,7 +50,6 @@ is.data.frame(Boston)     # it's still data.frame too
 
 Boston                    # only first 10 rows will print
 print(Boston, n=100)      # if you want to see more rows
-print(Boston, width=1000) # if you want to see more cols
 
 # fix(Boston)   # spreadsheet view NOT RECOMMENDED. CLOSE TO MOVE FORWARD.
 
@@ -84,6 +79,7 @@ plot(chas, medv)
 hist(medv)
 
 
+### setting response variable
 # Rename "medv" column as "resp" to streamline analysis.
 Boston2 <- Boston %>% rename(resp=medv)
 Boston2
@@ -108,8 +104,9 @@ resp.col.name <- "resp"
   summary(Orig)
   sum(is.na(Orig))
   # If there is na in the data, run below
-  # Orig <- Orig %>% na.omit()
-  # dim(Orig)
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
   ##----------
@@ -146,8 +143,8 @@ resp.col.name <- "resp"
 
   ChiSq.pval <- Orig %>% summarise_all(funs(chisq.test(., Orig$resp)$p.value))
   ChiSq.pval
-  barplot(t(t(as.matrix(ChiSq.pval))), las=2, cex.names=1, 
-      main="p-values from Chi-sq test of association"))
+  barplot(t(t(as.matrix(ChiSq.pval))), las=2, cex.names=1,
+      main="p-values from Chi-sq test of association")
   abline(h=.05, col='red')
 
   which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
