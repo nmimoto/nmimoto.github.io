@@ -1,0 +1,352 @@
+###
+###
+### Concrete Data - Decision Tree (Regression)
+###                w Bagging, Raondom Forest and Boosting
+###
+#################################
+
+###---------------------------------------------------
+###--- 0. Preliminary
+library(MASS)      # install.packages("MASS")
+data(Boston)
+
+library(tidyverse)   # install.packages(tidyverse")
+Boston <- as_tibble(Boston)
+Boston
+
+#  ?Boston  # see explanation for variables
+
+#1  crim     per capita crime rate by town.
+#2  zn       proportion of residential land zoned for lots over 25,000 sq.ft.
+#3  indus    proportion of non-retail business acres per town.
+#4  chas     Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+#5  nox      nitrogen oxides concentration (parts per 10 million).
+#6  rm       average number of rooms per dwelling.
+#7  age      proportion of owner-occupied units built prior to 1940.
+#8  dis      weighted mean of distances to five Boston employment centres.
+#9  rad      index of accessibility to radial highways.
+#10 tax      full-value property-tax rate per $10,000.
+#11 ptratio  pupil-teacher ratio by town.
+#12 black    1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+#13 lstat    lower status of the population (percent).
+#14 medv     median value of owner-occupied homes in \$1000s.
+
+
+# 13 lstat = lower status of the population (percent)
+#      Proportion of population that is lower status
+#      = 1/2 (proportion of adults without,
+#      some high school education and proportion of male
+#      workers classified as laborers). The logarithmic
+#      specification implies that socioeconomic status
+#      distinctions mean more in the upper brackets of
+#      society than in the lower classes. Source: 1970 U. S. Census
+
+
+
+#- Correlaiton Plots
+# pairs(Boston)   # shows scatterplot matrix (large)
+
+# library(corrplot)   # install.packages("corrplot")
+# corrplot(cor(Boston), method="number")
+# corrplot(cor(Boston))
+
+# attach(Boston)
+# hist(medv)
+
+
+
+
+
+
+###-----------------------------------
+###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston               # Entire Data set (have to be data.frame)
+train.size <- 400            # num of rows for training set
+test.size <- 96              # num of rows for testing set
+resp.col.name <- "medv"      # name of response column
+num.folds <- 5               # k for k-fold CV
+my.seed <- 3231              # give a seed
+
+    #---
+    set.seed(my.seed)
+    ix = sample(1:nrow(Orig))
+    Orig2 = Orig[ix, ]
+    Train.set  = Orig2[1:train.size, ]
+    Train.resp = Orig2[1:train.size, resp.col.name]
+    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
+    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
+
+    # K-fold Cross Validation
+    library(cvTools)     # install.packages("cvTools")
+    set.seed(my.seed)
+    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
+
+    CV.train      = list(Train.set[ folds$which!=1, ])
+    CV.train.resp = list(Train.resp[folds$which!=1,1])
+    CV.valid      = list(Train.set[ folds$which==1, ])
+    CV.valid.resp = list(Train.resp[folds$which==1,1])
+
+    for (k in 2:num.folds) {
+      CV.train[[k]]      = Train.set[ folds$which!=k, ]
+      CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
+      CV.valid[[k]]      = Train.set[ folds$which==k, ]
+      CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+    }
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 1. Decision Tree has high variance
+
+#---------
+library(tree)
+tree31 <- tree(medv ~., CV.train[[1]])
+summary(tree31)
+
+plot(tree31)
+text(tree31, pretty=1, cex=.7)
+
+
+#---------
+tree32 <- tree(medv ~., CV.train[[2]])
+summary(tree32)
+
+plot(tree32)
+text(tree32, pretty=0, cex=.7)
+
+
+
+
+###-------------------------------------------------
+###--- 2. Decision Tree Growing using rpart().  It has color plotting.
+library(rpart)
+library(rpart.plot)
+tree00<- rpart(medv~., data=Train.set)
+summary(tree00)
+
+plot(tree00)
+text(tree00)
+
+rpart.plot(tree00)
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Decision Tree (Grow and Prune using tree())
+
+#--- Growing the tree
+library(tree)
+tree1 = tree(medv~., Train.set)
+summary(tree1)
+tree1
+
+plot(tree1)
+text(tree1, pretty=0, cex=1)
+
+#--- Check the training fit
+Train.fitted = predict(tree1, type="vector")
+Train.fitted
+
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+abline(0,1, col="red")
+
+Train.RSS <- data.frame(
+  RMSE = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  Rsquare = caret::R2(Train.fitted, Train.resp)
+)
+Train.RSS
+
+#         RMSE   Rsquare
+#medv 3.777721 0.8377335
+
+
+#--- Predict the response, calculate test RMSE
+Test.pred = predict(tree1, Test.set, type="vector")
+Test.pred
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+#         RMSE   Rsquare
+#medv 4.605124 0.6852545
+
+#      RMSE   Rsquare
+#1 4.946511 0.6353647
+
+
+#--- Pruning the tree
+set.seed(my.seed)
+cv.for.pruning = cv.tree(tree1, FUN=prune.tree, K=5)   #5-fold CV
+     #use FUN= prune.misclass if you are doing classification tree
+names(cv.for.pruning)
+
+plot(cv.for.pruning$size, cv.for.pruning$dev, type="b")
+plot(cv.for.pruning$k, cv.for.pruning$dev, type="b")
+# dev is the Av. CV error rate
+# k is the pruning parameter (alpha)
+# size is the number of terminal nodes
+
+cv.for.pruning
+
+# We conclude that it's better to not purne.  If you want to prune, use below.
+prune1 = prune.tree(tree1, best=6)  # specify 8-node tree
+plot(prune1)
+text(prune1, pretty=0, cex=1)
+
+
+
+#--- Predict the response, calculate test RMSE
+Test.pred=predict(prune1, Test.set, type="vector")
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Bagging
+library(randomForest)
+set.seed(my.seed)
+treeRF01 = randomForest(medv~., data=Train.set, mtry=13, ntree=500, importance=TRUE)
+treeRF01
+
+Test.pred = predict(treeRF01, newdata=Test.set)
+
+importance (treeRF01)
+varImpPlot (treeRF01)
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+
+
+###--- change ntree to 25
+library(randomForest)
+set.seed(my.seed)
+treeRF02 = randomForest(medv~., data=Train.set, mtry=13, ntree=25, importance=TRUE)
+treeRF02
+
+Test.pred = predict(treeRF02, newdata=Test.set)
+
+importance (treeRF02)
+varImpPlot (treeRF02)
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Radnom Forest
+
+###--- change mtry to 6
+library(randomForest)
+set.seed(my.seed)
+treeRF03 = randomForest(medv~., data=Train.set, mtry=6, ntree=500, importance=TRUE)
+treeRF03
+
+Test.pred = predict(treeRF03, newdata=Test.set)
+
+importance (treeRF03)
+varImpPlot (treeRF03)
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 4. Boosting
+set.seed(my.seed)
+treeBT01 = gbm::gbm(medv~., data=Train.set, distribution="gaussian", n.trees=5000,
+             interaction.depth=4)
+summary(treeBT01)
+
+Test.pred=predict(treeBT01, newdata=Test.set, n.trees=5000)
+
+plot(treeBT01, i="rm")
+plot(treeBT01, i="lstat")
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 5. OLS for comparison
+Reg01 = lm(medv~., data=Train.set)
+summary(Reg01)
+
+Test.pred=predict(Reg01, newdata=Test.set)
+
+plot(Test.pred, as.matrix(Test.resp), xlab="Predicted", ylab="Actual")
+abline(0,1, col="red")
+
+Test.RSS <- data.frame(
+  RMSE = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+  Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Test.RSS
+#         RMSE   Rsquare
+#medv 3.862942 0.7645155

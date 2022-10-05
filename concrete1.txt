@@ -1,0 +1,60 @@
+###
+###
+###  Concrete Data - Multiple Regression (Simple version)
+###    ver 0.0.2
+###
+##################################################
+
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Concrete <- read_csv("https://nmimoto.github.io/datasets/concrete.csv")
+Concrete
+
+  # Cement           (component 1)                    -- quantitative -- kg in a m3 mixture
+  # Slag             (component 2) Blast Furnace Slag -- quantitative -- kg in a m3 mixture
+  # Fly              (component 3) Fly Ash            -- quantitative -- kg in a m3 mixture
+  # Water            (component 4)                    -- quantitative -- kg in a m3 mixture
+  # Superplasticizer (component 5)                    -- quantitative -- kg in a m3 mixture
+  # Coarse           (component 6) Coarse Aggregate   -- quantitative -- kg in a m3 mixture
+  # Fine             (component 7) Fine Aggregate     -- quantitative -- kg in a m3 mixture
+  # Age                                               -- quantitative -- Day (1~365)
+  # CCS              Concrete compressive strength    -- quantitative -- MPa -- response variable
+
+# Rename "CCS" column as "resp" to streamline analysis.
+Concrete2 <- Concrete %>% rename(resp=CCS) %>% relocate(resp)
+Concrete2
+
+dim(Concrete2)
+
+
+###-------------------------------------------------
+###--- 1. Multiple Linear Regression
+
+
+#- Regression with all variables
+Reg01 <- lm(resp ~ . , data=Concrete2)
+summary(Reg01)
+
+plot(Reg01)
+
+
+
+#- Backward stepwise regression
+Reg02 <- lm(resp ~ . -Fine, data=Concrete2)
+summary(Reg02)
+
+
+Reg03 <- lm(resp ~ . -Fine -Coarse, data=Concrete2)
+summary(Reg03)
+
+plot(Reg03)
+
+
+
+#--- Looking at the result
+str(Reg03)  # click on environment tab in Rstudio
+plot(Reg03$residuals)
+plot(Reg03$fitted.values, Reg03$residuals)
