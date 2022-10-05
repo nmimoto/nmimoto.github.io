@@ -16,12 +16,8 @@ library(tidyverse)           # install.packages("tidyverse")
 Boston <- as_tibble(Boston)
 Boston
 
-# Rename "medv" column as "resp" to streamline analysis.
-Boston2 <- Boston %>% rename(resp=medv)
-Boston2
-
-# move "resp" columnm to 1st
-Boston2 <- Boston2 %>% relocate(resp)
+# Rename "medv" column as "resp" and move "resp" columnm to 1st
+Boston2 <- Boston %>% rename(resp=medv) %>% relocate(resp)
 Boston2
 
 # turn "chas" column into 0/1 factor
@@ -97,15 +93,24 @@ lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
 Fit01 = lm(resp ~. , data=Train.set)
 summary(Fit01)
 
-# predict values resp in Test set
-pred = predict(Fit01, newdata = Test.set)
+# Get training / validation fit
+Train.fitted = predict(Fit01, newdata=Train.set)
+Test.pred    = predict(Fit01, newdata=Test.set)
 
-library(caret)          # install.packages("caret")
+#--- Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
 OLS <- data.frame(
-  RMSE = caret::RMSE(pred,  Test.set$resp),
-  Rsquare = caret::R2(pred, Test.resp$resp)
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
 )
 OLS
+
 
 
 
@@ -115,25 +120,40 @@ OLS
 library(glmnet)         # install.packages('glmnet', repos='https://cran.case.edu/')
 
 # Display the best lambda value
-x <- model.matrix(resp ~. , Train.set)[,-1]
-y <- Train.set$resp
 set.seed(my.seed)
+x <- model.matrix(resp ~. , Train.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+y <- Train.set$resp
 
 CV.for.lambda <- cv.glmnet(x, y, alpha = 1, nfolds=5)
 CV.for.lambda$lambda.min
 FitLasso <- glmnet(x, y, alpha = 1, lambda = CV.for.lambda$lambda.min)
 coef(FitLasso)
+summary(Fit01)
 
-x.test <- model.matrix(resp ~., Test.set)[,-1]
-pred <- as.vector(predict(FitLasso, x.test))
+# Compare OLS vs Lasso coef
+cbind(coef(Fit01), coef(FitLasso))
 
-# Model performance metrics
-LASSO <- data.frame(
-  RMSE    = caret::RMSE(pred,  Test.set$resp),
-  Rsquare = caret::R2(pred, Test.resp$resp)
+# Get training / validation fit
+Train.fitted <- as.vector(predict(FitLasso, x.train))
+Test.pred   <- as.vector(predict(FitLasso, x.test))
+
+# Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+Lasso <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
 )
-LASSO
+Lasso
 
+OLS
 
 
 
@@ -142,26 +162,39 @@ LASSO
 ###--- 5. Ridge Regression (Entire Training set. Auto 5-fold CV)
 
 # Display the best lambda value
-x <- model.matrix(resp ~. , Train.set)[,-1]
-y <- Train.set$resp
 set.seed(my.seed)
+x <- model.matrix(resp ~. , Train.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+y <- Train.set$resp
 
 CV.for.lambda <- cv.glmnet(x, y, alpha = 0, nfolds=5)
 CV.for.lambda$lambda.min
 FitRidge <- glmnet(x, y, alpha = 0, lambda = CV.for.lambda$lambda.min)
 coef(FitRidge)
 
-x.test <- model.matrix(resp ~., Test.set)[,-1]
-pred <- as.vector(predict(FitRidge, x.test))
+# Compare OLS vs Lasso coef
+cbind(coef(Fit01), coef(FitLasso), coef(FitRidge))
 
-# Model performance metrics
-RIDGE <- data.frame(
-  RMSE    = caret::RMSE(pred, as.matrix(Test.resp)),
-  Rsquare = caret::R2(pred, Test.resp)
+# Get training / validation fit
+Train.fitted <- as.vector(predict(FitRidge, x.train))
+Test.pred   <- as.vector(predict(FitRidge, x.test))
+
+# Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+Ridge <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
 )
-RIDGE
+Ridge
 
 
 OLS
-LASSO
-RIDGE
+Lasso
+Ridge
