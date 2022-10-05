@@ -1,0 +1,36 @@
+###
+###  UCI Superconductivty Data Data Set
+###
+
+Downloaded From:
+  https://archive.ics.uci.edu/ml/datasets/Superconductivty+Data
+
+Data Type:
+  multivariate
+
+Data Set Information:
+
+  There are two files: (1) train.csv contains 81 features extracted from 21263
+  superconductors along with the critical temperature in the 82nd column,
+  (2) unique_m.csv contains the chemical formula broken up for all the 21263
+  superconductors from the train.csv file. The last two columns have the
+  critical temperature and chemical formula. The original data comes from
+  [Web Link] which is public. The goal here is to predict the critical
+  temperature based on the features extracted.
+
+
+Variable Information:
+
+
+
+
+Superplasticizer (component 5)                    -- quantitative -- kg in a m3 mixture
+Coarse           (component 6) Coarse Aggregate   -- quantitative -- kg in a m3 mixture
+Fine             (component 7) Fine Aggregate     -- quantitative -- kg in a m3 mixture
+
+
+
+----------
+library(tidyverse)
+DF <- read_csv("https://nmimoto.github.io/datasets/concrete.csv")
+DF
