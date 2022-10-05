@@ -1,0 +1,160 @@
+###
+###
+### Concrete data - Regularization
+###                        LASSO and Ridge Regression w Training vs Test
+###   ver 0.0.4
+###
+###################################################
+
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Concrete <- read_csv("https://nmimoto.github.io/datasets/concrete.csv")
+Concrete
+
+print(Concrete, n=20)  # if you want to see more rows
+
+  # Cement           (component 1)                    -- quantitative -- kg in a m3 mixture
+  # Slag             (component 2) Blast Furnace Slag -- quantitative -- kg in a m3 mixture
+  # Fly              (component 3) Fly Ash            -- quantitative -- kg in a m3 mixture
+  # Water            (component 4)                    -- quantitative -- kg in a m3 mixture
+  # Superplasticizer (component 5)                    -- quantitative -- kg in a m3 mixture
+  # Coarse           (component 6) Coarse Aggregate   -- quantitative -- kg in a m3 mixture
+  # Fine             (component 7) Fine Aggregate     -- quantitative -- kg in a m3 mixture
+  # Age                                               -- quantitative -- Day (1~365)
+  # CCS              Concrete compressive strength    -- quantitative -- MPa -- response variable
+
+#- Respoonse variable is CCS
+plot(Concrete$CCS)
+hist(Concrete$CCS)
+
+
+# Rename "CCS" column as "resp" to streamline analysis.
+Concrete2 <- Concrete %>% rename(resp=CCS)
+Concrete2
+
+# move "resp" columnm to 1st
+Concrete2 <- Concrete2 %>% relocate(resp)
+Concrete2
+
+dim(Concrete2)
+
+
+
+###-------------------------------------------------
+###--- 1. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Concrete2            # Entire Data set (have to be data.frame)
+train.size <- 850            # num of rows for training set
+test.size <- 180             # num of rows for testing set
+my.seed <- 4345              # give a seed
+
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# [  Train.set 850        ]  [Test.set 180]  1030 total
+# [170][170][170][170][170]
+
+
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+
+
+
+
+###-------------------------------------------------
+###--- 3. Ordinary Regression (w Entire Training set)
+Fit01 = lm(resp ~. , data=Train.set)
+summary(Fit01)
+
+# predict values resp in Test set
+pred = predict(Fit01, newdata = Test.set)
+
+library(caret)          # install.packages("caret")
+OLS <- data.frame(
+  RMSE = caret::RMSE(pred,  Test.set$resp),
+  Rsquare = caret::R2(pred, Test.resp$resp)
+)
+OLS
+
+
+
+
+###-------------------------------------------------
+###--- 4. Lasso Regression (Entire Training set. Auto 5-fold CV)
+library(glmnet)         # install.packages('glmnet', repos='https://cran.case.edu/')
+
+# Display the best lambda value
+set.seed(my.seed)
+x <- model.matrix(resp ~. , Train.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+y <- Train.set$resp
+
+
+CV.for.lambda <- cv.glmnet(x, y, alpha = 1, nfolds=5)
+CV.for.lambda$lambda.min
+FitLasso <- glmnet(x, y, alpha = 1, lambda = CV.for.lambda$lambda.min)
+coef(FitLasso)
+summary(Fit01)
+
+fitted <- as.vector(predict(FitRidge, x.train))
+pred   <- as.vector(predict(FitLasso, x.test))
+
+# Model performance metrics
+LASSO <- data.frame(
+  RMSE.tr    = caret::RMSE(fitted, as.matrix(Train.resp)),
+  Rsquare.tr = caret::R2(fitted, Train.resp),
+  RMSE.test = caret::RMSE(pred, as.matrix(Test.resp)),
+  Rsquare.test = caret::R2(pred, Test.resp)
+)
+LASSO
+
+
+
+
+
+###-------------------------------------------------
+###--- 5. Ridge Regression (Entire Training set. Auto 5-fold CV)
+
+# Display the best lambda value
+set.seed(my.seed)
+x       <- model.matrix(resp ~. , Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+y       <- Train.set$resp
+
+
+CV.for.lambda <- cv.glmnet(x, y, alpha = 0, nfolds=5)
+CV.for.lambda$lambda.min
+FitRidge <- glmnet(x, y, alpha = 0, lambda = CV.for.lambda$lambda.min)
+coef(FitRidge)
+
+fitted <- as.vector(predict(FitRidge, x.train))
+pred   <- as.vector(predict(FitRidge, x.test))
+
+# Model performance metrics
+RIDGE <- data.frame(
+  RMSE.tr    = caret::RMSE(fitted, as.matrix(Train.resp)),
+  Rsquare.tr = caret::R2(fitted, Train.resp),
+  RMSE.test = caret::RMSE(pred, as.matrix(Test.resp)),
+  Rsquare.test = caret::R2(pred, Test.resp)
+)
+RIDGE
+
+
+OLS
+LASSO
+RIDGE
