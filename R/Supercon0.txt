@@ -1,0 +1,95 @@
+###
+###
+###  Superconductor - Prelim  ver 0.0.4
+###
+###
+####################################################
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Super <- read_csv("https://nmimoto.github.io/datasets/superconduct.csv")
+Super          # see the data
+
+dim(Super)
+names(Super)   # list of column names
+
+Super                    # only first 10 rows will print
+print(Super, n=100)      # if you want to see more rows
+print(Super, width=1000) # if you want to see more cols
+
+
+# Histogram of the respoonse variable
+plot(Super$critical_temp)
+hist(Super$critical_temp)
+
+
+# Rename "critial_temp" column as "resp" and move "resp" columnm to 1st
+Super2 = Super %>% rename(resp=critical_temp) %>% relocate(resp)
+Super2
+
+# Take random sample of 1000 rows b/c Super2 will take too long to analyze.
+set.seed(5563)
+Super3 <- Super2[sample(nrow(Super2), 1000), ]
+
+#-------------------------------------------------
+###--- 1. Routine Exploratory Analysis (class of resp should be "dbl")
+Orig <- Super3        # "resp" column needed
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
+
+
+  ##----------
+  ##- Correlation Check
+
+  # Pick columns that are numeric
+  library(corrplot)    # install.packages("corrplot")
+    Orig_num <- Orig %>% select_if(is.numeric)
+    # cor(Orig_num)
+    corrplot::corrplot(cor(Orig_num))
+    # corrplot::corrplot(cor(Orig_num), method="number")
+
+
+  ##----------
+  ##- Visualization
+
+  # pairs(Orig) equivalent
+  library(GGally)      # install.packages("GGally")
+    #GGally::ggpairs(Orig[, c(2:7, 1)], aes(alpha=1))
+    #GGally::ggpairs(Orig[, c(8:14, 1)], aes(alpha=1))
+
+    # Too many columns to plot
+
+
+  ###----------
+  ###- Chi-sq test of association for each column
+
+  # Pick columns that has more than 1 unique value
+  list_cols <- Orig %>% summarise_all(function(x) length(unique(x))) %>%
+        gather() %>% filter(value>1) %>% pull(key)
+
+  # Apply chisq.test to those columns
+  ChiSq.pval <- Orig %>% select(list_cols) %>%
+        summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+
+  ChiSq.pval <- Orig %>% summarise_all(funs(chisq.test(., Orig$resp)$p.value))
+  ChiSq.pval
+  barplot(t(t(as.matrix(ChiSq.pval))), las=2, cex.names=1,
+      main="p-values from Chi-sq test of association")
+  abline(h=.05, col='red')
+
+  which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
+  list_cols[which(ChiSq.pval < .05)]  # Top list of 'important' variables
+
+  which(ChiSq.pval > .6)              # Col num of variables w >.6 p-value
+  list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
+
+### End of Routine Exploratory Analysis.
+### Try repeating with Super3.
