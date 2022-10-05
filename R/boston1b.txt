@@ -161,19 +161,19 @@ Reg01 <- lm(resp ~., data=CV.train[[k]])
 
   #--- Get training / validation fit
   Train.fitted = predict(Reg01, newdata=CV.train[[k]])
-  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
+  Valid.pred = predict(Reg01, newdata=CV.valid[[k]])
 
     #--- Plot Y vs Yhat
     plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual")
-    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    lines(Valid.pred, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
     abline(0,1)
 
     library(caret)            # install.packages("caret")
     CVFitDiagnosis <- data.frame(
       tr.RMSE   = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
       tr.Rsquare  = caret::R2(Train.fitted,           CV.train.resp[[k]]),
-      val.RMSE  = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-      val.Rsquare = caret::R2(Valid.fitted,           CV.valid.resp[[k]])
+      val.RMSE  = caret::RMSE(Valid.pred, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.pred,           CV.valid.resp[[k]])
     )
     CVFitDiagnosis
 
@@ -190,25 +190,25 @@ layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
 CVFitDiagnosis <- numeric(0)
 for (k in 1:5) {
 
-  Reg01 <- lm(resp ~. -chas, data=CV.train[[k]])      ## <====== Change the model here
+  Reg01 <- lm(resp ~. , data=CV.train[[k]])      ## <====== Change the model here
   # summary(Reg01)
   # plot(Reg01)      # plots 4 diagnosis plots
 
   #--- Get training / validation fit
   Train.fitted = predict(Reg01, newdata=CV.train[[k]])
-  Valid.fitted = predict(Reg01, newdata=CV.valid[[k]])
+  Valid.pred = predict(Reg01, newdata=CV.valid[[k]])
 
     #--- Plot Y vs Yhat
     plot( Train.fitted, as.matrix(CV.train.resp[[k]]), xlab="Fitted", ylab="Actual",main=paste("K=",k))
-    lines(Valid.fitted, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    lines(Valid.pred, as.matrix(CV.valid.resp[[k]]), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
     abline(0,1)
 
     library(caret)            # install.packages("caret")
     CVFitDiagnosis1 <- data.frame(
       tr.RMSE     = caret::RMSE(Train.fitted, as.matrix(CV.train.resp[[k]])),
       tr.Rsquare  = caret::R2(Train.fitted,             CV.train.resp[[k]]),
-      val.RMSE    = caret::RMSE(Valid.fitted, as.matrix(CV.valid.resp[[k]])),
-      val.Rsquare = caret::R2(Valid.fitted,             CV.valid.resp[[k]])
+      val.RMSE    = caret::RMSE(Valid.pred, as.matrix(CV.valid.resp[[k]])),
+      val.Rsquare = caret::R2(Valid.pred,             CV.valid.resp[[k]])
     )
     CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
 }
@@ -235,25 +235,25 @@ Av.CVFitDiagnosis
 ## [80][80][80][80][80]
 
 
-Reg01 <- lm(resp ~. -chas, data=Train.set)      ## <====== Best model you found in 4
+Reg01 <- lm(resp ~. , data=Train.set)      ## <====== Best model you found in 4
 summary(Reg01)
 plot(Reg01)      # plots 4 diagnosis plots
 
 #--- Get training / validation fit
 Train.fitted = predict(Reg01, newdata=Train.set)
-Test.fitted  = predict(Reg01, newdata=Test.set)
+Test.pred    = predict(Reg01, newdata=Test.set)
 
 #--- Plot Y vs Yhat
 plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
-lines(Test.fitted, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
 library(caret)            # install.packages("caret")
 FinalFitDiagnosis <- data.frame(
   tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
   tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
-  test.RMSE    = caret::RMSE(Test.fitted,  as.matrix(Test.resp)),
-  test.Rsquare = caret::R2(  Test.fitted,            Test.resp)
+  test.RMSE    = caret::RMSE(Test.pred,  as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,            Test.resp)
 )
 FinalFitDiagnosis
 
