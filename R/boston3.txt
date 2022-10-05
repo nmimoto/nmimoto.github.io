@@ -67,7 +67,7 @@ Boston3
 Orig <- Boston3              # Entire Data set (have to be data.frame)
 train.size <- 400            # num of rows for training set
 test.size <- 106             # num of rows for testing set
-my.seed <- 4345              # give a seed
+my.seed <- 3231              # give a seed
 
   ###
   ### This line replaces the AAAA to BBBB chunk
