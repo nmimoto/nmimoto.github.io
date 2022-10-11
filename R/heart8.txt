@@ -377,8 +377,6 @@ treeBT01 = gbm::gbm(as.numeric(resp=="Yes") ~., data=Train.set,
 
 summary(treeBT01)
 
-Test.pred=predict(treeBT01, newdata=Test.set,
-
 plot(treeBT01, i="Chol")
 plot(treeBT01, i="MaxHR")
 
@@ -442,8 +440,12 @@ library(pROC)
 
 
 
+
+
+
+
 ###-------------------------------------------------
-###--- 9. Logistic Regression for comparison (Train vs Test only)
+###--- 8. Logistic Regression for comparison (Train vs Test only)
 Fit03 <- glm(resp ~ .,  family=binomial, data=Train.set)
 summary(Fit03)
 
@@ -452,7 +454,7 @@ summary(Fit03)
 Chosen.model <- Fit03
 
 ###----------------------------
-#- 9a Output result for given threshold value
+#- 8a Output result for given threshold value
 threshold = .5 # pick a threshold
 
     #- Check the training set accuracy
@@ -476,7 +478,7 @@ threshold = .5 # pick a threshold
 
 
 ###----------------------------
-#- 9b Output ROC curve and AUC for all threshold
+#- 8b Output ROC curve and AUC for all threshold
 library(pROC)
     #- Training Set
     plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
@@ -519,8 +521,12 @@ Boosting
 
 
 
+
+
+
+
 ###-----------------------------------------------------------
-###--- Threshold Picker
+###--- 9. Threshold Picker
 
 #cost.list = c(0,0,3,1)/4           # order of (TP, TN, FP, FN)
 cost.list = c(0,0,2,1)/3           # order of (TP, TN, FP, FN)
