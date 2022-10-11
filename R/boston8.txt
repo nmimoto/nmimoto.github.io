@@ -1,0 +1,348 @@
+###
+### Boston Data (MASS) - Decision Tree (Regression)
+###                        with Bagging, Raondom Forest and Boosting
+###                        with 5-fold Cross Validation
+###   ver 0.0.4
+###
+#################################
+
+
+###-------------------------------------------------
+###--- 0. Preliminary
+
+# Using Boston3 from https://nmimoto.github.io/R/boston0.txt
+library(MASS)                # install.packages("MASS")
+library(tidyverse)           # install.packages("tidyverse")
+Boston <- as_tibble(Boston)
+Boston
+
+# Rename "medv" column as "resp" to streamline analysis.
+Boston2 <- Boston %>% rename(resp=medv) %>% relocate(resp)
+Boston2
+
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
+Boston3
+
+# Importance List by Chisq test
+
+  # top list:
+  # 3  4  6 10
+  # "zn" "indus" "nox"   "rad"
+
+  # bottom list
+  # c(7, 8, 9, 13)
+  # "rm"    "age"   "dis"   "black"
+
+  #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (dbl)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
+
+
+# check to see if Boston3 has NA
+Orig <- Boston3
+
+#- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
+
+
+
+###-------------------------------------------------
+###--- 1. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Orig                 # Entire Data set (have to be data.frame)
+train.size <- 400            # num of rows for training set
+test.size <- 106             # num of rows for testing set
+my.seed <- 3231              # give a seed
+
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red", pch=19)
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 2. Decision Tree has high variance (CV.train fit only)
+
+#---------
+library(tree)          # install.packages('tree', repos='https://cran.case.edu/')
+tree31 <- tree(resp ~., CV.train[[1]])
+summary(tree31)
+
+plot(tree31)
+text(tree31, pretty=1, cex=.7)
+
+
+#---------
+tree32 <- tree(resp ~., CV.train[[2]])
+summary(tree32)
+
+plot(tree32)
+text(tree32, pretty=0, cex=.7)
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Decision Tree Growing using rpart().  It has color plotting.
+###                             (Train set fitting only)
+library(rpart)         # install.packages('rpart', repos='https://cran.case.edu/')
+library(rpart.plot)    # install.packages('rpart.plot', repos='https://cran.case.edu/')
+tree00<- rpart(resp~., data=Train.set)
+summary(tree00)
+
+rpart.plot(tree00)     # now you can plot in color
+
+plot(tree00)           # old way of plotting
+text(tree00)
+
+
+
+
+
+###-------------------------------------------------
+###--- 4. Decision Tree (Grow and Prune using tree())
+
+#--- 4a. Growing the tree
+library(tree)     # install.packages('tree', repos='https://cran.case.edu/')
+tree1 = tree(resp~., Train.set)
+summary(tree1)
+tree1
+
+plot(tree1)
+text(tree1, pretty=0, cex=1)
+
+# Check the training fit and test prediction
+Train.fitted = predict(tree1, type="vector")
+Test.pred    = predict(tree1, Test.set, type="vector")
+
+# Training fit and Test pred plot
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+GrowOnly <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+GrowOnly
+
+#         RMSE   Rsquare
+#resp 4.605124 0.6852545
+
+#      RMSE   Rsquare
+#1 4.946511 0.6353647
+
+
+
+#----------------------
+#--- 4b. Pruning the tree
+set.seed(my.seed)
+cv.for.pruning = cv.tree(tree1, FUN=prune.tree, K=5)   #5-fold CV
+     #use FUN= prune.misclass if you are doing classification tree
+names(cv.for.pruning)
+
+plot(cv.for.pruning$size, cv.for.pruning$dev, type="b")
+plot(cv.for.pruning$k,    cv.for.pruning$dev, type="b")
+                                        # size is the number of terminal nodes
+                                        # dev is the Av. CV error rate
+                                        # k is the pruning parameter (alpha)
+cv.for.pruning
+
+
+# In this case, it's probably better not to purne.  If you want to prune, use below.
+pruned2 = prune.tree(tree1, best=5)  # prune to 5-node tree
+plot(pruned2)
+text(pruned2, pretty=0, cex=1)
+
+
+# For pruned tree, check the training fit and test prediction
+Train.fitted = predict(pruned2, type="vector")
+Test.pred    = predict(pruned2, Test.set, type="vector")
+
+# Training fit and Test pred plot
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+
+GrowAndPrune <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+GrowAndPrune
+
+GrowOnly
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 5. Bagging (Train and Test only)
+library(ipred)    #  install.packages('ipred', repos='https://cran.case.edu/')
+set.seed(my.seed)
+treeBag01 = bagging(resp~., data=Train.set, nbagg=500,
+                    coob = TRUE,
+                    control = rpart.control(minsplit = 2, cp = 0))
+treeBag01
+
+
+# Check the training fit and test prediction
+Train.fitted = predict(treeBag01, type="vector")
+Test.pred    = predict(treeBag01, Test.set, type="vector")
+
+# Training fit and Test pred plot
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+Bagging  <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Bagging
+
+
+
+
+
+###-------------------------------------------------
+###--- 6. Radnom Forest (Train and Test)
+
+###--- change mtry to 6
+library(randomForest)
+set.seed(my.seed)
+treeRF03 = randomForest(resp~., data=Train.set, mtry=6, ntree=25, importance=TRUE)
+treeRF03
+
+importance (treeRF03)
+varImpPlot (treeRF03)
+
+# Check the training fit and test prediction
+Train.fitted = predict(treeRF03, type="response")
+Test.pred    = predict(treeRF03, Test.set, type="response")
+
+# Training fit and Test pred plot
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+library(caret)          # install.packages("caret")
+RandomForest <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+RandomForest
+
+
+
+
+
+###-------------------------------------------------
+###--- 7. Boosting (Train and Test)
+set.seed(my.seed)
+treeBT01 = gbm::gbm(resp~., data=Train.set, distribution="gaussian", n.trees=5000,
+             interaction.depth=4)
+summary(treeBT01)
+
+plot(treeBT01, i="rm")
+plot(treeBT01, i="lstat")
+
+# Check the training fit and test prediction
+Train.fitted = predict(treeBT01, type="response")
+Test.pred    = predict(treeBT01, Test.set, type="response")
+
+# Training fit and Test pred plot
+plot(Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+library(caret)          # install.packages("caret")
+Boosting <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+Boosting
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 9. OLS for comparison
+Reg01 = lm(resp~., data=Train.set)
+summary(Reg01)
+
+Train.fitted=predict(Reg01)
+Test.pred   =predict(Reg01, newdata=Test.set)
+
+plot(Train.fitted, as.matrix(Train.resp), xlab="Predicted", ylab="Actual")
+lines(Test.pred, as.matrix(Test.resp), type="p", col="red", pch=19)
+abline(0,1, col="red")
+
+library(caret)          # install.packages("caret")
+OLS <- data.frame(
+    tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+    tr.Rsquare   = caret::R2(Train.fitted, Train.resp),
+    test.RMSE    = caret::RMSE(Test.pred, as.matrix(Test.resp)),
+    test.Rsquare = caret::R2(Test.pred, Test.resp)
+)
+OLS
+
+
+OLS
+GrowOnly
+GrowAndPrune
+Bagging
+RandomForest
+Boosting

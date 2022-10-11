@@ -1,0 +1,563 @@
+###
+###  Heart Data - Decision Tree (Classification)
+###               with Bagging, Random Forest, and Boosting
+###
+###  ver 0.0.4
+####################################################
+
+
+###-------------------------------------------------------
+###--- 0. Preliminary
+
+# Using Heart2 from https://nmimoto.github.io/R/heart0.txt
+library(tidyverse)
+Heart <- read_csv(file="https://nmimoto.github.io/datasets/heart.csv")
+
+# Column manipulation
+Heart2 <- Heart %>%
+    select(-"index")  %>%            # remove col named "index"
+    rename(resp=AHD) %>%             # rename "AHD" as "resp"
+    relocate(resp) %>%               # move "resp" to 1st column
+    mutate(resp=as.factor(resp),     # Turn these columns to <factor> instead of <double>
+           ChestPain=as.factor(ChestPain),
+           Thal=as.factor(Thal),
+           Sex=as.factor(Sex),
+           Fbs=as.factor(Fbs),
+           RestECG=as.factor(RestECG),
+           ExAng=as.factor(ExAng))
+
+print(Heart2, width=1000)
+table(Heart2$resp)    # note that first level is "No"
+
+
+# Low p-value from Chi-sq test of association
+#  3 4 8 10 11 12 13 14
+#  "Sex" "ChestPain" "RestECG" "ExAng" "Oldpeak" "Slope" "Ca" "Thal"
+# High p-value from Chi-sq test of association
+#  7
+#  "Fbs"
+
+
+# need to remove rows with NA.
+Orig <- Heart2
+
+#- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
+
+
+###--------------------------------------------------------------------
+###--- 1. Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Orig                 # Entire Data set (have to be data.frame)
+train.size <- 250            # num of rows for training set
+test.size <-  47             # num of rows for testing set
+my.seed <- 7211             # give a seed
+
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+
+
+###-------------------------------------------------
+###--- 2. Decision Tree has high variance (CV.train fit only)
+
+#---------
+library(tree)          # install.packages('tree', repos='https://cran.case.edu/')
+tree31 <- tree(resp ~., CV.train[[1]])
+summary(tree31)
+
+plot(tree31)
+text(tree31, pretty=1, cex=.7)
+
+
+#---------
+tree32 <- tree(resp ~., CV.train[[2]])
+summary(tree32)
+
+plot(tree32)
+text(tree32, pretty=0, cex=.7)
+
+
+
+
+###-------------------------------------------------
+###--- 3. Decision Tree Growing using rpart().  It has color plotting.
+###                             (Train set fitting only)
+library(rpart)         # install.packages('rpart', repos='https://cran.case.edu/')
+library(rpart.plot)    # install.packages('rpart.plot', repos='https://cran.case.edu/')
+tree00<- rpart(resp~., data=Train.set)
+summary(tree00)
+
+rpart.plot(tree00)     # now you can plot in color
+
+plot(tree00)           # old way of plotting
+text(tree00)
+
+
+
+
+
+###-------------------------------------------------
+###--- 4. Decision Tree (Grow and Prune using tree())
+
+#--- 4a. Growing the tree
+library(tree)
+tree1 = tree(resp~., Train.set)
+summary(tree1)
+tree1
+
+plot(tree1)
+text(tree1, pretty=0, cex=1)
+
+# Check the training fit and test prediction
+#Train.fitted = predict(tree1, type="vector")
+#Test.pred = predict(tree1, Test.set, type="vector")
+
+Train.prob = predict(tree1, type="vector")[,"Yes"]
+Train.pred = ifelse(Train.prob > threshold, "Yes", "No")
+Test.prob  = predict(tree1, Test.set, type="vector")[,"Yes"]
+Test.pred  = ifelse(Test.prob > threshold, "Yes", "No")
+
+
+
+#----------------------
+#--- 4b. Pruning the tree
+set.seed(my.seed)
+cv.for.pruning = cv.tree(tree1, FUN=prune.misclass, K=5)   #5-fold CV
+     #use FUN= prune.tree if you are doing regression tree
+names(cv.for.pruning)
+
+plot(cv.for.pruning$size, cv.for.pruning$dev, type="b")
+plot(cv.for.pruning$k,    cv.for.pruning$dev, type="b")
+                                        # size is the number of terminal nodes
+                                        # dev is the Av. CV error rate
+                                        # k is the pruning parameter (alpha)
+cv.for.pruning
+
+
+# We conclude that it's better to purne at 6 nodes.
+pruned1 = prune.tree(tree1, best=6)  # prune to 6-node tree
+plot(pruned1)
+text(pruned1, pretty=0, cex=1)
+
+
+
+###----------------------------
+#- 4c Pick a threshold and visualize fit
+Chosen.model <- pruned1  # tree1 (unpruned) or pruned1
+threshold = .6   # pick a threshold
+
+    #- Check the training set accuracy
+    library(caret)     # install.packages('caret', repos='https://cran.case.edu/')
+    Train.prob = predict(Chosen.model, type="vector")[,"Yes"]
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    Test.prob  = predict(Chosen.model, Test.set, type="vector")[,"Yes"]
+    Test.pred  = ifelse(Test.prob > threshold, "Yes", "No")
+    CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test <- caret::confusionMatrix(factor(Test.pred), factor(as.matrix(Test.resp)), positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+    colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+    rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
+
+
+###----------------------------
+#- 4d  Output ROC curve and AUC for all threshold
+library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.train
+    abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+    auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.test
+    abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+    auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+    GrowAndPrune = c(auc.train, auc.test)
+    GrowAndPrune
+
+    # Training ROC and Test ROC side by side
+    layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+    GrowAndPrune
+
+
+
+
+
+###-------------------------------------------------
+###--- 5. Bagging (Train and Test only)
+library(ipred)    #  install.packages('ipred', repos='https://cran.case.edu/')
+set.seed(my.seed)
+treeBag01 = bagging(resp~., data=Train.set, nbagg=500,
+                    coob = TRUE,
+                    control = rpart.control(minsplit = 2, cp = 0))
+treeBag01
+
+
+###----------------------------
+#- 5a. Pick a threshold and visualize fit
+Chosen.model <- treeBag01
+threshold = .5    # pick a threshold
+
+    #- Check the training set accuracy
+library(caret)     # install.packages('caret', repos='https://cran.case.edu/')
+    Train.prob = predict(Chosen.model, type="prob")[,"Yes"]
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    Test.prob = predict(Chosen.model, newdata=Test.set, type="prob")[,"Yes"]
+    Test.pred = ifelse(Test.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test  <- caret::confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+    colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+    rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
+
+
+###----------------------------
+#- 5b Output ROC curve and AUC for all threshold
+library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.train
+    abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+    auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.test
+    abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+    auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+    Bagging = c(auc.train, auc.test)
+    Bagging
+
+    # Training ROC and Test ROC side by side
+    layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+    Bagging
+
+
+
+
+
+
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 6. Random Forest (Train and Test only)
+library(randomForest)
+set.seed(my.seed)
+treeBag01 = randomForest(resp~., data=Train.set, mtry=13, ntree=500, importance=TRUE)
+treeBag01
+
+importance (treeBag01)
+varImpPlot (treeBag01)
+
+
+###----------------------------
+#- 6a. Pick a threshold and visualize fit
+Chosen.model <- treeBag01
+threshold = .5    # pick a threshold
+
+    #- Check the training set accuracy
+library(caret)     # install.packages('caret', repos='https://cran.case.edu/')
+    Train.prob = predict(Chosen.model, type="prob")[,"Yes"]
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    Test.prob = predict(Chosen.model, newdata=Test.set, type="prob")[,"Yes"]
+    Test.pred = ifelse(Test.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test  <- caret::confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+    colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+    rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
+
+
+###----------------------------
+#- 6b Output ROC curve and AUC for all threshold
+library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.train
+    abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+    auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.test
+    abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+    auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+    RandomForest = c(auc.train, auc.test)
+    RandomForest
+
+    # Training ROC and Test ROC side by side
+    layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+    RandomForest
+
+
+
+
+
+###-------------------------------------------------
+###--- 7. Boosting (Train and Test only)
+library(gbm)     # install.packages('gbm', repos='https://cran.case.edu/')
+set.seed(my.seed)
+treeBT01 = gbm::gbm(as.numeric(resp=="Yes") ~., data=Train.set,
+                    distribution="bernoulli",   # for binary classification
+                    n.trees=5000,
+                    interaction.depth=4)
+
+summary(treeBT01)
+
+Test.pred=predict(treeBT01, newdata=Test.set,
+
+plot(treeBT01, i="Chol")
+plot(treeBT01, i="MaxHR")
+
+
+###----------------------------
+#- 7a. Pick a threshold and visualize fit
+Chosen.model <- treeBT01
+threshold = .5    # pick a threshold
+
+    #- Check the training set accuracy
+    library(caret)     # install.packages('caret', repos='https://cran.case.edu/')
+    Train.prob = predict(Chosen.model, type="response", n.trees=1000)
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    Test.prob = predict(Chosen.model, newdata=Test.set, type="response", n.trees=1000)
+    Test.pred = ifelse(Test.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using the threshold
+    CM.train <- caret::confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test  <- caret::confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)), positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+    colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
+    rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
+
+
+###----------------------------
+#- 7b Output ROC curve and AUC for all threshold
+library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.train
+    abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+    auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.test
+    abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+    auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+    Boosting = c(auc.train, auc.test)
+    Boosting
+
+    # Training ROC and Test ROC side by side
+    layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+    Boosting
+
+
+
+###-------------------------------------------------
+###--- 9. Logistic Regression for comparison (Train vs Test only)
+Fit03 <- glm(resp ~ .,  family=binomial, data=Train.set)
+summary(Fit03)
+
+
+###---
+Chosen.model <- Fit03
+
+###----------------------------
+#- 9a Output result for given threshold value
+threshold = .5 # pick a threshold
+
+    #- Check the training set accuracy
+    library(caret)
+    Train.prob =predict(Chosen.model, type ="response")
+    Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
+    Test.prob = predict(Chosen.model, newdata=Test.set, type="response")
+    Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+    CM.train <- confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+    CM.test  <- confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)),  positive="Yes")
+
+    CM.train            # Training set result
+    CM.train$table      # output just the table
+
+    CM.train[["byClass"]][["Sensitivity"]]
+    CM.train[["byClass"]][["Specificity"]]
+
+    CM.test             # Testing set
+    CM.test$table      # output just the table
+
+
+
+###----------------------------
+#- 9b Output ROC curve and AUC for all threshold
+library(pROC)
+    #- Training Set
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.train
+    abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+    auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+    #- Test Set
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    # point corresponding to CM.test
+    abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+    auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+    LogiReg = c(auc.train, auc.test)
+    LogiReg
+
+
+    layout(matrix(1:2, 1, 2))
+    plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+    plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"))
+    text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+    layout(1)
+
+
+    LogiReg
+
+
+
+###--- Compare
+LogiReg
+GrowAndPrune
+Bagging
+RandomForest
+Boosting
+
+
+
+
+
+###-----------------------------------------------------------
+###--- Threshold Picker
+
+#cost.list = c(0,0,3,1)/4           # order of (TP, TN, FP, FN)
+cost.list = c(0,0,2,1)/3           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,1)/2           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,2)/3           # order of (TP, TN, FP, FN)
+#cost.list = c(0,0,1,3)/4           # order of (TP, TN, FP, FN)
+
+
+threshold.list = seq(0.01,.99,.01)    # grid for threshold
+cost=0
+library(caret)      # for confusionMatrix
+
+#  Have to be switched depending on the model
+Chosen.model <- pruned1;    Test.prob  = predict(Chosen.model, Test.set, type="vector")[,"Yes"]
+# Chosen.model <- treeBag01;  Test.prob = predict(Chosen.model, newdata=Test.set, type="prob")[,"Yes"]
+# Chosen.model <- treeBT01;   Test.prob = predict(Chosen.model, newdata=Test.set, type="response", n.trees=1000)
+
+
+for (i in 1:length(threshold.list)){
+
+    threshold = threshold.list[i]
+
+    #- Check the training set accuracy
+    Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+    CM.test  <- confusionMatrix(factor(Test.pred),
+                                factor(as.matrix(Test.resp)),
+                                positive="Yes")
+    TP = CM.test$table[2,2]   # True  Pos
+    TN = CM.test$table[1,1]   # True  Neg
+    FP = CM.test$table[2,1]   # False Pos
+    FN = CM.test$table[1,2]   # False Neg
+
+    cost[i] = sum(c(TP, TN, FP, FN) * cost.list)
+}
+plot(threshold.list, cost, xlab="threshold")
+
+cost.list
+which.min(cost)
+min(cost)
+threshold.list[which.min(cost)]
