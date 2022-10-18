@@ -54,7 +54,7 @@ Heart3 <- Heart %>%
 
 print(Heart3, width=1000)
 
-Heart3 <- Heart3 %>% select(-c("ChestPain", "Thal"))
+Heart3 <- Heart3 %>% select(-c("ChestPain", "Thal"))    # remove columns
 
 print(Heart3, width=1000)
 
