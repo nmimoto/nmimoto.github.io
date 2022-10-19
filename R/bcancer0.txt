@@ -1,7 +1,6 @@
 ###
-###
-###  BCancer - Prelim  ver 0.0.1
-###
+###  BCancer - Prelim
+###      ver 0.0.4
 ###
 ####################################################
 
@@ -11,42 +10,48 @@
 library(tidyverse)
 BCancer <- read_csv("https://nmimoto.github.io/datasets/bcancer.csv")
 BCancer
+print(BCancer, width=1000)  # show all columns
 
-print(BCancer, n=100)  # if you want to see more rows
+#  569 × 32
+#  1  id                      "numeric"   "dbl"
+#  2  diagnosis               "character" "chr"   <--- Response Variable. M=malignant, B=benign
+#  3  mean_radius             "numeric"   "dbl"   (mean of distances from center to points on the perimeter)
+#  4  mean_texture            "numeric"   "dbl"
+#  5  mean_perimeter          "numeric"   "dbl"
+#  6  mean_area               "numeric"   "dbl"
+#  7  mean_smoothness         "numeric"   "dbl"
+#  8  mean_compactness        "numeric"   "dbl"
+#  9  mean_concavity          "numeric"   "dbl"
+#  10 mean_concave_points     "numeric"   "dbl"
+#  11 mean_symmetry           "numeric"   "dbl"
+#  12 mean_fractal dimension  "numeric"   "dbl"
+#  13 radius_error            "numeric"   "dbl"
+#  14 texture_error           "numeric"   "dbl"   (standard deviation of gray-scale values)
+#  15 perimeter_error         "numeric"   "dbl"
+#  16 area_error              "numeric"   "dbl"
+#  17 smoothness_error        "numeric"   "dbl"   (local variation in radius lengths)
+#  18 compactness_error       "numeric"   "dbl"   (perimeter^2 / area - 1.0)
+#  19 concavity_error         "numeric"   "dbl"   (severity of concave portions of the contour)
+#  20 concave_points_error    "numeric"   "dbl"   (number of concave portions of the contour)
+#  21 symmetry_error          "numeric"   "dbl"
+#  22 fractal_dimension_error "numeric"   "dbl"   ("coastline approximation" - 1)
+#  23 worst_radius            "numeric"   "dbl"
+#  24 worst_texture           "numeric"   "dbl"
+#  25 worst_perimeter         "numeric"   "dbl"
+#  26 worst_area              "numeric"   "dbl"
+#  27 worst_smoothness        "numeric"   "dbl"
+#  28 worst_compactness       "numeric"   "dbl"
+#  29 worst_concavity         "numeric"   "dbl"
+#  30 worst_concave_points    "numeric"   "dbl"
+#  31 worst_symmetry          "numeric"   "dbl"
+#  32 worst_fractal_dimension "numeric"   "dbl"
 
-  #  569 × 32
-  #  1  id
-  #  2  diagnosis     <--- Response Variable. M=malignant, B=benign
-  #  3  mean_radius (mean of distances from center to points on the perimeter)
-  #  4  mean_texture
-  #  5  mean_perimeter
-  #  6  mean_area
-  #  7  mean_smoothness
-  #  8  mean_compactness
-  #  9  mean_concavity
-  #  10 mean_concave_points
-  #  11 mean_symmetry
-  #  12 mean_fractal dimension
-  #  13 radius_error
-  #  14 texture_error          (standard deviation of gray-scale values)
-  #  15 perimeter_error
-  #  16 area_error
-  #  17 smoothness_error  (local variation in radius lengths)
-  #  18 compactness_error      (perimeter^2 / area - 1.0)
-  #  19 concavity_error  (severity of concave portions of the contour)
-  #  20 concave_points_error   (number of concave portions of the contour)
-  #  21 symmetry_error
-  #  22 fractal_dimension_error   ("coastline approximation" - 1)
-  #  23 worst_radius
-  #  24 worst_texture
-  #  25 worst_perimeter
-  #  26 worst_area
-  #  27 worst_smoothness
-  #  28 worst_compactness
-  #  29 worst_concavity
-  #  30 worst_concave_points
-  #  31 worst_symmetry
-  #  32 worst_fractal_dimension
+dim(BCancer)
+
+# List out each column name and its Class and Type
+Cls = BCancer %>% head %>% collect %>% lapply(class) %>% unlist
+Type = BCancer %>% head %>% collect %>% lapply(type_sum) %>% unlist
+cbind(Cls, Type)
 
 
 #- Histogram of the respoonse variable
@@ -55,15 +60,14 @@ table(BCancer$diagnosis)
 
 # Rename medv column as resp.
 BCancer2 <- BCancer %>%
-              rename(resp=diagnosis) %>%             # rename the column
-              relocate(resp) %>%                       # move "resp" to 1st column
-              mutate(resp=ifelse(resp=="M", "Yes", "No")) %>%    # change M/B to Yes/No
-              mutate(resp=as.factor(resp))
+    select(-"id") %>%                        # remove "id" column
+    rename(resp=diagnosis) %>%               # rename the column
+    relocate(resp) %>%                       # move "resp" to 1st column
+    mutate(resp=ifelse(resp=="M", "Yes", "No")) %>%    # change M/B to Yes/No
+    mutate(resp=as.factor(resp))
 BCancer2
 
-table(BCancer2$resp)    # note that first level is "No"
-
-
+table(BCancer2$resp)    # note that it is No/Yes, instead of Yes/No
 
 
 
@@ -75,9 +79,10 @@ resp.col.name <- "resp"
   #- Check for N/A in data. Remove if there's any.
   summary(Orig)
   sum(is.na(Orig))
+  dim(Orig)
   # If there is na in the data, run below
-  # Orig <- Orig %>% na.omit()
-  # dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
   ##----------
@@ -88,7 +93,7 @@ resp.col.name <- "resp"
     Orig_num <- Orig %>% select_if(is.numeric)
     cor(Orig_num)
     corrplot::corrplot(cor(Orig_num))
-    corrplot::corrplot(cor(Orig_num), method="number")
+    # corrplot::corrplot(cor(Orig_num), method="number")
 
 
   ##----------
@@ -125,5 +130,14 @@ resp.col.name <- "resp"
 
   which(ChiSq.pval > .6)              # Col num of variables w >.6 p-value
   list_cols[which(ChiSq.pval > .6)]   # Top list of 'unimportatnt' variables
+
+
+#  which(ChiSq.pval < .05)             # Col num of variables w <.05 p-value
+# [1]  1  2 22 29
+# [1] "resp"  "mean_radius" "worst_radius"  "worst_concave_points"
+# which(ChiSq.pval > .6)               # Col num of variables w >.6 p-value
+# [1]  6 20
+# [1] "mean_smoothness" "symmetry_error"
+
 
 ### End of Routine Exploratory Analysis.
