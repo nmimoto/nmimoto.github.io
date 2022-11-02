@@ -1,0 +1,145 @@
+###
+###
+###  Concrete Data - Multiple Regression (Simple version)
+###    ver 0.0.4
+###
+##################################################
+
+
+#-------------------------------------------------
+###--- 0. Preliminary
+library(tidyverse)
+Concrete <- read_csv("https://nmimoto.github.io/datasets/concrete.csv")
+Concrete
+
+print(Concrete, n=20)  # if you want to see more rows
+
+  # Cement           (component 1)                    -- quantitative -- kg in a m3 mixture
+  # Slag             (component 2) Blast Furnace Slag -- quantitative -- kg in a m3 mixture
+  # Fly              (component 3) Fly Ash            -- quantitative -- kg in a m3 mixture
+  # Water            (component 4)                    -- quantitative -- kg in a m3 mixture
+  # Superplasticizer (component 5)                    -- quantitative -- kg in a m3 mixture
+  # Coarse           (component 6) Coarse Aggregate   -- quantitative -- kg in a m3 mixture
+  # Fine             (component 7) Fine Aggregate     -- quantitative -- kg in a m3 mixture
+  # Age                                               -- quantitative -- Day (1~365)
+  # CCS              Concrete compressive strength    -- quantitative -- MPa -- response variable
+
+# Rename "CCS" column as "resp" to streamline analysis.
+Concrete2 <- Concrete %>% rename(resp=CCS) %>% relocate(resp)
+Concrete2
+
+
+
+#-------------------------------------------------
+###--- 1. Routine Exploratory Analysis (class of resp should be "dbl")
+Orig <- Concrete2    # "resp" column is required
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
+
+
+
+
+###-------------------------------------------------
+###--- 1. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Concrete2            # Entire Data set (have to be data.frame)
+train.size <- 850            # num of rows for training set
+test.size <- 180             # num of rows for testing set
+my.seed <- 4345              # give a seed
+
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# [  Train.set 850        ]  [Test.set 180]  1030 total
+# [170][170][170][170][170]
+
+
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$Age,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$Age, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+
+
+
+
+
+###-------------------------------------------------
+###--- 2. Multiple Regression with manual CV
+layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
+CVFitDiagnosis <- numeric(0)
+for (k in 1:5) {
+
+    set.seed(my.seed)
+    Fit00 = lm(resp ~.,  data=CV.train[[k]]) # <===== Try using different set of columns here
+
+    # summary(Fit00)
+    # plot(Fit00)  # Use only if NN is small enough (hidden <10)
+
+    #--- Get training / validation fit
+    Train.fitted = predict(Fit00, newdata=CV.train[[k]])
+    Valid.pred   = predict(Fit00, newdata=CV.valid[[k]])
+
+    #--- Plot Y vs Yhat
+    plot( Train.fitted, as.matrix(CV.train[[k]]$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+    lines(Valid.pred,   as.matrix(CV.valid[[k]]$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+    abline(0,1)
+
+    library(caret)            # install.packages("caret")
+    CVFitDiagnosis1 <- data.frame(
+        tr.RMSE     = caret::RMSE(Train.fitted, as.matrix(CV.train[[k]]$resp)),
+        tr.Rsquare  = caret::R2(  Train.fitted,           CV.train[[k]]$resp),
+        val.RMSE    = caret::RMSE(Valid.pred,   as.matrix(CV.valid[[k]]$resp)),
+        val.Rsquare = caret::R2(  Valid.pred,             CV.valid[[k]]$resp)
+    )
+    CVFitDiagnosis <- rbind(CVFitDiagnosis, CVFitDiagnosis1)
+}
+layout(1)
+
+CVFitDiagnosis
+Av.CVFitDiagnosis = apply(CVFitDiagnosis, 2, mean)
+Av.CVFitDiagnosis
+
+
+
+
+###-------------------------------------------------
+###--- 3. Ordinary Regression (w Entire Training set)
+Fit01 = lm(resp ~. , data=Train.set)
+summary(Fit01)
+
+# get training / validation fit
+Train.fitted = predict(Fit01, newdata = Train.set)
+Test.pred    = predict(Fit01, newdata = Test.set)
+
+#--- Plot Y vs Yhat
+plot( Train.fitted, as.matrix(CV.train[[k]]$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
+lines(Valid.pred,   as.matrix(CV.valid[[k]]$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)          # install.packages("caret")
+OLS <- data.frame(
+  RMSE.tr      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  Rsquare.tr   = caret::R2(  Train.fitted,           Train.resp),
+  RMSE.test    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  Rsquare.test = caret::R2(  Test.pred,              Test.resp)
+)
+OLS
+
+
+
+## Also try
+## lm(resp ~ . -Fine, data=Concrete2)
