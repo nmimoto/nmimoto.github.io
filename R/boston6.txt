@@ -1,0 +1,200 @@
+###
+###
+###  Boston data (MASS) - Regularization: LASSO and Ridge Regression
+###                         Training vs Testing only
+###   ver 0.0.4
+###
+#################################################################
+
+
+###-------------------------------------------------
+###--- 0. Preliminary
+
+# Using Boston3 from https://nmimoto.github.io/R/boston0.txt
+library(MASS)                # install.packages("MASS")
+library(tidyverse)           # install.packages("tidyverse")
+Boston <- as_tibble(Boston)
+Boston
+
+# Rename "medv" column as "resp" and move "resp" columnm to 1st
+Boston2 <- Boston %>% rename(resp=medv) %>% relocate(resp)
+Boston2
+
+# turn "chas" column into 0/1 factor
+Boston3 <- Boston2 %>% mutate( chas=as.factor(chas) )
+Boston3
+
+# Importance List by Chisq test
+
+  # top list:
+  # 3  4  6 10
+  # "zn" "indus" "nox"   "rad"
+
+  # bottom list
+  # c(7, 8, 9, 13)
+  # "rm"    "age"   "dis"   "black"
+
+  #1  resp    (dbl)   <- used to be "medv". Response variable (Y).
+  #2  crim    (dbl)
+  #3  zn      (dbl)
+  #4  indus   (dbl)
+  #5  chas    (factor)
+  #6  nox     (dbl)
+  #7  rm      (dbl)
+  #8  age     (dbl)
+  #9  dis     (dbl)
+  #10 rad     (int)
+  #11 tax     (dbl)
+  #12 ptratio (dbl)
+  #13 black   (dbl)
+  #14 lstat   (dbl)
+
+
+###
+###  For Regularlization Method, Data should be standardized.
+###
+
+
+
+
+###-------------------------------------------------
+###--- 1. Data Separation (Copied from Rtut-CV)
+### Divide Dataset to Training and Testing and Set up k fold CV
+Orig <- Boston3              # Entire Data set (have to be data.frame)
+train.size <- 400            # num of rows for training set
+test.size <- 106             # num of rows for testing set
+my.seed <- 3231              # give a seed
+
+  ###
+  ### This line replaces the AAAA to BBBB chunk
+  source('https://nmimoto.github.io/R/ML-00.txt')
+  ###
+
+# Output (all data.frame):
+#   Train.set      /  Train.resp
+#   Test.set       /  Test.resp
+#   CV.train[[k]]  /  CV.train.resp[[k]]
+#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# [ Train.set 400     ]     [Test.set 106]
+# [80][80][80][80][80]
+
+
+#--- plot Training and Test for visualization
+fold = 2
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+
+
+
+
+###-------------------------------------------------
+###--- 3. Ordinary Regression (w Entire Training set)
+Fit01 = lm(resp ~. , data=Train.set)
+summary(Fit01)
+
+# Get training / validation fit
+Train.fitted = predict(Fit01, newdata=Train.set)
+Test.pred    = predict(Fit01, newdata=Test.set)
+
+#--- Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+OLS <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
+)
+OLS
+
+
+
+
+
+###-------------------------------------------------
+###--- 4. Lasso Regression (Entire Training set. Auto 5-fold CV)
+library(glmnet)         # install.packages('glmnet', repos='https://cran.case.edu/')
+
+# Display the best lambda value
+set.seed(my.seed)
+x <- model.matrix(resp ~. , Train.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+y <- Train.set$resp
+
+CV.for.lambda <- cv.glmnet(x, y, alpha = 1, nfolds=5)
+CV.for.lambda$lambda.min
+FitLasso <- glmnet(x, y, alpha = 1, lambda = CV.for.lambda$lambda.min)
+coef(FitLasso)
+summary(Fit01)
+
+# Compare OLS vs Lasso coef
+cbind(coef(Fit01), coef(FitLasso))
+
+# Get training / validation fit
+Train.fitted <- as.vector(predict(FitLasso, x.train))
+Test.pred   <- as.vector(predict(FitLasso, x.test))
+
+# Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+Lasso <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
+)
+Lasso
+
+OLS
+
+
+
+
+###-------------------------------------------------
+###--- 5. Ridge Regression (Entire Training set. Auto 5-fold CV)
+
+# Display the best lambda value
+set.seed(my.seed)
+x <- model.matrix(resp ~. , Train.set)[,-1]
+x.train <- model.matrix(resp ~., Train.set)[,-1]
+x.test  <- model.matrix(resp ~., Test.set)[,-1]
+y <- Train.set$resp
+
+CV.for.lambda <- cv.glmnet(x, y, alpha = 0, nfolds=5)
+CV.for.lambda$lambda.min
+FitRidge <- glmnet(x, y, alpha = 0, lambda = CV.for.lambda$lambda.min)
+coef(FitRidge)
+
+# Compare OLS vs Lasso coef
+cbind(coef(Fit01), coef(FitLasso), coef(FitRidge))
+
+# Get training / validation fit
+Train.fitted <- as.vector(predict(FitRidge, x.train))
+Test.pred   <- as.vector(predict(FitRidge, x.test))
+
+# Plot Y vs Yhat
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(0,1)
+
+library(caret)            # install.packages("caret")
+Ridge <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,              Test.resp)
+)
+Ridge
+
+
+OLS
+Lasso
+Ridge
