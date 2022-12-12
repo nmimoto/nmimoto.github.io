@@ -1,0 +1,142 @@
+*   Cluster1.R
+###
+###
+###  489/589 ML Ch10 Lab 2 - Clustering Analysis
+###
+###
+####################################################
+
+
+###
+###--------------- Simulated Data --------------------
+###                       1. K-means Clustering
+###                       2. Hierachical Clustering
+
+
+
+###-------------------------------------------------
+###--- 1. K-means Clustering
+
+
+##-- Simulate Dataset
+set.seed (2)
+X=matrix(rnorm(50*2), 50, 2)
+X[1:25, 1]=X[1:25, 1]+3
+X[1:25, 2]=X[1:25, 2]-4
+plot(X)
+
+
+##-- K-means clustering with K=2
+set.seed(4)
+km.out=kmeans(X, centers=2, nstart=20)
+km.out
+
+plot(X, col=(km.out$cluster+1), xlab ="", ylab="", pch =20, cex =2,
+     main="K-Means Clustering Results with K=2")
+
+
+##-- K-means clustering with K=3
+set.seed(4)
+km.out=kmeans(X, centers=3, nstart=20)
+km.out
+
+plot(X, col=(km.out$cluster+1), xlab ="", ylab="", pch =20, cex =2,
+     main="K-Means Clustering Results with K=3")
+
+
+
+
+
+##-- Show it step by step
+set.seed(234523)
+km.1 <- kmeans(X, centers=5, iter.max=1)
+km.2 <- kmeans(X, centers=km.1$centers, iter.max=1)
+km.3 <- kmeans(X, centers=km.2$centers, iter.max=1)
+km.4 <- kmeans(X, centers=km.2$centers, iter.max=1)
+
+
+M <- cbind(km.1$cluster, km.2$cluster, km.3$cluster)
+changing <- which(apply(M, 1, sd)>0)
+changing
+
+par(mfrow=c(1,3))
+
+plot(X,col=km.1$cluster, pch=19, main="It1")
+points(X[changing, c(1,2)],pch=21,cex=2)
+
+plot(X,col=km.2$cluster, pch=19, main="It2")
+points(X[changing, c(1,2)],pch=21,cex=2)
+
+plot(X,col=km.3$cluster, pch=19, main="It3")
+points(X[changing, c(1,2)],pch=21,cex=2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+##-- Effect of nstart  (Use nstart>20)
+km.out =kmeans(X, 3, nstart=1)
+km.out$tot.withinss
+
+km.out =kmeans(X, 3, nstart=20)
+km.out$tot.withinss
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 2. Hierarchical Clustering
+
+
+##-- Simulate Dataset
+set.seed (2)
+X=matrix(rnorm(50*2), 50, 2)
+X[1:25, 1]=X[1:25, 1]+3
+X[1:25, 2]=X[1:25, 2]-4
+plot(X)
+
+
+##-- Hierarchical Clustering
+hc.co = hclust(dist(X), method="complete")
+hc.av = hclust(dist(X), method="average")
+hc.si = hclust(dist(X), method="single")
+
+
+par(mfrow =c(1,3))
+plot(hc.co, main="Complete Linkage", xlab="", sub ="", cex =.9)
+plot(hc.av, main="Average Linkage",  xlab="", sub ="", cex =.9)
+plot(hc.si, main="Single Linkage",   xlab="", sub ="", cex =.9)
+
+
+cutree(hc.co, 2)
+cutree(hc.av, 2)
+cutree(hc.si, 2)
+
+cutree (hc.si, 4)
+
+
+
+X.sc=scale(X)
+plot(hclust(dist(X.sc), method="complete"),
+     main="Hierarchical Clustering with Scaled Features")
+
+
+
+
+##-- Correlation based distance
+X=matrix(rnorm(30*3), ncol =3)
+dd=as.dist(1-cor(t(x)))
+plot(hclust(dd, method =" complete"),
+     main="Complete Linkage with Correlation-Based Distance",
+     xlab="", sub ="")

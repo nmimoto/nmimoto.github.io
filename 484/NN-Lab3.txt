@@ -1,0 +1,143 @@
+###
+###
+###  Neural Network Demo 3 - Smarket Data
+###
+###
+####################################################
+###                        Also see ML-04Lab2.R
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 1. Preliminary
+library (ISLR)
+names(Smarket )
+
+    # [1] "Year"   "Lag1"    "Lag2"   "Lag3"   "Lag4"
+    # [6] "Lag5"   "Volume"  "Today"  "Direction"
+
+dim(Smarket )
+# [1] 1250 9
+
+summary(Smarket)
+pairs(Smarket)
+
+cor(Smarket)             # gives error because the 1st column is not numeric
+cor(Smarket[,-c(1,9)])   # 1st col is Year, 9th col is Up/Down response
+attach(Smarket)
+
+
+
+
+
+
+
+##--- Scale data for neural network
+Means = c(0, apply(Smarket[,2:8], 2, mean))
+SDs   = c(1, apply(Smarket[,2:8], 2, sd))
+Smarket.sc = as.data.frame((Smarket[,1:8]-Means)/SDs)
+Smarket.sc = cbind(Smarket.sc, "Direction"=Smarket[ ,9])
+
+
+##--- Separate into Training Set and Testing set ---
+
+ix.train = (Year<2005)               # Train = 2001 to 2004
+                                     # Test  = 2005
+
+Smarket.tR  <- Smarket.sc[ix.train,  ]    # Training Set
+Direc.tR    <- Direction[ix.train]    # Training Response
+
+Smarket.tS  <- Smarket.sc[!ix.train, ]   # Test Set
+Direc.tS    <- Direction[!ix.train]   # Test Response
+
+dim(Smarket.tR)
+dim(Smarket.tS)
+#[1] 252 9
+
+
+
+
+###-------- Fit Neural Network
+library(neuralnet)          # install.packages("neuralnet")
+set.seed(2)
+dataset.tR  <- Smarket.tR
+response.tR <- Direc.tR
+dataset.tS  <- Smarket.tS
+response.tS <- Direc.tS
+
+
+  NN.fit = neuralnet(Direction ~ Lag1 + Lag2,
+                     dataset.tR, hidden = 20, linear.output=FALSE)
+          # lin.out=FALSE means activation function is applied to output node
+# plot(NN.fit)
+
+
+    # Predict for TEST set
+    NN.pred = compute(NN.fit,  dataset.tS[, 1:8])
+
+
+library(caret)
+CM <- confusionMatrix(factor(NN.pred), factor(Direction.tS), positive="Up")
+CM
+
+
+    plot.roc(response.tS, as.vector(NN.pred$net.result[,1]), levels=c("Down", "Up"))
+    abline(h=.7798, v=.9348, col="red")   #  point out specific place
+
+    auc(response.tS, as.vector(NN.pred$net.result[,1]), levels=c("Down", "Up"))
+
+
+
+
+
+
+
+
+###-------- Fit Neural Network
+library(neuralnet)          # install.packages("neuralnet")
+set.seed(2)
+dataset.tR  <- Smarket.tR
+response.tR <- Direc.tR
+dataset.tS  <- Smarket.tS
+response.tS <- Direc.tS
+
+
+  NN.fit = neuralnet(Direction ~ Lag1 + Lag2 + Volume,
+                     dataset.tR, hidden = 20, linear.output=FALSE)
+          # lin.out=FALSE means activation function is applied to output node
+# plot(NN.fit)
+
+
+    # Predict for TRAINING set
+    NN.pred.all = compute(NN.fit,  dataset.tR[, 2:8])
+    NN.pred     = NN.pred.all$net.result[,1]
+    NN.pred.UD = ifelse(NN.pred>.5, "Down", "Up")
+
+    library(caret)
+    CM <- confusionMatrix(factor(NN.pred.UD), factor(response.tR), positive="Up")
+    CM
+
+    library(pROC)
+    plot.roc(response.tR, as.vector(NN.pred), levels=c("Down", "Up"))
+
+    auc(response.tR, as.vector(NN.pred), levels=c("Down", "Up"))
+
+
+
+    # Predict for TEST set
+    NN.pred.all = compute(NN.fit,  dataset.tS[, 2:8])
+    NN.pred     = NN.pred.all$net.result[,1]
+    NN.pred.UD = ifelse(NN.pred>.5, "Down", "Up")
+
+    library(caret)
+    CM <- confusionMatrix(factor(NN.pred.UD), factor(response.tS), positive="Up")
+    CM
+
+    library(pROC)
+    plot.roc(response.tS, as.vector(NN.pred), levels=c("Down", "Up"))
+    abline(h=.7798, v=.9348, col="red")   #  point out specific place
+
+    auc(response.tS, as.vector(NN.pred), levels=c("Down", "Up"))
