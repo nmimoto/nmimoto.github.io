@@ -1,0 +1,210 @@
+###
+###
+###  Principal Component Analysis - USArrests Data
+###
+###
+####################################################
+
+
+
+###-------------------------------------------------
+###--- 1. Preliminary
+
+
+names(USArrests)    # data is in base R.  No need to load package
+#  [1] "Murder"   "Assault"  "UrbanPop" "Rape"
+
+?USArrests
+
+states.long = row.names(USArrests)
+states.long
+# [1] "Alabama"        "Alaska"         "Arizona"
+# [4] "Arkansas"       "California"     "Colorado"
+# [7] "Connecticut"    "Delaware"       "Florida"
+#[10] "Georgia"        "Hawaii"         "Idaho"
+#[13] "Illinois"       "Indiana"        "Iowa"
+#[16] "Kansas"         "Kentucky"       "Louisiana"
+#[19] "Maine"          "Maryland"       "Massachusetts"
+#[22] "Michigan"       "Minnesota"      "Mississippi"
+#[25] "Missouri"       "Montana"        "Nebraska"
+#[28] "Nevada"         "New Hampshire"  "New Jersey"
+#[31] "New Mexico"     "New York"       "North Carolina"
+#[34] "North Dakota"   "Ohio"           "Oklahoma"
+#[37] "Oregon"         "Pennsylvania"   "Rhode Island"
+#[40] "South Carolina" "South Dakota"   "Tennessee"
+#[43] "Texas"          "Utah"           "Vermont"
+#[46] "Virginia"       "Washington"     "West Virginia"
+#[49] "Wisconsin"      "Wyoming"
+
+states <- c("AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+            "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+            "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+            "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+            "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY")
+
+row.names(USArrests) <- states
+
+## column-wise mean and variance
+Means <- apply(USArrests , 2, mean)
+Means
+SDs   <- apply(USArrests , 2, sd)
+SDs
+
+
+attach(USArrests)
+
+## Exploratory Plots
+plot(-1,0, ylim=c(50, 350), xlim=c(0,20), xlab="Murder", ylab="Assault")
+text(Murder, Assault, labels=states, cex=.8)
+
+plot(-1,0, ylim=c(0, 100), xlim=c(0,20), xlab="Murder", ylab="UrbanPop")
+text(Murder, UrbanPop, labels=states, cex=.8)
+
+plot(-1,0, ylim=c(0, 100), xlim=c(30,35), xlab="Assault", ylab="UrbanPop")
+text(Assault, UrbanPop, labels=states, cex=.8)
+
+
+layout(matrix(1:6, 2, 3, byrow=TRUE))
+
+    plot(-10,0, xlim=c(0,20), ylim=c(40, 350),  xlab="Murder", ylab="Assault")
+    text(Murder, Assault, labels=states, cex=.8)
+
+    plot(-10,0, xlim=c(0,20), ylim=c(0, 100),  xlab="Murder", ylab="UrbanPop")
+    text(Murder, UrbanPop, labels=states, cex=.8)
+
+    plot(-10,0, xlim=c(0,20), ylim=c(0, 60),  xlab="Murder", ylab="Rape")
+    text(Murder, Rape, labels=states, cex=.8)
+
+    plot(-10,0, xlim=c(40,350), ylim=c(0, 100),  xlab="Assault", ylab="UrbanPop")
+    text(Assault, UrbanPop, labels=states, cex=.8)
+
+    plot(-10,0, xlim=c(40,350), ylim=c(0, 60),  xlab="Assault", ylab="Rape")
+    text(Assault, Rape, labels=states, cex=.8)
+
+    plot(-10,0, xlim=c(0,60), ylim=c(0, 100),  xlab="Rape", ylab="UrbanPop")
+    text(Rape, UrbanPop, labels=states, cex=.8)
+
+    layout(matrix(1,1,1))
+
+
+
+## If you plot same with fixed scale for all crimes
+layout(matrix(1:6, 2, 3, byrow=TRUE))
+
+    plot(-100,0, xlim=c(0,350), ylim=c(40, 350),  xlab="Murder", ylab="Assault")
+    text(Murder, Assault, labels=states, cex=.8)
+
+    plot(-100,0, xlim=c(0,350), ylim=c(0, 100),  xlab="Murder", ylab="UrbanPop")
+    text(Murder, UrbanPop, labels=states, cex=.8)
+
+    plot(-100,0, xlim=c(0,350), ylim=c(0, 350),  xlab="Murder", ylab="Rape")
+    text(Murder, Rape, labels=states, cex=.8)
+
+    plot(-100,0, xlim=c(0,350), ylim=c(0, 100),  xlab="Assault", ylab="UrbanPop")
+    text(Assault, UrbanPop, labels=states, cex=.8)
+
+    plot(-100,0, xlim=c(0,350), ylim=c(0, 350),  xlab="Assault", ylab="Rape")
+    text(Assault, Rape, labels=states, cex=.8)
+
+    plot(-100,0, xlim=c(0,350), ylim=c(0, 100),  xlab="Rape", ylab="UrbanPop")
+    text(Rape, UrbanPop, labels=states, cex=.8)
+
+    layout(matrix(1,1,1))
+
+
+
+
+
+###-------------------------------------------------
+###--- 2. Principal Component Analysis (Scaled)
+
+##--- PCA
+PCA.out =prcomp(USArrests, scale =TRUE)
+
+
+names(PCA.out)
+#  [1] "sdev" "rotation " "center " "scale" "x"
+
+PCA.out$center     # same as Means
+PCA.out$scale      # same as SDs
+PCA.out$rotation   # Contains PC loadings
+  #             PC1     PC2     PC3     PC4
+  # Murder   -0.5359  0.4182 -0.3412  0.6492
+  # Assault  -0.5832  0.1880 -0.2681 -0.7434
+  # UrbanPop -0.2782 -0.8728 -0.3780  0.1339
+  # Rape     -0.5434 -0.1673  0.8178  0.0890
+dim(PCA.out$x)
+biplot(PCA.out, scale=0)
+abline(h=0, v=0, lty=2)
+
+
+##-- Flip The sign of PC loading
+PCA.out$rotation=-PCA.out$rotation
+PCA.out$x=-PCA.out$x
+biplot(PCA.out, scale=0)
+abline(h=0, v=0, lty=2)
+
+
+
+##--- Var explained by each Princ Comp
+PCA.out$sdev      # SD of each Principal Component
+
+PCA.var =PCA.out$sdev^2
+PCA.var
+pve=PCA.var/sum(PCA.var)
+pve
+
+layout(matrix(1:2, 1, 2))
+    plot(pve, ylim=c(0,1), type='b',
+         xlab="Principal Component",
+         ylab="Proportion of Variance Explained")
+
+    plot(cumsum(pve), ylim=c(0,1), type='b',
+         xlab="Principal Component",
+         ylab ="Cumulative Proportion of Variance Explained")
+
+    layout(matrix(1,1,1))
+
+
+
+
+
+
+
+###-------------------------------------------------
+###--- 3. Principal Component Analysis (If you don't scale it )
+
+##--- PCA
+PCA.out =prcomp(USArrests, scale=FALSE)
+
+names(PCA.out)
+#  [1] "sdev" "rotation " "center " "scale" "x"
+
+PCA.out$center     # same as Means
+PCA.out$scale      # same as SDs
+PCA.out$rotation   # Contains PC loadings
+
+biplot(PCA.out, scale=0)
+abline(h=0, v=0, lty=2)
+
+
+
+##--- Var explained by each Princ Comp
+PCA.out$sdev      # SD of each Principal Component
+
+PCA.var =PCA.out$sdev^2
+PCA.var
+pve=PCA.var/sum(PCA.var)
+pve
+
+layout(matrix(1:2, 1, 2))
+
+    plot(pve, ylim=c(0,1), type='b',
+         xlab="Principal Component",
+         ylab="Proportion of Variance Explained")
+
+    plot(cumsum(pve), ylim=c(0,1), type='b',
+         xlab="Principal Component",
+         ylab ="Cumulative Proportion of Variance Explained")
+
+    layout(matrix(1,1,1))
