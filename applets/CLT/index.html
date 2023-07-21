@@ -1,1 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>CLTapplet</title>
+    <link rel="stylesheet" href="css/Histogram.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+     .myChartsTittle2{
+         padding-left: 44px;
+     }
+     @media(max-width:628px){
+         .myChartsTittle2{
+             padding-top: 20px;
+             padding-left: 20px;
+         }
+     }
+     hr{width: 90%; margin: 0px auto 40px;}
+    </style>
+</head>
+
+
+<!------------------------------------------->
+<body style="padding-top:50px; padding-bottom:50px; width: 85%; max-width:1200px; margin:auto;">
+
+    <div class="row mb-5 align-items-center">
+        <p class="myChartsTittle2" style="font-size: 36px;">Central Limit Theorem Applet</p>
+
+        <div class="col-lg-4 col-md-12 px-2">
+            <div class="d-grid gap-2">
+                <p class="myChartsTittle2" style="font-size: 14px;">Choose The Population Distribution</p>
+                <select class="form-select form-select-sm mb-3" name="distribution">
+                    <option>Normal</option>
+                    <option>Uniform</option>
+                    <option>Skewed</option>
+                    <option>Custom</option>
+                </select>
+
+                <p class="myChartsTittle2" style="font-size: 14px;">Choose the sample size</p>
+                <div class="input-group input-group-sm mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm">N = </span>
+                    <input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" name="histogram3SampleSize" id="histogram3SampleSize" max="100000" min="2" value="2">
+                </div>
+
+                <button class="btn btn-primary btn-sm mb-2" id="sampleAnimated" style="width:100%; margin-right: 7px;">Run sim with animation</button>
+                <button class="btn btn-outline-primary btn-sm mb-2" id="sample5" style="width:100%; margin-right: 7px;">Repeat sim 5 more times</button>
+                <button class="btn btn-outline-primary btn-sm mb-2" id="sample10000" style="width:100%; margin-right: 7px;">Repeat sim 100 more times</button>
+                <button class="btn btn-outline-primary btn-sm mb-2" id="sample100000" style="width:100%;">Repeat sim 10,000 more times</button>
+
+                <button id="resetSamples" class="btn btn-danger btn-sm mb-2">Reset</button>
+
+            </div>
+        </div>
+    </div>
+
+    <!---1st ----------------------------->
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-4 col-md-12 px-2">
+            <p class="mb-2">Population Parameters:</p>
+            <div id="statsDisplay1">
+                <table class="table">
+                    <tbody>
+                        <tr class="table-primary">
+                            <td>mean</td>
+                            <td><span class="blue right" id="mean1">15.96</span></td>
+                        </tr>
+                        <tr class="table-danger">
+                            <td>median</td>
+                            <td><span class="secondary right" id="median1">15.96</span>
+                        </tr>
+                        <tr class="table-success">
+                            <td>sd</td>
+                            <td><span  id="sd1">5.11</span></td>
+                        </tr>
+                        <!--
+                             <tr class="">
+                             <td>skew</td>
+                             <td><span class="right" id="skew1">0.02</span></td>
+                             </tr>
+                             <tr class="">
+                             <td>kurtosis</td>
+                             <td><span class="right" id="kurtosis1">-0.05</span></td>
+                             </tr>
+                        -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <p class="myChartsTittle2" style="font-size: 20px;">Population pdf</p>
+            <div id="histogram1" class="histogram">
+            </div>
+            <p class="myChartsTittle2" style="text-align: center;font-size: 12px; position: relative; right: 5px; color: red;padding-top:0;">\mu</p>
+        </div>
+    </div>
+
+    <hr>
+    <!---2nd ----------------------------->
+    <div class="row mb-5">
+        <div class="col-lg-4 col-md-12 px-2">
+            <p class="mb-2">Sample Statistics:</p>
+            <div id="statsDisplay2">
+                <table class="table">
+                    <tbody>
+                        <tr class="table-info"><td>Reps</td><td><span  id="reps3">10</span></td></tr>
+                        <tr class="table-primary"><td>mean</td><td><span id="mean3">0.00</span></td></tr>
+                        <tr class="table-success"><td>sd</td><td><span id="sd3">0.00</span></td></tr>
+                        <tr class="table"><td>Reps</td><td><span id="reps2">5</span></td></tr>
+                        <tr class="table-success"><td>range</td><td><span id="range2">9.00</span>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <p class="myChartsTittle2" style="font-size: 20px;">Histogram of Sample of size N</p>
+            <div id="histogram2" class="histogram">
+            </div> <!-- Sample Data -->
+        </div>
+    </div>
+
+    <hr>
+    <!---3rd ----------------------------->
+    <div class="row mb-5">
+        <div class="col-lg-4 col-md-12 px-2">
+
+            <div class="d-grid gap-2">
+                <select class="form-select form-select-sm mb-2" id="histogram3Stat">
+                    <option value="mean">Mean</option>
+                    <option value="median">Median</option>
+                    <option value="standardDeviation">sd</option>
+                    <option value="variance">Variance</option>
+                    <option value="varianceUnbiased">Var (U)</option>
+                    <option value="meanAbsoluteDeviation">MAD</option>
+                    <option value="range">Range</option>
+                </select>
+
+                <!--<select name="histogram3SampleSize" id="histogram3SampleSize">
+                     <option value="5">5</option>
+                     </select>-->
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="histogram3FitNormal">
+                    <label class="form-check-label" for="histogram3FitNormal"> Fit normal </label>
+                </div>
+            </div>
+
+            <div id="statsDisplay3">
+                <table class="table">
+                    <tbody>
+                        <tr class="table-info"><td>Reps</td><td><span  id="reps3">10</span></td></tr>
+                        <tr class="table-primary"><td>mean</td><td><span id="mean3">0.00</span></td></tr>
+                        <!-- <tr class="table-danger"><td>median</td><td><span id="median3">13.50</span></tr>  -->
+                        <tr class="table-success"><td>sd</td><td><span id="sd3">0.00</span></td></tr>
+                        <!-- <tr class=""><td>skew</td><td><span id="skew3">0.00</span></td></tr><tr class=""><td>kurtosis</td><td><span class="right" id="kurtosis3">0.00</span></td></tr> -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <p class="myChartsTittle2" id="my3titleId" style="font-size: 20px;">Distribution of Mean</p>
+            <div id="histogram3" class="histogram">
+            </div> <!-- Parent Population -->
+            <p class="myChartsTittle2" style="text-align: center;font-size: 12px; position: relative; right: 5px; color: red;padding-top:0;">Mean of \bar X</p>
+        </div>
+    </div>
+
+
+
+
+
+    <!---4th ----------------------------->
+    <div class="row mb-5" style="display: none;">
+        <div class="col-lg-4 col-md-12 px-2">
+            <div class="d-grid gap-2">
+
+                <select class="form-select form-select-sm mb-2" id="histogram4Stat">
+                    <option value="none" selected>None</option>
+                    <option value="mean" selected>Mean</option>
+                    <option value="median">Median</option>
+                    <option value="standardDeviation">sd</option>
+                    <option value="variance">Variance</option>
+                    <option value="varianceUnbiased">Var (U)</option>
+                    <option value="meanAbsoluteDeviation">MAD</option>
+                    <option value="range">Range</option>
+                </select>
+
+
+                <select id="histogram4SampleSize">
+                    <option value="2">N=2</option>
+                    <option value="5">N=5</option>
+                    <option value="10">N=10</option>
+                    <option value="16">N=16</option>
+                    <option value="20">N=20</option>
+                    <option value="25">N=25</option>
+                </select>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="histogram4FitNormal">
+                    <label class="form-check-label" for="histogram4FitNormal">
+                        Fit normal
+                    </label>
+                </div>
+
+            </div>
+
+            <div id="statsDisplay4">
+                <table class="table">
+                    <tbody>
+                        <tr><td>Reps</td><td><span  id="reps4">0</span></td></tr>
+
+                        <tr class="table-primary">
+                            <td>mean</td>
+                            <td><span id="mean4">24</span></td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <td>median</td>
+                            <td><span id="median4">48</span>
+                        </tr>
+                        <tr class="table-danger">
+                            <td>sd</td>
+                            <td><span id="sd4">48</span></td>
+                        </tr>
+                        <tr class="">
+                            <td>skew</td>
+                            <td><span id="skew4">48</span></td>
+                        </tr>
+                        <tr class="">
+                            <td>kurtosis</td>
+                            <td><span id="kurtosis4">48</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <div class="column">
+                <div id="histogram4" class="histogram">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<script src="bootstrap.min.js"></script>-->
+
+    <script src="js/jquery-1.10.1.min.js"></script>
+    <script src="js/Stats.js"></script>
+    <script src="js/HistogramData.js"></script>
+    <script src="js/Histogram.js"></script>
+    <script src="js/AnimatedHistogram.js"></script>
+    <script src="js/Sampling2.js"></script>
+    <script src="js/SamplingApp.js"></script>
+    <script src="js/StatisticsFunctions.js"></script>
+
+</body>
+</html>
