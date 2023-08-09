@@ -1,1 +1,173 @@
-aaa
+<!DOCTYPE html>
+<html>
+    <link rel="icon"
+          type="image/png"
+          href="favicon.png">
+
+    <head>  <!--html/head/ ----------------------------------------------->
+        <title>Stat Applets</title>
+        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/style.css">
+        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/title.css">
+        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/boxes.css">
+        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/tree.css">
+        <link rel="stylesheet" type="text/css" href="https://nmimoto.github.io/style/footnote.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- MathJax -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script type="text/javascript" id="MathJax-script" async
+                src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+        <style>
+         :root{
+             /*
+                #363636; /* Jet */
+             */
+             <!-------------------------------------------------------->
+             --fontTitle: Arial Black;
+             --fontBody:  Arial Black;
+             --fontBoxH:  Arial Black;
+             --fontBox:   Arial Black;
+
+             --BGoutside:          #EEF8FF; /* Alice Blue */
+             --BGbox1:             #003554; /* Prussian Blue */
+             --BGfootnoteR:        #FF5A5F;   /* Sizzling Red */
+             --fontcolTitle:       Black;
+             --fontcolBody:        White;      /*   when not defined */
+             --fontcolBox:         #EEF8FF; /* Alice Blue */
+             --fontcolLink:        #D1F5FF; /* Light Cyan */
+             --fontcolLinkHover:   White;
+             --fontcolLinkActive:  #EEF8FF; /* Alice Blue */
+             --fontcolLinkVisited: #1E91D6; /* Green Blue Crayola */
+
+             --fsizeTitleH1: 40px;
+             --fsizeTitleH2: 35px;
+             --fsizeTitle:   18px;
+             --fsizeBoxH1:   18px;
+             --fsizeBox:     15px;
+             --opac:         .97;
+
+             /* used in style-tree */
+             --fontTriangle: Black;
+             --BGopentree: SeaGreen;
+         }
+         .bigcontainer {
+             background-image: url("bg-.jpg");
+         }
+        </style>
+    </head>
+    <!-- TWO COLUMN TEMPLATE
+         /* bigcontainer           */
+         /*     container          */
+         /*         /titleR/       */
+         /*         /row/boxLEFT/  */
+         /*             /boxRIGHT/ */
+         /*         /row/boxLEFT/  */
+         /*             /boxRIGHT/ */
+         /*         /footnoteL/    */
+         /*         /footnoteR/    */
+    -->
+
+    <body>
+        <!-- /body/container/ --------------------------------------------------------->
+        <div class="bigcontainer">
+            <div class="container">
+
+                <!------------------------------->
+                <div class="titleRone">
+                    <h2> Stat Applets</h2>
+                    Department of Statistics <br>
+                    University of Akron
+                </div>
+
+                <!------------------------------->
+                <div class="row">
+                    <div class="boxLEFT">
+                        <h1>0. Preliminary</h1>
+                        <ul>
+                            <li><a href="applets/CLT/index.html"> CLT applet</a></li>
+                            <li><a href="https://www.dataversity.net/a-brief-history-of-machine-learning/">A Brief History of ML</a></li>
+                            <li><a href="https://www.reddit.com/r/statistics/comments/8de54s/is_r_better_than_python_at_anything_i_started/">R vs Python in Data Sci</a></li>
+                        </ul>
+                        <h1>1. Introduction</h1>
+                        <ul>
+                            <li><a href="https://onlinestatbook.com/rvls.html">Rice Virtual Lab in Statistics</a></li>
+                        </ul>
+                        <h1>2. Regression Methods</h1>
+                        <ul>
+                            <li><a href="https://nmimoto.github.io/">Top</a></li>
+                            <li><a href="https://nmimoto.github.io/">Top</a></li>
+                        </ul>
+
+                        <h1>8. Unsupervised Learning</h1>
+                        <ul>
+                            <li><a href="PCA1.txt">     Demo1 - Principal Component Analysis</a></li>
+                            <li><a href="Cluster1.txt"> Demo2 - k-means Cluster</a></li>
+                            <li><a href="Cluster2.txt"> Demo3 - Hierarchical Cluster</a></li>
+                        </ul>
+                    </div>
+                    <!------------------>
+                    <div class="boxRIGHT">
+                        <h1>Textbooks</h1>
+                        <ul>
+                            <li><a href="https://www.statlearning.com">   James et. al. / ISLR web page</a></li>
+                            <li><a href="https://static1.squarespace.com/static/5ff2adbe3fe4fe33db902812/t/6009dd9fa7bc363aa822d2c7/1611259312432/ISLR+Seventh+Printing.pdf">ISLR 1st ed. pdf (main)</a></li>
+                            <li><a href="https://web.stanford.edu/~hastie/ISLR2/ISLRv2_website.pdf">   ISLR 2nd ed. pdf </a></li>
+                            <li><a href="a">Bishop / Pattern Recognition and ML</a></li>
+                            <li><a href="a">Murphy / ML: A Prob Perspective</a></li>
+                            <li><a href="http://www.deeplearningbook.org">   Goodfellow / Deep Learning</a></li>
+                            <li><a href="a">   Shaw-Taylor / Kernel Methods for Pattern</a></li>
+                        </ul>
+                        <h1>R and Rstudio</h1>
+                        <ul>
+                            <li><a href="https://www.r-project.org">                       R (CRAN)  </a></li>
+                            <li><a href="https://rstudio.com/products/rstudio/download/">  Rstudio   </a></li>
+                            <li><a href="https://nmimoto.github.io/IntroR/">     Intro to R/R-studio </a></li>
+                            <li><a href="https://nmimoto.github.io/R/">          R resources         </a></li>
+                        </ul>
+                        <h1>Databank</h1>
+                        <ul>
+                            <li><a href="https://archive.ics.uci.edu/ml/datasets/">   UCI          </a></li>
+                            <li><a href="https://scikit-learn.org/stable/index.html"> Scikit-learn </a></li>
+                            <li><a href="https://www.kaggle.com/datasets">            Kaggle       </a></li>
+                            <li><a href="https://dasl.datadescription.com">           DASL         </a></li>
+                        </ul>
+                        <h1>Other Resources</h1>
+                        <ul>
+                            <li><a href="https://www.youtube.com/watch?v=WXuK6gekU1Y">AlphaGo: documentary</a></li>
+                            <li><a href="ML_articles.txt">Articles in ML</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!------------------------------->
+                <div class="footnoteL">
+                </div>
+
+                <!------------------------------->
+                <div class="footnoteR">
+                    <a href="https://nmimoto.github.io/">Home</a>
+                    &nbsp;
+                    <a href="https://github.com/nmimoto/nmimoto.github.io/tree/master/484">Git</a>
+                </div>
+
+
+
+
+
+
+                <div class="clr"></div>  <!-- Stop box blelow from coming up -->
+
+            </div><!-- End of /Body/container -->
+        </div><!-- End of /Body/bigcontainer -->
+
+        <!-- /Body/TreeCollapsibleJava/ -->
+        <script>
+         debugger;
+         console.log('wow');
+         var toggler = document.querySelectorAll(".rootTree");
+         Array.from(toggler).forEach(item => {
+             item.addEventListener("click", () => {
+                 item.parentElement .querySelector(".children") .classList.toggle("active");
+                 item.classList.toggle("rootTree-down");  }); });
+        </script>
+    </body>
+</html>
