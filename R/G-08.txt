@@ -5,9 +5,12 @@
 
 
 #--- Single integral from 0 to 1 --------------------------------------------
-  f <- function(t){ 1/t^(1/2) }
-  F <- integrate(f, 0, Inf)
-  F  
+  f <- function(x){
+      b=3
+      x * (1/b)*exp(-x/b) 
+  }
+  A <- integrate(f, 0, Inf)
+  A  
 
 
 
