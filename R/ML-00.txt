@@ -27,7 +27,7 @@ Creates training and testing data as global variables. "
 
 
     fold.size = floor(nrow(DF)/(numFolds+1))
-    train.size = test.size*numFolds
+    train.size = fold.size*numFolds
     test.size = nrow(DF)-train.size
 
     cat("\n    number of folds: ", numFolds,
