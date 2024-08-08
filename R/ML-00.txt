@@ -21,7 +21,7 @@ Creates training and testing data as global variables. "
 
     # break out if 'resp' column doesn't exist
     if (!("resp" %in% colnames(DF))) {
-      cat("'resp' column must exist in DF")
+      cat("\n  'resp' column must exist in DF  \n")
       break
     }
 
