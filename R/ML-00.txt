@@ -18,6 +18,14 @@ CreateCV <- function(DF, numFolds, seed){
 response variable must be called 'resp'.
 Creates training and testing data as global variables. "
 
+
+    # break out if 'resp' column doesn't exist
+    if (!("resp" %in% colnames(DF))) {
+      cat("'resp' column must exist in DF")
+      break
+    }
+
+
     fold.size = floor(nrow(DF)/(numFolds+1))
     train.size = test.size*numFolds
     test.size = nrow(DF)-train.size
