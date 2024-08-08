@@ -1,56 +1,79 @@
-library(MASS)        # install.packages('MASS')
-library(tidyverse)   # install.packages('tidyverse')
+#-- To load this page --
+#
+#    source("https://nmimoto.github.io/R/ML-00.txt")
+#
+#  Above source() automatically installs function:
+#    CreateCV(DF, numFolds, seed)
+#
 
 
-###-------------------------------------------------------
-###--- 1. Data Separation (Copied from Rtut-CV)
+#-- Usage Example: 
+#    source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
+#    CreateCV(Boston, numFolds=5, seed=5480)
+#
 
-### --- Divide Dataset to Training and Testing and Set up k fold CV
-# Orig <- Default2             # Entire Data set (have to be data.frame)
-# train.size <- 8500           # num of rows for training set
-# test.size <- 1500            # num of rows for testing set
-# my.seed <- 8346              # give a seed
 
-    #---AAAA---
-    resp.col.name <- "resp"   # name of response column
-    num.folds <- 5               # k for k-fold CV
+CreateCV <- function(DF, numFolds, seed){
+"K-fold Cross Validation.
+response variable must be called 'resp'.
+Creates training and testing data as global variables. "
+
+    fold.size = floor(nrow(DF)/(numFolds+1))
+    train.size = test.size*numFolds
+    test.size = nrow(DF)-train.size
+
+    cat("\n    number of folds: ", numFolds,
+        "\n    number of obs: ", nrow(DF),
+        "\n    size of training data: ", train.size,
+        "\n    size of test data: ", test.size,
+        "\n    size of each fold : ", fold.size, "\n")
+
 
     set.seed(my.seed)
-    ix = sample(1:nrow(Orig))
-    Orig2 = Orig[ix, ]
-    Train.set  = Orig2[1:train.size, ]
-    Train.resp = Orig2[1:train.size, resp.col.name]
-    Test.set   = Orig2[(train.size+1):(train.size+test.size), ]
-    Test.resp  = Orig2[(train.size+1):(train.size+test.size), resp.col.name]
+    ix = sample(1:nrow(DF))                # random suffle of row index.
+    fold_ix = rep(1:(numFolds+1), length.out=nrow(DF))   # sequence of 1-6
+    # cbind(ix, fold_ix)
 
-    # K-fold Cross Validation
-    library(cvTools)     # install.packages("cvTools")
-    set.seed(my.seed)
-    folds = cvFolds(  nrow(Train.set),  K=num.folds  )  # k-fold CV (random assignment)
-
-    CV.train      = list(Train.set[ folds$which!=1, ])
-    CV.train.resp = list(Train.resp[folds$which!=1,1])
-    CV.valid      = list(Train.set[ folds$which==1, ])
-    CV.valid.resp = list(Train.resp[folds$which==1,1])
-
-    for (k in 2:num.folds) {
-      CV.train[[k]]      = Train.set[ folds$which!=k, ]
-      CV.train.resp[[k]] = Train.resp[folds$which!=k,1]
-      CV.valid[[k]]      = Train.set[ folds$which==k, ]
-      CV.valid.resp[[k]] = Train.resp[folds$which==k,1]
+    # Assign 1-6 back to the original row numbers
+    CVfold = matrix(0, nrow(DF))
+    for (fold in 1:numFolds){
+        CVfold[ix[(fold_ix==fold)]] = fold
     }
-    #---BBBB---
+    # CVfold   # fold_ix=6 comes out as CVfold=0
 
-###  Line below will replace above chunk (#---AAAA to #---BBBB)
-###  source('https://nmimoto.github.io/R/ML-00.txt')
-###
+    Train.set  = DF[CVfold!=0, ]
+    Train.resp = DF[CVfold!=0, "resp"]
+    Test.set   = DF[CVfold==0, ]
+    Test.resp  = DF[CVfold==0, "resp"]
 
-    # Output (all data.frame):
-    #   Train.set
-    #   Train.resp
-    #   Test.set
-    #   Test.resp
-    #   CV.train[[k]]
-    #   CV.train.resp[[k]]
-    #   CV.valid[[k]]
-    #   CV.valid.resp[[k]]
+    CV.train      = list(DF[CVfold>0 & CVfold!=1,  ])
+    CV.train.resp = list(DF[CVfold>0 & CVfold!=1,  "resp"])
+    CV.valid      = list(DF[CVfold>0 & CVfold==1,  ])
+    CV.valid.resp = list(DF[CVfold>0 & CVfold==1,  "resp"])
+
+    for (k in 2:numFolds) {
+      CV.train[[k]]      = DF[CVfold>0 & CVfold!=k,  ]
+      CV.train.resp[[k]] = DF[CVfold>0 & CVfold!=k,  "resp"]
+      CV.valid[[k]]      = DF[CVfold>0 & CVfold==k,  ]
+      CV.valid.resp[[k]] = DF[CVfold>0 & CVfold==k,  "resp"]
+    }
+
+
+    #Output (all data.frame):
+    Train.set           <<-  Train.set
+    Train.resp          <<-  Train.resp
+    Test.set            <<-  Test.set
+    Test.resp           <<-  Test.resp
+    CV.train[[k]]       <<-  CV.train[[k]]
+    CV.train.resp[[k]]  <<-  CV.train.resp[[k]]
+    CV.valid[[k]]       <<-  CV.valid[[k]]
+    CV.valid.resp[[k]]  <<-  CV.valid.resp[[k]]
+
+
+    cat("\n    Global variables created: ",
+    "\n      Train.set       Train.resp          ",
+    "\n      Test.set        Test.resp           ",
+    "\n      CV.train[[k]]   CV.train.resp[[k]]  ",
+    "\n      CV.valid[[k]]   CV.valid.resp[[k]]  \n\n")
+
+}
