@@ -68,14 +68,14 @@ Creates training and testing data as global variables. "
 
 
     #Output (all data.frame):
-    Train.set           <<-  Train.set
-    Train.resp          <<-  Train.resp
-    Test.set            <<-  Test.set
-    Test.resp           <<-  Test.resp
-    CV.train[[k]]       <<-  CV.train[[k]]
-    CV.train.resp[[k]]  <<-  CV.train.resp[[k]]
-    CV.valid[[k]]       <<-  CV.valid[[k]]
-    CV.valid.resp[[k]]  <<-  CV.valid.resp[[k]]
+    Train.set      <<-  Train.set
+    Train.resp     <<-  Train.resp
+    Test.set       <<-  Test.set
+    Test.resp      <<-  Test.resp
+    CV.train       <<-  CV.train
+    CV.train.resp  <<-  CV.train.resp
+    CV.valid       <<-  CV.valid
+    CV.valid.resp  <<-  CV.valid.resp
 
 
     cat("\n    Global variables created: ",
