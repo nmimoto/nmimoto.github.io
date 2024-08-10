@@ -37,7 +37,7 @@ Creates training and testing data as global variables. "
         "\n    size of each fold : ", fold.size, "\n")
 
 
-    set.seed(my.seed)
+    set.seed(seed)
     ix = sample(1:nrow(DF))                # random suffle of row index.
     fold_ix = rep(1:(numFolds+1), length.out=nrow(DF))   # sequence of 1-6
     # cbind(ix, fold_ix)
