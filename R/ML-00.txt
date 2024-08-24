@@ -50,7 +50,7 @@ Creates training and testing data as global variables. "
     # CVfold   # fold_ix=6 comes out as CVfold=0
 
     Train.set  = DF[CVfold!=0, ]
-    Tune.resp  = DF[CVfold!=0, "resp"]
+    Train.resp = DF[CVfold!=0, "resp"]
     Test.set   = DF[CVfold==0, ]
     Test.resp  = DF[CVfold==0, "resp"]
 
