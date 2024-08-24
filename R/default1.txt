@@ -48,14 +48,14 @@ Default2
 
 
 ###-------------------------------------------------------
-###--- 1. Data Separation (Copied from Rtut-CV)
+###--- 1. Data Separation (Copied from Ch3-Lab)
 
 # Load the file from my website
 source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
 
 # Use this function to create CV dataset
-CreateCV(Boston, numFolds=5, seed=5480)
+CreateCV(Default2, numFolds=5, seed=5480)
 
 # Output (all as Data Frame):
 #   Train.set      Train.resp
