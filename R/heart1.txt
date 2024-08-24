@@ -40,27 +40,23 @@ Heart2 <- Heart %>%
 
 
 # need to remove rows with NA.
-Orig <- Heart2
-
 #- Check for N/A in data. Remove if there's any.
-  summary(Orig)
-  dim(Orig)
-  sum(is.na(Orig))
+  sum(is.na(Heart2))
   # If there is na in the data, run below
-  Orig <- Orig %>% na.omit()
-  dim(Orig)
+  Heart2 <- Heart2 %>% na.omit()
+  dim(Heart2)
 
 
 
 ###-------------------------------------------------------
-###--- 1. Data Separation (Copied from Rtut-CV)
+###--- 1. Data Separation (Copied from Ch3-Lab)
 
 # Load the file from my website
 source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
 
 # Use this function to create CV dataset
-CreateCV(Boston, numFolds=5, seed=5480)
+CreateCV(Heart2, numFolds=5, seed=5480)
 
 # Output (all as Data Frame):
 #   Train.set      Train.resp
