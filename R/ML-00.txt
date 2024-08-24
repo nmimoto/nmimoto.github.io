@@ -27,12 +27,12 @@ Creates training and testing data as global variables. "
 
 
     fold.size = floor(nrow(DF)/(numFolds+1))
-    tune.size = fold.size*numFolds
+    train.size = fold.size*numFolds
     test.size = nrow(DF)-train.size
 
     cat("\n    number of folds: ", numFolds,
         "\n    number of obs: ", nrow(DF),
-        "\n    size of tuning data: ", tune.size,
+        "\n    size of training data: ", train.size,
         "\n    size of test data: ", test.size,
         "\n    size of each fold : ", fold.size, "\n")
 
@@ -49,8 +49,8 @@ Creates training and testing data as global variables. "
     }
     # CVfold   # fold_ix=6 comes out as CVfold=0
 
-    Tune.set  = DF[CVfold!=0, ]
-    Tune.resp = DF[CVfold!=0, "resp"]
+    Train.set  = DF[CVfold!=0, ]
+    Tune.resp  = DF[CVfold!=0, "resp"]
     Test.set   = DF[CVfold==0, ]
     Test.resp  = DF[CVfold==0, "resp"]
 
@@ -68,7 +68,7 @@ Creates training and testing data as global variables. "
 
 
     #Output (all data.frame):
-    Tune.set       <<-  Tune.set
+    Train.set      <<-  Train.set
     Tune.resp      <<-  Tune.resp
     Test.set       <<-  Test.set
     Test.resp      <<-  Test.resp
@@ -79,7 +79,7 @@ Creates training and testing data as global variables. "
 
 
     cat("\n    Global variables created: ",
-    "\n      Tune.set        Tune.resp          ",
+    "\n      Train.set       Train.resp          ",
     "\n      Test.set        Test.resp           ",
     "\n      CV.train[[k]]   CV.train.resp[[k]]  ",
     "\n      CV.valid[[k]]   CV.valid.resp[[k]]  \n\n")
