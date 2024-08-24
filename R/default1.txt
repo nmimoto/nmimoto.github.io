@@ -42,6 +42,11 @@ Default2 <- Default %>%
               relocate(resp)               # move "resp" columnm to 1st
 Default2
 
+# Check for N/A in data. Remove if there's any.
+  sum(is.na(Default2))
+  # If there is na in the data, run below
+  Default2 <- Default2 %>% na.omit()
+  dim(Default2)
 
 
 
