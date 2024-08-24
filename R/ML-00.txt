@@ -31,15 +31,21 @@ Creates training and testing data as global variables. "
     test.size = nrow(DF)-train.size
 
     cat("\n    number of folds: ", numFolds,
-        "\n    number of obs: ", nrow(DF),
-        "\n    size of training data: ", train.size,
-        "\n    size of test data: ", test.size,
-        "\n    size of each fold : ", fold.size, "\n")
+        "\n    number of obs: ",   nrow(DF),
+        "\n    training data: ", fold.size , " x ", numFolds, " = ", train.size,
+        "\n    size of test data: ", test.size, "\n")
+
+#    cat("\n    number of folds: ", numFolds,
+#        "\n    number of obs: ", nrow(DF),
+#        "\n    size of training data: ", train.size,
+#        "\n    size of test data: ", test.size,
+#        "\n    size of each fold : ", fold.size, "\n")
 
 
     set.seed(seed)
     ix = sample(1:nrow(DF))                # random suffle of row index.
-    fold_ix = rep(1:(numFolds+1), length.out=nrow(DF))   # sequence of 1-6
+    fold_ix = c(rep(1:(numFolds), length.out=train.size), rep(0, test.size))
+# fold_ix = rep(1:(numFolds+1), length.out=nrow(DF))   # sequence of 1-6
     # cbind(ix, fold_ix)
 
     # Assign 1-6 back to the original row numbers
@@ -47,7 +53,7 @@ Creates training and testing data as global variables. "
     for (fold in 1:numFolds){
         CVfold[ix[(fold_ix==fold)]] = fold
     }
-    # CVfold   # fold_ix=6 comes out as CVfold=0
+    # CVfold   # fold_ix=0 comes out as CVfold=0
 
     Train.set  = DF[CVfold!=0, ]
     Train.resp = DF[CVfold!=0, "resp"]
