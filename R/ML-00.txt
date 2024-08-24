@@ -75,7 +75,7 @@ Creates training and testing data as global variables. "
 
     #Output (all data.frame):
     Train.set      <<-  Train.set
-    Tune.resp      <<-  Tune.resp
+    Train.resp     <<-  Train.resp
     Test.set       <<-  Test.set
     Test.resp      <<-  Test.resp
     CV.train       <<-  CV.train
