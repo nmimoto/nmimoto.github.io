@@ -39,8 +39,7 @@ Heart2 <- Heart %>%
 #  "Fbs"
 
 
-# need to remove rows with NA.
-#- Check for N/A in data. Remove if there's any.
+# Check for N/A in data. Remove if there's any.
   sum(is.na(Heart2))
   # If there is na in the data, run below
   Heart2 <- Heart2 %>% na.omit()
