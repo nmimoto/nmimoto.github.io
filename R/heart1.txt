@@ -51,28 +51,27 @@ Orig <- Heart2
   dim(Orig)
 
 
+
 ###-------------------------------------------------------
 ###--- 1. Data Separation (Copied from Rtut-CV)
-Orig <- Orig         # Entire Data set (have to be data.frame)
-train.size <- 250    #num of rows for training set
-test.size <-  47     # num of rows for testing set
-my.seed <-1534       # give a seed
 
-  ###
-  ### This line replaces the AAAA to BBBB chunk
-  source('https://nmimoto.github.io/R/ML-00.txt')
-  ###
+# Load the file from my website
+source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
-# Output (all data.frame):
-#   Train.set      /  Train.resp
-#   Test.set       /  Test.resp
-#   CV.train[[k]]  /  CV.train.resp[[k]]
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+
+# Use this function to create CV dataset
+CreateCV(Boston, numFolds=5, seed=5480)
+
+# Output (all as Data Frame):
+#   Train.set      Train.resp
+#   Test.set       Test.resp
+#   CV.train[[[[k]]]]  CV.train.resp[[[[k]]]]
+#   CV.valid[[[[k]]]]  CV.valid.resp[[[[k]]]]
 
 
 
 
-#--- 2.1
+#--- 1.1
 # Visualization doesn't help much any more
 ix_no = (Train.set$resp=="No")
 ix_yes = (Train.set$resp=="Yes")
