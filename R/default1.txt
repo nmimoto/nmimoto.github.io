@@ -12,8 +12,6 @@
 ###--- 5. Determine the Best Threshold
 
 
-
-
 ###-------------------------------------------------------
 ###--- 0. Preliminary
 library(ISLR)    # install.packages('ISLR', repos='https://cran.case.edu/')
@@ -42,12 +40,17 @@ Default2 <- Default %>%
               relocate(resp)               # move "resp" columnm to 1st
 Default2
 
-# Check for N/A in data. Remove if there's any.
-  sum(is.na(Default2))
-  # If there is na in the data, run below
-  Default2 <- Default2 %>% na.omit()
-  dim(Default2)
 
+Orig <- Default2
+resp.col.name <- "resp"
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  sum(is.na(Orig))
+  # If there is na in the data, run below
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
 
@@ -58,9 +61,8 @@ Default2
 # Load the file from my website
 source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
-
 # Use this function to create CV dataset
-CreateCV(Default2, numFolds=5, seed=5480)
+CreateCV(Orig, numFolds=5, seed=5480)
 
 # Output (all as Data Frame):
 #   Train.set      Train.resp
