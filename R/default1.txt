@@ -42,7 +42,6 @@ Default2
 
 
 Orig <- Default2
-resp.col.name <- "resp"
 
   #- Check for N/A in data. Remove if there's any.
   summary(Orig)
