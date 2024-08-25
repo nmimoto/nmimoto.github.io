@@ -38,12 +38,20 @@ Heart2 <- Heart %>%
 #  7
 #  "Fbs"
 
+print(Heart2, width=1000)
+table(Heart2$resp)    # note that first level is "No"
 
-# Check for N/A in data. Remove if there's any.
-  sum(is.na(Heart2))
+
+Orig <- Heart2
+
+  #- Check for N/A in data. Remove if there's any.
+  summary(Orig)
+  dim(Orig)
+  sum(is.na(Orig))
   # If there is na in the data, run below
-  Heart2 <- Heart2 %>% na.omit()
-  dim(Heart2)
+  dim(Orig)
+  Orig <- Orig %>% na.omit()
+  dim(Orig)
 
 
 
@@ -55,7 +63,7 @@ source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
 
 # Use this function to create CV dataset
-CreateCV(Heart2, numFolds=5, seed=5480)
+CreateCV(Orig, numFolds=5, seed=5480)
 
 # Output (all as Data Frame):
 #   Train.set      Train.resp
