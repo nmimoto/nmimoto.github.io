@@ -88,7 +88,7 @@ lines(Train.set$RestBP[ix_yes], Train.set$Chol[ix_yes], col="red", type="p")
 ###-------------------------------------------------------
 ###--- 2. Logistic Regression with CV
 
-AUCs <- MSE.valid <- matrix(0, 5, 2)
+AUCs <- matrix(0, 5, 2)
 colnames(AUCs) = c("Train AUC", "Valid AUC")
 for (k in 1:5) {
 
