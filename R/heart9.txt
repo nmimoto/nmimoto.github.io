@@ -76,26 +76,20 @@ Orig <- Heart3
   dim(Orig)
 
 
-###--------------------------------------------------------------------
-###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Orig                 # Entire Data set (have to be data.frame)
-train.size <- 250            # num of rows for training set
-test.size <-  47             # num of rows for testing set
-my.seed <- 7211             # give a seed
+###-------------------------------------------------------
+###--- 1. Data Separation (Copied from Ch3-Lab)
 
-  ###
-  ### This line replaces the AAAA to BBBB chunk
-  source('https://nmimoto.github.io/R/ML-00.txt')
-  ###
+# Load the file from my website
+source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
-# Output (all data.frame):
-#   Train.set      /  Train.resp
-#   Test.set       /  Test.resp
-#   CV.train[[k]]  /  CV.train.resp[[k]]
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+# Use this function to create CV dataset
+CreateCV(Orig, numFolds=5, seed=7211)
 
-
-
+# Output (all as Data Frame):
+#   Train.set      Train.resp
+#   Test.set       Test.resp
+#   CV.train[[[[k]]]]  CV.train.resp[[[[k]]]]
+#   CV.valid[[[[k]]]]  CV.valid.resp[[[[k]]]]
 
 
 
