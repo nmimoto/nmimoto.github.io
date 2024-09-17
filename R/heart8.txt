@@ -58,7 +58,7 @@ source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
 
 # Use this function to create CV dataset
-CreateCV(Orig, numFolds=5, seed=5480)
+CreateCV(Orig, numFolds=5, seed=7211)
 
 # Output (all as Data Frame):
 #   Train.set      Train.resp
