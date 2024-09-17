@@ -25,6 +25,23 @@ dim(Digits2)
 
 
 
+###-------------------------------------------------------
+###--- 1. Data Separation (Copied from Ch3-Lab)
+
+# Load the file from my website
+source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
+
+
+# Use this function to create CV dataset
+CreateCV(Digits2, numFolds=5, seed=55622)
+
+# Output (all as Data Frame):
+#   Train.set      Train.resp
+#   Test.set       Test.resp
+#   CV.train[[[[k]]]]  CV.train.resp[[[[k]]]]
+#   CV.valid[[[[k]]]]  CV.valid.resp[[[[k]]]]
+
+
 ###--------------------------------------------------------------------
 ###--- 0b. Divide Dataset to Training and Testing and Set up k fold CV
 Orig <- Digits2              # Entire Data set (have to be data.frame)
