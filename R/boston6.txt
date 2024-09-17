@@ -56,25 +56,22 @@ Boston3
 
 
 
+###-------------------------------------------------------
+###--- 1. Data Separation (Copied from Ch3-Lab)
 
-###-------------------------------------------------
-###--- 1. Data Separation (Copied from Rtut-CV)
-### Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Boston3              # Entire Data set (have to be data.frame)
-train.size <- 400            # num of rows for training set
-test.size <- 106             # num of rows for testing set
-my.seed <- 3231              # give a seed
+# Load the file from my website
+source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 
-  ###
-  ### This line replaces the AAAA to BBBB chunk
-  source('https://nmimoto.github.io/R/ML-00.txt')
-  ###
 
-# Output (all data.frame):
-#   Train.set      /  Train.resp
-#   Test.set       /  Test.resp
-#   CV.train[[k]]  /  CV.train.resp[[k]]
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]
+# Use this function to create CV dataset
+CreateCV(Boston3, numFolds=5, seed=3231)
+
+# Output (all as Data Frame):
+#   Train.set      Train.resp
+#   Test.set       Test.resp
+#   CV.train[[[[k]]]]  CV.train.resp[[[[k]]]]
+#   CV.valid[[[[k]]]]  CV.valid.resp[[[[k]]]]
+
 
 # [ Train.set 400     ]     [Test.set 106]
 # [80][80][80][80][80]
