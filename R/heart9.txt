@@ -5,9 +5,9 @@
 ####################################################
 #--- 0. Preliminary
 #--- 1. Support Vector Machine with Linear Kernel using In-House CV
-#--- 2. SVM with Linear Kernel using Auto-CV
-#--- 3. SVM with Radial Kernel using Auto-CV
-#--- 4. SVM with Polynomial Kernel using Auto-CV
+#--- 2. SVM with Linear Kernel using Auto-CV on Train.set
+#--- 3. SVM with Radial Kernel using Auto-CV on Train.set
+#--- 4. SVM with Polynomial Kernel using Auto-CV on Train.set
 #--- 5. Threshold Picker
 
 
@@ -77,7 +77,7 @@ Orig <- Heart3
 
 
 ###-------------------------------------------------------
-###--- 1. Data Separation (Copied from Ch3-Lab)
+###--- 0b. Data Separation (Copied from Ch3-Lab)
 
 # Load the file from my website
 source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
@@ -144,13 +144,8 @@ Av.AUCs
 
 
 ###-------------------------------------------------
-###--- 2. SVM with Linear Kernel using Auto-CV
+###--- 2. SVM with Linear Kernel using Auto-CV on Train.set
 library (e1071)         # install.packages('e1071", repos='https://cran.case.edu/')
-
-
-## [ Train.set 400     ]     [Test.set 106]
-## [80][80][80][80][80]
-
 
 # Pick best Cost with automatic 5-fold CV
 set.seed (my.seed)
@@ -228,13 +223,8 @@ threshold <- .7
 
 
 ###-------------------------------------------------
-###--- 3. SVM with Linear Kernel using Auto-CV
+###--- 3. SVM with Radial Kernel using Auto-CV on Train.set
 library (e1071)         # install.packages('e1071", repos='https://cran.case.edu/')
-
-
-## [ Train.set 400     ]     [Test.set 106]
-## [80][80][80][80][80]
-
 
 # Pick best Cost with automatic 5-fold CV
 set.seed (my.seed)
@@ -311,13 +301,8 @@ threshold <- .7
 
 
 ###-------------------------------------------------
-###--- 4. SVM with Linear Kernel using Auto-CV
+###--- 4. SVM with Polynomial Kernel using Auto-CV on Train.set
 library (e1071)         # install.packages('e1071", repos='https://cran.case.edu/')
-
-
-## [ Train.set 400     ]     [Test.set 106]
-## [80][80][80][80][80]
-
 
 # Pick best Cost with automatic 5-fold CV
 set.seed (my.seed)
@@ -388,12 +373,6 @@ threshold <- .7
 
 ###
 ###
-
-
-
-
-
-
 
 
 
