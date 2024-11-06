@@ -34,9 +34,9 @@ Boston5 <- Boston2 %>% mutate_each(base::scale)
 Boston5
 
 # Same as above, but this way you keep means and SD for unscaling
-Boston.means <- Boston2 %>% mutate_each(mean)
+Boston.means <- Boston2 %>%  mutate(across(everything(), mean))
 Boston.means
-Boston.SDs   <- Boston2 %>% mutate_each(sd)
+Boston.SDs <- Boston2 %>%  mutate(across(everything(), sd))
 Boston.SDs
 Boston6 <- tibble((Boston2 - Boston.means)/Boston.SDs)
 Boston6
