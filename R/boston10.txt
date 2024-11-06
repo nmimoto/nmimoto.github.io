@@ -127,7 +127,8 @@ for (k in 1:5) {
                              hidden=3,             # <===== Try different num of nodes here
                              learningrate=1e-2,    # <===== For numerical problem try changing number here
                              act.fct=sigmoid,
-                             linear.output=TRUE)   # This should be TRUE for regression
+                             stepmax = 1e+05,      # Increase this to give PC more time 
+                             linear.output=TRUE)   # This should be TRUE for regression 
                              # linear.output FALSE means activation function is applied to output node
   # summary(Fit00)
   # plot(Fit00)  # Use only if NN is small enough (hidden <10)
@@ -189,6 +190,7 @@ Fit01 = neuralnet::neuralnet(resp ~.,
                              hidden=3,
                              learningrate=1e-2,
                              act.fct=sigmoid,
+                             stepmax = 1e+05,      # Increase this to give PC more time 
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
 
