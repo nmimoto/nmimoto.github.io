@@ -1,0 +1,27 @@
+###
+###  Time Sereis Analysis
+###  Study Topics for Midterm
+###
+1. Autocorrelation
+
+   What does autocorrelation mean?
+
+   What happens to sample mean if the series is correlated?
+
+   Given a series, how do you directly demonstrate (plot) an autocorrelation of lag 1?
+
+   Definition of sample ACF and sample ACVF
+
+   Given data, how do you check for autocorrelation?
+
+   How do you plot ACF and ACVF in R?
+
+   How do you determine if sample ACF is significant?
+
+   What is the difference between White Noise and IID noise
+
+   Definition of weak stationarity
+   How do you visually check for stationarity?
+
+   Random Trend. Give an example.
+   Deterministic Trend. Give an example.
