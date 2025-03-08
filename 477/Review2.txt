@@ -1,0 +1,32 @@
+###
+###  Time Sereis Analysis
+###  Review Topics 2
+###
+AR(p) and MA(q) model
+
+  Formula for Theoretical ACF and ACVF of AR(1), and MA(1)
+
+
+  Condition for AR(p) to be causal process
+  Condition for MA(q) to be invertible process
+    Given the model equation, use R to check for causality/invertibility
+    what does causal/invertible process mean?
+    why is it important?
+
+
+  Yule-Walker Equation
+    Derivation
+    PACF
+    Solution to the equation under AR(p)
+
+
+  Model Diagnostics
+    Parameter Significance
+    AIC and AICc
+    When is a model adequate?
+    What metrics do you use to decide which model is better?
+
+
+  Best Linear Predictor for AR(p)
+    Rolling 1-step forecast.  Formula. Calculation. its pred MSE
+    Static h-step forecast.  Asymptotics and long-run pred MSE

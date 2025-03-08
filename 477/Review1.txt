@@ -1,6 +1,6 @@
 ###
 ###  Time Sereis Analysis
-###  Study Topics for Midterm
+###  Review Topics 1
 ###
 1. Autocorrelation
 
@@ -25,3 +25,9 @@
 
    Random Trend. Give an example.
    Deterministic Trend. Give an example.
+
+   Random Walk without drift
+   Random Walk with drift
+
+   (Given data, how do you look for sign that it is a random walk?)
+   (Given data, how do you look for sign that it is a linear trend + WN?)
