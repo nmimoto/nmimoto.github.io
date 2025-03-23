@@ -91,3 +91,63 @@ Creates training and testing data as global variables. "
     "\n      CV.valid[[k]]   CV.valid.resp[[k]]  \n\n")
 
 }
+
+
+
+#----------------------------------------
+classificationOutput = function(Fit00, Train.set, Test.set, threshold) {
+
+    #- Extract fitted response (training)
+    Train.prob =predict(Fit00, type ="response")
+    head(Train.prob)
+
+    #- Predict in Test Set
+    Test.prob = predict(Fit00, newdata=Test.set, type="response")
+    head(Test.prob)
+
+
+    ###----------------------------
+    #- 4a Output result for given threshold value
+    #threshold = .1 # pick a threshold
+
+        #- Check the training set accuracy
+        library(caret)
+        Train.pred = ifelse(Train.prob > threshold, "Yes", "No")  # Turn the fitted values to Up/Down using threshold of .5
+        Test.pred  = ifelse(Test.prob  > threshold, "Yes", "No")
+        CM.train <- confusionMatrix(factor(Train.pred), factor(as.matrix(Train.resp)), positive="Yes")
+        CM.test  <- confusionMatrix(factor(Test.pred),  factor(as.matrix(Test.resp)),  positive="Yes")
+
+        print(CM.train)
+        print(CM.test)
+
+        cat("    [Specificity][  ]  = TrueNeg / sum of col\n")
+        cat("    [  ][Sensitivity]  = TruePos / sum of col\n")
+        cat("    Low threshold  -> Sensitivity goes to 1. Very agressive. Eveyone is flagged pos.\n")
+        cat("    High threshold -> Specificity goes to 1. Very conservative. Everyone is flagged neg.\n")
+
+
+    ###----------------------------
+    #- 4b Output ROC curve and AUC for all threshold
+    library(pROC)
+        layout(matrix(1:2, 1, 2))
+        #- Training Set
+        plot.roc(factor(as.matrix(Train.resp)),  Train.prob, levels=c("No", "Yes"),
+                 main="Training AUC")
+        # point corresponding to CM.train
+        # abline(h=CM.train[["byClass"]][["Sensitivity"]], v=CM.train[["byClass"]][["Specificity"]], col="red")
+        auc.train = auc(factor(as.matrix(Train.resp)), Train.prob, levels=c("No", "Yes"))
+        text(.2, .2, paste("Train AUC=",round(auc.train, 3)))
+
+        #- Test Set
+        plot.roc(factor(as.matrix(Test.resp)),  Test.prob, levels=c("No", "Yes"),
+                 main="Test AUC")
+        # point corresponding to CM.test
+        # abline(h=CM.test[["byClass"]][["Sensitivity"]], v=CM.test[["byClass"]][["Specificity"]], col="red")
+        auc.test = auc(factor(as.matrix(Test.resp)), Test.prob, levels=c("No", "Yes"))
+        text(.2, .2, paste("Test AUC=",round(auc.test, 3)))
+
+
+    #----------------------------------------
+    return(list(train=CM.train,
+                test=CM.test))
+}
