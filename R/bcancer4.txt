@@ -154,6 +154,9 @@ threshold = .9   # pick a threshold
     # Prediction      No Yes
     #        No     1437  62         [Specificity][  ]  = TrueNeg / sum of col
     #        Yes       0   1         [  ][Sensitivity]  = TruePos / sum of col
+    # High threshold -> Specificity goes to 1. Very conservative. Everyone is flagged neg.
+    # Low threshold  -> Sensitivity goes to 1. Very agressive. Eveyone is flagged pos.
+
 
     colSums(CM.test$table) / sum(colSums(CM.test$table))    # % of Actual Yes/No
     rowSums(CM.test$table) / sum(rowSums(CM.test$table))    # % of predicted Yes/No
