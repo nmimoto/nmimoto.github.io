@@ -46,14 +46,82 @@
                             <button class="w3-button w3-padding-large w3-white w3-border">
                                 <a href="https://brightspace.uakron.edu/d2l/home"><b>video (20m)</b></a>
                             </button>
-                            <p>
-                                Statistics is the discipline of data<br>
-                                Descriptive Stats vs Inferential Stats<br>
-                                Population, Sample, and SRS<br>
-                                What does Probability Theory give us?<br>
-                                Ex 1.8 Concrete filled H-beam<br>
-                                Ex 1.2 Rolls of Wallpaper<br>
-                            </p>
+
+                            <!-- W3css Accordion ---------------------------->
+                            <button onclick="myFunction('id1a1')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                1. Statistics is the discipline of data
+                            </button>
+                            <div id="id1a1" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <button onclick="myFunction('id1a2')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                2. Descriptive Stats vs Inferential Stats
+                            </button>
+                            <div id="id1a2" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <button onclick="myFunction('id1a3')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                3. Population, Sample, and SRS
+                            </button>
+                            <div id="id1a3" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <button onclick="myFunction('id1a4')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                4. What does Probability Theory give us?
+                            </button>
+                            <div id="id1a4" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <button onclick="myFunction('id1a5')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                5. Ex 1.8 Concrete filled H-beam
+                            </button>
+                            <div id="id1a5" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <button onclick="myFunction('id1a6')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                6. Ex 1.2 Rolls of Wallpaper
+                            </button>
+                            <div id="id1a6" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    <h5> bbbb </h5>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                    <p>Some text..</p>
+                                </div>
+                            </div>
+                            <!-- End W3css Accordion ---------------------------->
+
                         </div>
                     </div>
                     <hr>
@@ -405,6 +473,18 @@
                 <a href="https://nmimoto.github.io/401/">Back To Class Webpage</a></button>
             <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
         </footer>
+
+        <!-- W3css Accordion ---------------------------->
+        <script>
+         function myFunction(id) {
+             var x = document.getElementById(id);
+             if (x.className.indexOf("w3-show") == -1) {
+                 x.className += " w3-show";
+             } else {
+                 x.className = x.className.replace(" w3-show", "");
+             }
+         }
+        </script>
 
     </body>
 </html>
