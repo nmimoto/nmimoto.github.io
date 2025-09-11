@@ -1343,34 +1343,34 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ef2929; }
-code span.an { color: #8f5902; font-weight: bold; font-style: italic; }
-code span.at { color: #204a87; }
-code span.bn { color: #0000cf; }
-code span.cf { color: #204a87; font-weight: bold; }
-code span.ch { color: #4e9a06; }
-code span.cn { color: #8f5902; }
-code span.co { color: #8f5902; font-style: italic; }
-code span.cv { color: #8f5902; font-weight: bold; font-style: italic; }
-code span.do { color: #8f5902; font-weight: bold; font-style: italic; }
-code span.dt { color: #204a87; }
-code span.dv { color: #0000cf; }
-code span.er { color: #a40000; font-weight: bold; }
-code span.ex { }
-code span.fl { color: #0000cf; }
-code span.fu { color: #204a87; font-weight: bold; }
-code span.im { }
-code span.in { color: #8f5902; font-weight: bold; font-style: italic; }
-code span.kw { color: #204a87; font-weight: bold; }
-code span.op { color: #ce5c00; font-weight: bold; }
-code span.ot { color: #8f5902; }
-code span.pp { color: #8f5902; font-style: italic; }
-code span.sc { color: #ce5c00; font-weight: bold; }
-code span.ss { color: #4e9a06; }
-code span.st { color: #4e9a06; }
-code span.va { color: #000000; }
-code span.vs { color: #4e9a06; }
-code span.wa { color: #8f5902; font-weight: bold; font-style: italic; }
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -1575,7 +1575,7 @@ border-radius: 0px;
   library(rmarkdown)
   render("/Users/nmimoto/Dropbox/GARAGE/IntroR/tmp__note-rmd.Rmd",
     html_document(toc=TRUE,
-                  toc_float=FALSE,
+                  toc_float=TRUE,
                   toc_depth=2,
                   theme="readable",
                   highlight="tango" ))
@@ -1584,92 +1584,83 @@ border-radius: 0px;
 highlight="kate"
 Copied from ~/Dropbox/GARAGE/Emacs/latex-temp05-Rmd.tex
 --->
-<!-- Need Video-->
-<iframe width="700" height="441" src="https://youtu.be/mNelNOyU-6o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen">
-</iframe>
-<p><br><br></p>
+<!--
+Need Video
+<iframe width="700" height="441" src="https://youtu.be/mNelNOyU-6o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen"></iframe>
+-->
+<p><a href="https://www.youtube.com/playlist?list=PLSWh3MeumZYbyu8HfYW5d-LoE8YtWlpgT">Click
+here for videos</a> <br><br></p>
 <div id="r-is-case-sensitive" class="section level2">
-    <h2>1. R is case sensitive</h2>
-    <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="dv">3</span>   <span class="co"># This assigns 3 to object X. But you can&#39;t see it.</span></span>
-        <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>X       <span class="co"># now you see what&#39;s inside X</span></span></code></pre></div>
-    <pre><code>## [1] 3</code></pre>
-    <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>x       <span class="co"># &quot;x&quot; is not same as &quot;X&quot;.</span></span></code></pre></div>
-    <p><br><br></p>
+<h2>1. R is case sensitive</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="dv">3</span>   <span class="co"># This assigns 3 to object X. But you can&#39;t see it.</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>X       <span class="co"># now you see what&#39;s inside X</span></span></code></pre></div>
+<pre><code>## [1] 3</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>x       <span class="co"># &quot;x&quot; is not same as &quot;X&quot;.</span></span></code></pre></div>
+<p><br><br></p>
 </div>
 <div id="vectors" class="section level2">
-    <h2>2. Vectors</h2>
-    <p>R uses vectors.</p>
-    <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">6</span>)      <span class="co"># create vector</span></span>
-        <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>X</span></code></pre></div>
-    <pre><code>## [1] 1 4 6</code></pre>
-    <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>            <span class="co"># 1 through 10</span></span>
-        <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>X</span></code></pre></div>
-    <pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-    <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">30</span>, <span class="dv">4</span>)    <span class="co"># 1 to 30 in step of 2</span></span>
-        <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>X</span></code></pre></div>
-    <pre><code>## [1]  1  5  9 13 17 21 25 29</code></pre>
-    <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
-        <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>X</span></code></pre></div>
-    <pre><code>##  [1] 0 0 0 0 0 0 0 0 0 0</code></pre>
-    <p><br></p>
-    <div id="apply-funciton-to-vector" class="section level3">
-        <h3>Apply funciton to vector</h3>
-        <p>When you apply a function to a vector, it usually work on EACH
-            element in the vector.</p>
-        <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of size 10 from Standard Normal</span></span>
-            <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>X</span></code></pre></div>
-        <pre><code>##  [1]  1.4530453 -1.2072829 -0.3514677
-##  [4]  0.2453460  1.0365689  0.3723902
-##  [7]  0.5971987 -0.2934279 -0.1469856
-## [10]  0.4789901</code></pre>
-        <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>Y <span class="ot">=</span> X <span class="sc">^</span> <span class="dv">2</span>      <span class="co"># square each number</span></span>
-            <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>Y</span></code></pre></div>
-        <pre><code>##  [1] 2.11134069 1.45753199 0.12352954
-##  [4] 0.06019465 1.07447499 0.13867447
-##  [7] 0.35664627 0.08609995 0.02160475
-## [10] 0.22943154</code></pre>
-        <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Y <span class="ot">=</span> X <span class="sc">*</span> <span class="dv">2</span>      <span class="co"># multiple 2 to each number</span></span>
-            <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>Y</span></code></pre></div>
-        <pre><code>##  [1]  2.9060906 -2.4145658 -0.7029354
-##  [4]  0.4906920  2.0731377  0.7447804
-##  [7]  1.1943974 -0.5868559 -0.2939711
-## [10]  0.9579803</code></pre>
-        <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>Y <span class="ot">=</span> <span class="fu">exp</span>(X)     <span class="co"># take exponential power of each number</span></span>
-            <span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>Y</span></code></pre></div>
-        <pre><code>##  [1] 4.2761168 0.2990086 0.7036546 1.2780634
-##  [5] 2.8195262 1.4511992 1.8170216 0.7457030
-##  [9] 0.8633064 1.6144432</code></pre>
-        <p><br><br></p>
-    </div>
+<h2>2. Vectors</h2>
+<p>R uses vectors.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">6</span>)      <span class="co"># create vector</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>## [1] 1 4 6</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>            <span class="co"># 1 through 10</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">30</span>, <span class="dv">4</span>)    <span class="co"># 1 to 30 in step of 2</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>## [1]  1  5  9 13 17 21 25 29</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>##  [1] 0 0 0 0 0 0 0 0 0 0</code></pre>
+<p><br></p>
+<div id="apply-funciton-to-vector" class="section level3">
+<h3>Apply funciton to vector</h3>
+<p>When you apply a function to a vector, it usually work on EACH
+element in the vector.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of size 10 from Standard Normal</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>##  [1]  0.0962578  1.3366320 -0.7827090  0.3168257  0.9596083 -0.6860354
+##  [7]  0.1484898  0.3031658  0.6301796 -0.8647272</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>Y <span class="ot">=</span> X <span class="sc">^</span> <span class="dv">2</span>      <span class="co"># square each number</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>Y</span></code></pre></div>
+<pre><code>##  [1] 0.009265564 1.786585186 0.612633329 0.100378515 0.920848044
+##  [6] 0.470644511 0.022049233 0.091909523 0.397126298 0.747753123</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Y <span class="ot">=</span> X <span class="sc">*</span> <span class="dv">2</span>      <span class="co"># multiple 2 to each number</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>Y</span></code></pre></div>
+<pre><code>##  [1]  0.1925156  2.6732641 -1.5654179  0.6336514  1.9192166 -1.3720707
+##  [7]  0.2969797  0.6063317  1.2603592 -1.7294544</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>Y <span class="ot">=</span> <span class="fu">exp</span>(X)     <span class="co"># take exponential power of each number</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>Y</span></code></pre></div>
+<pre><code>##  [1] 1.1010429 3.8062027 0.4571659 1.3727633 2.6106736 0.5035686
+##  [7] 1.1600810 1.3541390 1.8779478 0.4211664</code></pre>
+<p><br><br></p>
+</div>
 </div>
 <div id="descriptive-statistics" class="section level2">
-    <h2>3. Descriptive statistics</h2>
-    <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of n=10 from Standard Normal</span></span>
-        <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>X</span></code></pre></div>
-    <pre><code>##  [1]  0.23517920  0.87486899  1.09611778
-##  [4]  0.98434840 -0.27236446  0.70784119
-##  [7]  0.01653147  0.82634676  2.59635950
-## [10]  1.61081816</code></pre>
-    <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">length</span>(X)      <span class="co"># get length of X</span></span></code></pre></div>
-    <pre><code>## [1] 10</code></pre>
-    <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">mean</span>(X)        <span class="co"># sample mean</span></span></code></pre></div>
-    <pre><code>## [1] 0.8676047</code></pre>
-    <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">var</span>(X)         <span class="co"># variance</span></span></code></pre></div>
-    <pre><code>## [1] 0.6731004</code></pre>
-    <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">sd</span>(X)          <span class="co"># Standard Deviation</span></span></code></pre></div>
-    <pre><code>## [1] 0.8204269</code></pre>
-    <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">summary</span>(X)     <span class="co"># 5-number summary</span></span></code></pre></div>
-    <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.
-## -0.2724  0.3533  0.8506  0.8676  1.0682
-##    Max.
-##  2.5964</code></pre>
+<h2>3. Descriptive statistics</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of n=10 from Standard Normal</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>X</span></code></pre></div>
+<pre><code>##  [1]  0.6274894 -1.1606364 -0.8862771 -0.4122007 -1.5024925 -1.6102702
+##  [7] -1.7335872  0.8976902 -1.9628536  0.6891917</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">length</span>(X)      <span class="co"># get length of X</span></span></code></pre></div>
+<pre><code>## [1] 10</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">mean</span>(X)        <span class="co"># sample mean</span></span></code></pre></div>
+<pre><code>## [1] -0.7053946</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">var</span>(X)         <span class="co"># variance</span></span></code></pre></div>
+<pre><code>## [1] 1.189978</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">sd</span>(X)          <span class="co"># Standard Deviation</span></span></code></pre></div>
+<pre><code>## [1] 1.090861</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">summary</span>(X)     <span class="co"># 5-number summary</span></span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -1.9629 -1.5833 -1.0235 -0.7054  0.3676  0.8977</code></pre>
 <p><br></p>
 <div id="correlation" class="section level3">
 <h3>Correlation</h3>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of n=10 from Standard Normal</span></span>
 <span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>Y <span class="ot">=</span> <span class="fu">runif</span>(<span class="dv">10</span>)  <span class="co"># draw random sample of n=10 from Unif(0,1)</span></span>
 <span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a><span class="fu">cor</span>(X,Y)       <span class="co"># correlation between vector X and vector Y</span></span></code></pre></div>
-<pre><code>## [1] -0.2921617</code></pre>
+<pre><code>## [1] 0.2520712</code></pre>
 <p><br><br></p>
 </div>
 </div>
