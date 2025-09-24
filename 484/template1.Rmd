@@ -1,0 +1,108 @@
+---
+title: "Rmarkdown Template - HTML version"
+author: "[Your name here](https://nmimoto.github.io/484/)"
+output: html_document
+---
+<hr>
+<!--
+This section will be ignored by Rmarkdown.
+Open this file in R-studio, and click "knit" (instead of "run").
+--->
+
+
+<br><br>
+
+For more information, visit the [R Markdown website](https://rmarkdown.rstudio.com).
+
+You can use Latex to write math formula in Rmd:
+$$
+  \bar x \sim N(\mu, \sigma/\sqrt{n})
+$$
+
+
+<hr>
+
+#  484/584 Assignemnt 2 sample solution
+
+Due Wed Sep 10 11:00pm
+
+Write R code that performs tasks lited below.
+Use this text file as template. Submit on Brightspace
+under "Assessment" -> "Assignemnt 2".
+
+Refer to Intro-R Regression video.
+For particular function, you may have to google.
+
+<hr>
+
+## 1. Load concrete.csv from https://nmimoto.github.io/datasets/.
+There's no link on the page. Load it directly to R.
+(cf. Method 2 of Page 4 of https://nmimoto.github.io/IntroR/)
+Make sure you are using "tidyverse" package and function read_csv()
+instead of read.csv().
+
+```{r, fig.width=8, fig.height=4}
+library(tidyverse)
+Concrete <- read_csv("https://nmimoto.github.io/datasets/concrete.csv")
+```
+
+
+## 2. What is the class of each columns?  Is there any qualitative variable?
+
+```{r, fig.width=8, fig.height=4}
+head(Concrete)
+lapply(Concrete, class)
+```
+
+## 3. Plot scatterplot and histogram of the column "CCS".
+```{r, fig.width=8, fig.height=4}
+plot(Concrete$CCS)
+hist(Concrete$CCS)
+```
+
+## 4. Plot scatterplot of "Water" vs "CCS", and "Age" vs "CCS".
+Variable "CSS" has to be on the Y-axis.
+```{r, fig.width=8, fig.height=4}
+layout(matrix(1:2, 1, 2))
+plot(Concrete$Water, Concrete$CCS)
+plot(Concrete$Age, Concrete$CCS)
+
+layout(1)
+```
+
+## 5. Fit multivariate regression model with OLS using lm() funciton.
+CSS is the response variable.  Use all other columns as covariates in the model.
+How good is the fit?  Any variable that should be removed from the model?
+```{r, fig.width=8, fig.height=4}
+Reg1 <- lm(CCS ~ ., data=Concrete)
+summary(Reg1)
+# Based on p-value, the variables Coarse and/or Fine should be removed from the model.
+
+Reg2 <- lm(CCS ~ . -Fine, data=Concrete)
+summary(Reg2)
+# Removed Fine, Adj R-Squared went down slightly, Fine also needs removed.
+
+Reg3 <- lm(CCS ~ . -Coarse -Fine, data=Concrete)
+summary(Reg3)
+# Removed Coarse and Fine. All remaining variables have low p-values (<0.05).
+```
+
+## 6. In (5) above, is there any indication of non-linearity?  Data supports the
+assumption of the regression model?  (Hint: Check residual plot)
+```{r, fig.width=4, fig.height=4}
+plot(Reg3)
+```
+
+There is a slight indication of non-linearity, as the red mean-curve is
+bend in the middle. Residuals vs. Fitted plot shows uneven variance, which
+is not a good sign.
+The Q-Q plots, shows some deviation on the lower-end.
+All of this is pointing that the data is not supporting the assumption of the
+regression model.
+
+Depending on the situation, task at hand, and the alternative models available,
+we may have to accept this model.
+i.e. We might just have to call this model "not perfect, but good enough."
+That will be a case-by-case call.
+
+However, by no means this residual plot and q-q plot are ideal.
