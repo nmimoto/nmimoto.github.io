@@ -3,12 +3,10 @@ title: "Rmarkdown Template - HTML version"
 author: "[Your name here](https://nmimoto.github.io/484/)"
 output: html_document
 ---
-<hr>
-<!--
-This section will be ignored by Rmarkdown.
-Open this file in R-studio, and click "knit" (instead of "run").
---->
 
+Open this file in R-studio, and click "knit" (instead of "run").
+
+<hr>
 
 <br><br>
 
