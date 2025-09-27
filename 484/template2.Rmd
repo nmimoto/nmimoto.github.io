@@ -1,6 +1,7 @@
 ---
 title: "Rmarkdown Template - PDF version"
 author: "[Your name here](https://nmimoto.github.io/484/)"
+date: 2025-04-02
 output: pdf_document
 ---
 
