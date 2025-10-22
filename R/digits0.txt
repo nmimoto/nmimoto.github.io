@@ -10,7 +10,7 @@
 ###--- 0. Preliminary
 library(tidyverse)
 # load data from author's website
-Digits <- read_csv(file="https://nmimoto.github.io/datasets/NISTdigits.csv")
+Digits <- read_csv(file="https://nmimoto.github.io/datasets/nistdigits.csv")
 Digits
 
 names(Digits)
