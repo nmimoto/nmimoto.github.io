@@ -1,7 +1,7 @@
 ###
 ###
 ###  Concrete Data - Multiple Regression (Simple version)
-###    ver 0.0.4
+###    ver 0.0.5
 ###
 ##################################################
 
@@ -43,35 +43,24 @@ Orig <- Concrete2    # "resp" column is required
   dim(Orig)
 
 
+###-------------------------------------------------------
+###--- 1. Data Separation (Copied from Ch3-Lab)
 
+# Load the file from my website
+source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
+# Use this function to create CV dataset
+CreateCV(Orig, numFolds=5, seed=3231)
 
-###-------------------------------------------------
-###--- 1. Data Separation (Copied from Rtut-CV)
-### Divide Dataset to Training and Testing and Set up k fold CV
-Orig <- Concrete2            # Entire Data set (have to be data.frame)
-train.size <- 850            # num of rows for training set
-test.size <- 180             # num of rows for testing set
-my.seed <- 4345              # give a seed
-
-  ###
-  ### This line replaces the AAAA to BBBB chunk
-  source('https://nmimoto.github.io/R/ML-00.txt')
-  ###
-
-# Output (all data.frame):
-#   Train.set      /  Train.resp
-#   Test.set       /  Test.resp
-#   CV.train[[k]]  /  CV.train.resp[[k]]
-#   CV.valid[[k]]  /  CV.valid.resp[[k]]
-
-# [  Train.set 850        ]  [Test.set 180]  1030 total
-# [170][170][170][170][170]
-
+#    Global variables created:
+#      Train.set       Train.resp
+#      Test.set        Test.resp
+#      CV.train[[k]]   CV.train.resp[[k]]
+#      CV.valid[[k]]   CV.valid.resp[[k]]
 
 #--- plot Training and Test for visualization
 fold = 2
-plot(CV.train[[fold]]$Age,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
-lines(CV.valid[[fold]]$Age, CV.valid[[fold]]$resp, type="p", col="red",pch=19)
+plot(CV.train[[fold]]$lstat,  CV.train[[fold]]$resp, xlab="lstat", ylab="Response (medv)")
+lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red", pch=19)
 
 
 
@@ -125,21 +114,26 @@ summary(Fit01)
 Train.fitted = predict(Fit01, newdata = Train.set)
 Test.pred    = predict(Fit01, newdata = Test.set)
 
+library(caret)            # install.packages("caret")
+FinalFitDiagnosis <- data.frame(
+  tr.RMSE      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
+  tr.Rsquare   = caret::R2(  Train.fitted,           Train.resp),
+  test.RMSE    = caret::RMSE(Test.pred,  as.matrix(Test.resp)),
+  test.Rsquare = caret::R2(  Test.pred,            Test.resp)
+)
+FinalFitDiagnosis
+
+
 #--- Plot Y vs Yhat
-plot( Train.fitted, as.matrix(CV.train[[k]]$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
-lines(Valid.pred,   as.matrix(CV.valid[[k]]$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+plot( Train.fitted, as.matrix(Train.resp), xlab="Fitted", ylab="Actual",main="Final Test.set fit")
+lines(Test.pred, as.matrix(Test.resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
 
-library(caret)          # install.packages("caret")
-OLS <- data.frame(
-  RMSE.tr      = caret::RMSE(Train.fitted, as.matrix(Train.resp)),
-  Rsquare.tr   = caret::R2(  Train.fitted,           Train.resp),
-  RMSE.test    = caret::RMSE(Test.pred,    as.matrix(Test.resp)),
-  Rsquare.test = caret::R2(  Test.pred,              Test.resp)
-)
-OLS
+#--- Plot Residual vs Yhat in Test Set
+plot(Test.pred,  as.matrix(Test.set$resp-Test.pred), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(h=0)
 
 
 
 ## Also try
-## lm(resp ~ . -Fine, data=Concrete2)
+## Fit02 = lm(resp ~ . -Fine, data=Concrete2)
