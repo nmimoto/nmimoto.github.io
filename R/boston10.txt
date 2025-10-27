@@ -2,7 +2,7 @@
 ###
 ### Boston Data (MASS) - Newral Network (Regression)
 ###                         with 5-fold Cross Validation
-###   ver 0.0.4
+###   ver 0.0.5
 ###
 #################################
 
@@ -95,12 +95,11 @@ source("https://nmimoto.github.io/R/ML-00.txt")   # load CreateCV()
 # Use this function to create CV dataset
 CreateCV(Orig, numFolds=5, seed=3231)
 
-# Output (all as Data Frame):
+# Global variables created:
 #   Train.set      Train.resp
 #   Test.set       Test.resp
 #   CV.train[[[[k]]]]  CV.train.resp[[[[k]]]]
 #   CV.valid[[[[k]]]]  CV.valid.resp[[[[k]]]]
-
 
 
 #--- plot Training and Test for visualization
@@ -113,7 +112,6 @@ lines(CV.valid[[fold]]$lstat, CV.valid[[fold]]$resp, type="p", col="red", pch=19
 
 ###-------------------------------------------------
 ###--- 2. Newral Network with manual CV
-
 library(neuralnet)            # install.packages('neuralnet', repos='https://cran.case.edu/')
 sigmoid <- function(x) 1 / (1 + exp(-x))
 
@@ -121,21 +119,21 @@ layout(matrix(1:6, 2, 3, byrow=TRUE))    # to plot 5 in 1 page
 CVFitDiagnosis <- numeric(0)
 for (k in 1:5) {
 
-  set.seed(my.seed)
-  Fit00 = neuralnet::neuralnet(resp ~.,            # <===== Try using different set of columns here
-                             CV.train[[k]],
-                             hidden=3,             # <===== Try different num of nodes here
-                             learningrate=1e-2,    # <===== For numerical problem try changing number here
-                             act.fct=sigmoid,
-                             stepmax = 1e+05,      # Increase this to give PC more time 
-                             linear.output=TRUE)   # This should be TRUE for regression 
-                             # linear.output FALSE means activation function is applied to output node
-  # summary(Fit00)
-  # plot(Fit00)  # Use only if NN is small enough (hidden <10)
+    set.seed(my.seed)
+    Fit00 = neuralnet::neuralnet(resp ~.,            # <===== Try using different set of columns here
+                                 CV.train[[k]],
+                                 hidden=4,             # <===== Try different num of nodes here
+                                 learningrate=1e-02,    # <===== For numerical problem try changing number here
+                                 act.fct=sigmoid,
+                                 stepmax = 1e+07,      # Increase this to give PC more time
+                                 linear.output=TRUE)   # This should be TRUE for regression
+                                        # linear.output FALSE means activation function is applied to output node
+    # summary(Fit00)
+    # plot(Fit00)  # Use only if NN is small enough (hidden <10)
 
-  #--- Get training / validation fit
-  Train.fitted = predict(Fit00, newdata=CV.train[[k]], type="vector")
-  Valid.fitted = predict(Fit00, newdata=CV.valid[[k]], type="vector")
+    #--- Get training / validation fit
+    Train.fitted = predict(Fit00, newdata=CV.train[[k]], type="vector")
+    Valid.fitted = predict(Fit00, newdata=CV.valid[[k]], type="vector")
 
     #--- Plot Y vs Yhat
     plot( Train.fitted, as.matrix(CV.train[[k]]$resp), xlab="Fitted", ylab="Actual",main=paste("K=",k))
@@ -187,10 +185,10 @@ sigmoid <- function(x) 1 / (1 + exp(-x))
 set.seed(my.seed)
 Fit01 = neuralnet::neuralnet(resp ~.,
                              Train.set,
-                             hidden=3,
+                             hidden=4,
                              learningrate=1e-2,
                              act.fct=sigmoid,
-                             stepmax = 1e+05,      # Increase this to give PC more time 
+                             stepmax = 1e+07,      # Increase this to give PC more time
                              linear.output=TRUE)
                              # linear.output FALSE means activation function is applied to output node
 
@@ -205,6 +203,11 @@ Test.fitted  = predict(Fit01, newdata=Test.set, type="vector")
 plot( Train.fitted, as.matrix(Train.set$resp), xlab="Fitted", ylab="Actual",main="Final Test.set Fit")
 lines(Test.fitted,  as.matrix(Test.set$resp), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
+
+#--- Plot Residual vs Yhat in Test Set
+plot(Test.fitted,  as.matrix(Test.set$resp-Test.fitted), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(h=0)
+
 
 library(caret)            # install.packages("caret")
 FinalFitDiagnosis <- data.frame(
@@ -245,9 +248,15 @@ Train.resp.unscaled   <- Boston.means$resp[1] + Train.resp   * Boston.SDs$resp[1
 Test.fitted.unscaled  <- Boston.means$resp[1] + Test.fitted  * Boston.SDs$resp[1]
 Test.resp.unscaled    <- Boston.means$resp[1] + Test.resp    * Boston.SDs$resp[1]
 
+#--- Plot Y vs Yhat
 plot( Train.fitted.unscaled, as.matrix(Train.resp.unscaled), xlab="Fitted", ylab="Actual",main="Final Test.set fit - Unscaled")
 lines(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
 abline(0,1)
+
+#--- Plot Residual vs Yhat
+plot(Test.fitted.unscaled,  as.matrix(Test.resp.unscaled-Test.fitted.unscaled), type="p", xlab="Fitted", ylab="Actual", col="red", pch=20)
+abline(h=0)
+
 
 library(caret)            # install.packages("caret")
 FinalFitDiagnosis.unsc <- data.frame(
