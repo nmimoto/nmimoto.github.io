@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ASL</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=OpenSans">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+        <style>
+         body,h1,h2,h3,h4,h5 {font-family: "OpenSans", sans-serif}
+         h1 {
+             font-size: 70px; /* se h1 size */
+         }
+        </style>
+    </head>
+
+    <body class="w3-blue">
+
+        <!-- Color names
+             https://www.w3schools.com/w3css/w3css_color_material.asp
+
+             w3-content defines a container for
+             fixed size centered content,
+             and is wrapped around the whole page content,
+             except for the footer in this example -->
+        <div class="w3-content" style="max-width:1400px">
+
+            <!-- Header -->
+            <header class="w3-container w3-center w3-padding-32">
+                <h1><b>Akron Stats Lab</b></h1>
+                <p>
+                    (updated 03/26/2026) <br>
+                    contact nmimoto@uakron.edu with any questions.
+                    &nbsp;
+                    <a href="https://nmimoto.github.io/">[Home]</a>
+                </p>
+            </header>
+
+            <!-- ========== Grid ========== ------------------------->
+            <div class="w3-row">
+
+                <!-- Column 1 -->
+                <div class="w3-col l8 s12">
+
+                    <!-- C1-entry1 INFO ------------------------->
+                    <div class="w3-card-4 w3-margin w3-white">
+                        <div class="w3-container">
+                            <h4 style="display:inline-block;">
+                                <b>ASL Starting Fall 2026 - weekly meeting time TBD</b>
+                            </h4>
+                            <p>
+                                This is an opportunity to do undergrauate (or graduate) research at UAkron.
+                                This is a place for students and I to get together to talk about
+                                various current issues surrounding
+                                Stats/Data Science/Actuarial Science.
+                                Our world is rapidly changing.
+                                See below for some list of things I'm interested in.
+                                Fell free to bring your own topic!
+                                <br>
+                                You can register for 1cr to explore some ideas, participte in discussion,
+                                learn some new things and give two 10min presentation per semester
+                                on the topic of your choice.
+                                Or, youcan register for 2cr if you have a big project alrealy in mind.
+                                If you accumulate 3cr, this will count as Stat Elective.
+                                <br>
+                                You can also just show up to the meeting without registering, and
+                                hang out. All are welcome.
+                                <br>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- End of entry -->
+
+                    <!-- C1-entry ------------------------->
+                    <div class="w3-card-4 w3-margin w3-white">
+                        <div class="w3-container">
+                            <h4 style="display:inline-block;">
+                                <b>Modeling with Machine Learning</b>
+                            </h4>
+                            <br>
+
+                            <!-- W3css Accordion ------------------------------------------>
+                            <button onclick="myFunction('acc1-xas')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Pick out intersting data from web and try to model?
+                            </button>
+                            <div id="acc1-xas" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                </div>
+                            </div>
+                            <button onclick="myFunction('acc2-xas')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Or obtain our own data?
+                            </button>
+                            <div id="acc2-xas" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    we can create our own dataset by scraping the web ourselves.
+                                </div>
+                            </div> <!-- End W3css Accordion -->
+
+                        </div>
+                    </div>
+                    <!-- End of entry -->
+
+                    <!-- C1-entry DS ------------------------->
+                    <div class="w3-card-4 w3-margin w3-white">
+                        <div class="w3-container">
+                            <h4 style="display:inline-block;">
+                                <b>Language Models</b>
+                            </h4>
+                            <br>
+
+                            <!-- W3css Accordion ------------------------------------------>
+                            <button onclick="myFunction('acc1-xds')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - LLM from scratch?
+                            </button>
+                            <div id="acc1-xds" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    AI uses LLM.
+                                    It is a nural-network model that is trained on large text data.
+                                    Can we try to build smaller-scale large languate models from scratch?
+                                    There are some books avaialbe.
+                                </div>
+                            </div>
+                            <button onclick="myFunction('acc2-xds')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Chatbot?
+                            </button>
+                            <div id="acc2-xds" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    Can we make a chatbot that actually works?
+                                    How hard/easy is it?  Is it useful?
+                                </div>
+                            </div>
+                            <button onclick="myFunction('acc3-xds')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Text mining, sentiment analysis?
+                            </button>
+                            <div id="acc3-xds" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    Learn how to go through text data and summarize what's written?
+                                    What does the current tools look like, and what can it do?
+                                    What is the limitation?
+                                </div>
+                            </div>
+                            <!-- End of W3css Accordion ------------------------------------------>
+
+
+                        </div>
+                    </div><!-- End of entry -->
+
+                    <!-- C1-entry Stats ------------------------->
+                    <div class="w3-card-4 w3-margin w3-white">
+                        <div class="w3-container">
+                            <h4 style="display:inline-block;">
+                                <b>Statistical Model Building</b>
+                            </h4>
+                            <br>
+
+                            <!-- W3css Accordion ------------------------------------------>
+                            <button onclick="myFunction('acc1-xst')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Any interesting statistical models used in the industory?
+                            </button>
+                            <div id="acc1-xst" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    bbb
+                                </div>
+                            </div>
+                            <button onclick="myFunction('acc2-xst')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Interesting Statistics used in social sciences
+                            </button>
+                            <div id="acc2-xst" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    bbb
+                                </div>
+                            </div>
+                            <!-- End W3css Accordion -->
+                        </div>
+                    </div>
+                    <!-- End of entry -->
+
+                    <!-- C1-entry Stats ------------------------->
+                    <div class="w3-card-4 w3-margin w3-white">
+                        <div class="w3-container">
+                            <h4 style="display:inline-block;">
+                                <b>Anything Else?</b>
+                            </h4>
+                            <br>
+
+                            <!-- W3css Accordion ------------------------------------------>
+                            <button onclick="myFunction('acc1-xsts')" class="w3-button w3-block w3-left-align w3-padding-small">
+                                - Bring your own topic! Tell us what you've been interested in!
+                            </button>
+                            <div id="acc1-xsts" class="w3-container w3-hide">
+                                <div class="accordion-body">
+                                    bbb
+                                </div>
+                            </div>
+                            <!-- End W3css Accordion -->
+                        </div>
+                    </div>
+                    <!-- End of entry -->
+
+
+                </div> <!-- ===== END of Column 1 ===== ------------------------->
+
+                <!-- ===== Column 2 ===== --------------------------------------->
+                <div class="w3-col l4">
+
+                    <!-- C2-About ---------------------------->
+                    <div class="w3-card w3-margin w3-margin-top">
+                        <img src="figures/pic1.jpg" style="width:100%">
+                        <div class="w3-container w3-white">
+                            <h4><b>Akron Stats Lab</b></h4>
+                            <p>
+                                Undergrad (and grad) research oppoortunity at UAkron.
+                                We meet weekly to discuss and learn current issues surrounding data.
+                                All are welcome. </p>
+                        </div>
+                    </div><hr>
+
+                    <!-- posts ---------------------------->
+                    <div class="w3-card w3-margin">
+                        <div class="w3-container w3-padding">
+                            <h4>News and Announcements</h4>
+                        </div>
+                        <ul class="w3-ul w3-hoverable w3-white">
+                            <li class="w3-padding-16">
+                                <span class="w3-large">
+                                    News 1
+                                </span><br>
+                                <span>news will be here</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END Col2 --------------------------->
+
+
+
+
+                </div> <!-- END of GRID ------------------------->
+            <br>
+
+        </div><!-- END w3-content -->
+
+        <!-- Footer -->
+        <footer class="w3-container w3-right w3-gray w3-padding-32 w3-margin-top">
+            <button class="w3-button w3-black w3-padding-large w3-margin-bottom">
+                <a href="https://nmimoto.github.io/">Back To Home</a>
+            </button>
+            <p>
+                Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a>
+            </p>
+        </footer>
+
+        <!-- W3css Accordion ---------------------------->
+        <script>
+         function myFunction(id) {
+             var x = document.getElementById(id);
+             if (x.className.indexOf("w3-show") == -1) {
+                 x.className += " w3-show";
+             } else {
+                 x.className = x.className.replace(" w3-show", "");
+             }
+         }
+        </script>
+        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
