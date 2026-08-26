@@ -1,0 +1,18 @@
+---
+title: "Rmarkdown Template - HTML version"
+author: "[Your name here](https://nmimoto.github.io/484/)"
+date: 2025-04-02
+output: html_document
+---
+Open this file in R-studio, and click "knit" (instead of "run").
+For more information, visit the [R Markdown website](https://rmarkdown.rstudio.com).
+
+# Title
+
+## 1. Subtitle
+
+```{r, fig.width=8, fig.height=4}
+
+### Paste your code here
+
+```
