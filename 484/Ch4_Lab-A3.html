@@ -451,8 +451,8 @@ display: none;
 MASS</a></li>
 <li><a href="#data-preparation" id="toc-data-preparation">2. Data
 Preparation</a></li>
-<li><a href="#routine-exploratory-analysis-class-of-resp-should-be" id="toc-routine-exploratory-analysis-class-of-resp-should-be">3. Routine
-Exploratory Analysis (class of resp should be <fct>)</a></li>
+<li><a href="#routine-exploratory-analysis-class-of-resp-should-be-fct" id="toc-routine-exploratory-analysis-class-of-resp-should-be-fct">3.
+Routine Exploratory Analysis (class of resp should be fct)</a></li>
 <li><a href="#code-only" id="toc-code-only">CODE ONLY</a></li>
 </ul>
 </div>
@@ -634,14 +634,13 @@ h3,h4,h5,h6{ font-size: 16pt; }
 <p><br></p>
 <!---------------------------------------->
 </div>
-<div id="routine-exploratory-analysis-class-of-resp-should-be" class="section level2">
-<h2>3. Routine Exploratory Analysis (class of resp should be <fct>)</h2>
+<div id="routine-exploratory-analysis-class-of-resp-should-be-fct" class="section level2">
+<h2>3. Routine Exploratory Analysis (class of resp should be fct)</h2>
 <p><a href="#top">(top)</a></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>Orig <span class="ot">&lt;-</span> Heart2</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>resp.col.name <span class="ot">&lt;-</span> <span class="st">&quot;resp&quot;</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="co">#- Check for N/A in data. Remove if there&#39;s any.</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="fu">summary</span>(Orig)</span></code></pre></div>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="co">#- Check for N/A in data. Remove if there&#39;s any.</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">summary</span>(Orig)</span></code></pre></div>
 <pre><code>##   resp          Age        Sex            ChestPain       RestBP     
 ##  No :164   Min.   :29.00   0: 97   asymptomatic:144   Min.   : 94.0  
 ##  Yes:139   1st Qu.:48.00   1:206   nonanginal  : 86   1st Qu.:120.0  
