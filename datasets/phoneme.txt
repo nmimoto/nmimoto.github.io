@@ -68,6 +68,20 @@ Reference:
 
 ----------
 library(tidyverse)
-DF1 <- read_csv("phoneme.csv")
-
+DF1 <- read_csv("https://nmimoto.github.io/datasets/phoneme.csv")
 DF1
+
+
+# Define function that converts (1,2) to (No, Yes)
+thisFunc01 = function(x) {
+    case_when(x == 1 ~ "No",
+              x == 2 ~ "Yes",
+              .default = NA)}
+
+# Apply the function
+DF2 <- DF1 %>% mutate_at("Class", thisFunc01) %>%
+    mutate_at("Class", as.factor) %>%
+    mutate(Class = factor(Class, levels=c("No", "Yes")))
+
+DF2
+levels(DF2$Class)   # Important that the order is ("No", "Yes")
