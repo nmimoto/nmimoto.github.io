@@ -1,0 +1,73 @@
+###
+###  ELENA/KEEL Phoneme Data
+###
+
+Local copy:
+  phoneme.csv
+
+Downloaded From:
+  https://www.openml.org/d/1489
+  (CSV file: https://api.openml.org/data/v1/get_csv/1592281)
+
+Original Source:
+  ELENA project (European ESPRIT 5516 project ROARS), 1993; formatted by the KEEL repository
+  https://www.elen.ucl.ac.be/neural-nets/Research/Projects/ELENA/databases/REAL/phoneme/
+  https://sci2s.ugr.es/keel/dataset.php?cod=105
+
+Variable Information:
+
+  Name -- Data Type -- Measurement -- Description
+  V1    -- quantitative -- standardized, unitless -- amplitude of the 1st harmonic, AH1/Ene
+  V2    -- quantitative -- standardized, unitless -- amplitude of the 2nd harmonic, AH2/Ene
+  V3    -- quantitative -- standardized, unitless -- amplitude of the 3rd harmonic, AH3/Ene
+  V4    -- quantitative -- standardized, unitless -- amplitude of the 4th harmonic, AH4/Ene
+  V5    -- quantitative -- standardized, unitless -- amplitude of the 5th harmonic, AH5/Ene
+  Class -- binary (1, 2) -- none -- 1 = nasal vowel, 2 = oral vowel -- response variable
+
+Summary:
+  Number of instances (observations): 5404
+  Number of Attributes: 6
+  Attribute breakdown: 5 quantitative feature variables, and 1 binary response variable
+  Missing Attribute Values: None
+  Class distribution: class 1 (nasal) = 3818 (70.7%), class 2 (oral) = 1586 (29.3%)
+
+
+Abstract:
+  The aim is to distinguish between nasal and oral vowels using five acoustic
+  measurements of each vowel. The data comes from the ROARS project,
+  which developed a real-time analytical speech recognition system for French and Spanish.
+
+Data Characteristics:
+  Vowels come from 1809 isolated syllables (for example: pa, ta, pan, ...).
+  Three observation moments were kept for each vowel: the observation at maximum
+  total energy (Ene), and the observations 8 msec before and 8 msec after it.
+  This gave 5427 instances; 23 instances whose five first harmonics all had
+  amplitude zero were removed, leaving 5404. Patterns are in random order.
+  The attributes in the OpenML copy are standardized (mean 0, standard deviation 1).
+
+Notes:
+  The data was created by Dominique Van Cappel, THOMSON-SINTRA.
+  AHi/Ene is the amplitude of harmonic i normalised by the total energy Ene
+  (integrated over all frequencies). Each harmonic is signed: positive when it
+  corresponds to a local maximum of the spectrum and negative otherwise.
+  The original ELENA documentation codes the classes as 0 = nasal and 1 = oral;
+  the OpenML file shows them as 1 and 2 (mapping inferred from the class sizes,
+  3818 nasal and 1586 oral).
+
+
+Reference:
+  Alinat, P., Periodic Progress Report 4, ROARS Project ESPRIT II - Number 5516,
+  February 1993, Thomson report TS. ASM 93/S/EGS/NC/079.
+  Guerin-Dugue, A. and others, Deliverable R3-B4-P - Task B4: Benchmarks, Technical
+  report, Elena-NervesII "Enhanced Learning for Evolutive Neural Architecture",
+  ESPRIT-Basic Research Project Number 6891, June 1995.
+  Verleysen, M. and Voz, J.L. and Thissen, P. and Legat, J.D., A statistical Neural
+  Network for high-dimensional vector classification, ICNN'95 - IEEE International
+  Conference on Neural Networks, November 1995, Perth, Western Australia.
+
+
+----------
+library(tidyverse)
+DF1 <- read_csv("phoneme.csv")
+
+DF1

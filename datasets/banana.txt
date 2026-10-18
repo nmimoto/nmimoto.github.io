@@ -1,0 +1,54 @@
+###
+###  KEEL Banana Data
+###
+
+Local copy:
+  banana.csv
+
+Downloaded From:
+  https://www.openml.org/d/1460
+  (CSV file: https://api.openml.org/data/v1/get_csv/1586217)
+
+Original Source:
+  KEEL dataset repository
+  https://sci2s.ugr.es/keel/dataset.php?cod=182
+
+Variable Information:
+
+  Name -- Data Type -- Measurement -- Description
+  V1    -- quantitative -- standardized, unitless -- x coordinate (At1 in the KEEL file)
+  V2    -- quantitative -- standardized, unitless -- y coordinate (At2 in the KEEL file)
+  Class -- binary (1, 2) -- none -- one of the two banana shapes (coded -1 and 1 in the KEEL file) -- response variable
+
+Summary:
+  Number of instances (observations): 5300
+  Number of Attributes: 3
+  Attribute breakdown: 2 quantitative feature variables, and 1 binary response variable
+  Missing Attribute Values: None
+  Class distribution: class 1 = 2924 (55.2%), class 2 = 2376 (44.8%)
+
+
+Abstract:
+  An artificial two-dimensional data set whose instances belong to several
+  clusters with a banana shape. The class label identifies which of the two
+  banana shapes an instance belongs to. The two shapes interleave, so no straight
+  line separates the classes; the data is a standard test case for nonlinear
+  classifiers such as kernel SVMs.
+
+Data Characteristics:
+  Two continuous attributes (the x and y coordinates of each point) and a binary
+  class label. The attributes in the OpenML copy are standardized
+  (mean 0, standard deviation 1), not in raw units.
+
+Notes:
+  Linear methods do poorly on this data. In 5-fold cross-validation (tuned
+  hyperparameters), logistic regression reached 56.5% accuracy against a 55.2%
+  majority-class baseline, while an RBF-kernel SVM reached 90.4%.
+
+
+----------
+library(tidyverse)
+DF <- read_csv("banana.csv")
+
+DF
+

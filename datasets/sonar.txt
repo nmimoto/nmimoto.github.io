@@ -1,0 +1,63 @@
+###
+###  UCI Connectionist Bench (Sonar, Mines vs. Rocks) Data
+###
+
+Local copy:
+  sonar.csv
+
+Downloaded From:
+  https://www.openml.org/d/40
+  (CSV file: https://api.openml.org/data/v1/get_csv/40)
+
+Original Source:
+  UCI Machine Learning Repository
+  https://archive.ics.uci.edu/dataset/151/connectionist+bench+sonar+mines+vs+rocks
+
+Variable Information:
+
+  Name -- Data Type -- Measurement -- Description
+  attribute_1 ... attribute_60 -- quantitative -- unitless, 0.0 to 1.0 -- energy within a particular frequency band, integrated over a certain period of time
+  Class                        -- binary (Mine, Rock) -- none -- object that reflected the signal (M = mine, R = rock in the original UCI file) -- response variable
+
+Summary:
+  Number of instances (observations): 208
+  Number of Attributes: 61
+  Attribute breakdown: 60 quantitative feature variables, and 1 binary response variable
+  Missing Attribute Values: None
+  Class distribution: Mine = 111 (53.4%), Rock = 97 (46.6%)
+
+Abstract:
+  The task is to discriminate between sonar signals bounced off a metal cylinder
+  (a mine) and those bounced off a roughly cylindrical rock. This is the data set
+  Gorman and Sejnowski used in their study of classifying sonar signals with a
+  neural network.
+
+Data Characteristics:
+  111 patterns were obtained by bouncing sonar signals off a metal cylinder at
+  various angles and under various conditions, and 97 patterns were obtained
+  from rocks under similar conditions. The transmitted signal is a
+  frequency-modulated chirp, rising in frequency. The signals cover aspect angles
+  spanning 90 degrees for the cylinder and 180 degrees for the rock.
+  Each pattern is a set of 60 numbers in the range 0.0 to 1.0.
+
+Notes:
+  The data set was contributed to the benchmark collection by Terry Sejnowski
+  (Salk Institute / UC San Diego) and developed in collaboration with R. Paul
+  Gorman (Allied-Signal Aerospace Technology Center), 1988.
+  The integration aperture for higher frequencies occurs later in time, because
+  those frequencies are transmitted later during the chirp.
+  In the original UCI file the labels carry the letter R or M, and the numbers in
+  the labels are in increasing order of aspect angle but do not encode the angle
+  directly.
+
+Reference:
+  Gorman, R. P., and Sejnowski, T. J. (1988). "Analysis of Hidden Units in a
+  Layered Network Trained to Classify Sonar Targets" in Neural Networks, Vol. 1,
+  pp. 75-89.
+
+
+----------
+library(tidyverse)
+DF <- read_csv("sonar.csv")
+
+DF

@@ -1,0 +1,63 @@
+###
+###  UCI Ionosphere Data
+###
+
+Local copy:
+  ionosphere.csv
+
+Downloaded From:
+  https://www.openml.org/d/59
+  (CSV file: https://api.openml.org/data/v1/get_csv/59)
+
+Original Source:
+  UCI Machine Learning Repository
+  https://archive.ics.uci.edu/dataset/52/ionosphere
+
+Variable Information:
+
+  Name -- Data Type -- Measurement -- Description
+  a01 ... a34 -- quantitative -- unitless, -1 to 1 -- autocorrelation values, 2 per pulse number (a01-a02 for pulse 1, a03-a04 for pulse 2, ..., a33-a34 for pulse 17)
+  class       -- binary (g, b) -- none -- g = good radar return, b = bad radar return -- response variable
+
+Summary:
+  Number of instances (observations): 351
+  Number of Attributes: 35
+  Attribute breakdown: 34 quantitative feature variables, and 1 binary response variable
+  Missing Attribute Values: None
+  Class distribution: g (good) = 225 (64.1%), b (bad) = 126 (35.9%)
+
+
+Abstract:
+  Classification of radar returns from the ionosphere. "Good" returns show
+  evidence of some type of structure in the ionosphere; "bad" returns do not,
+  and their signals pass through the ionosphere.
+
+Data Characteristics:
+  The radar data was collected by a system in Goose Bay, Labrador. The system
+  consists of a phased array of 16 high-frequency antennas with a total
+  transmitted power on the order of 6.4 kilowatts. The targets were free
+  electrons in the ionosphere. Received signals were processed with an
+  autocorrelation function whose arguments are the time of a pulse and the pulse
+  number. There were 17 pulse numbers for the Goose Bay system, and each instance
+  is described by 2 attributes per pulse number, corresponding to the complex
+  value returned by the function.
+
+Notes:
+  The data was created by V. Sigillito, S. Wing, L. Hutton and K. Baker (Space
+  Physics Group, Applied Physics Laboratory, Johns Hopkins University, 1989) and
+  donated by Vince Sigillito.
+  The first attribute (a01) takes only the values 0 and 1, and the second
+  attribute (a02) equals 0 in every row, so it carries no information and can be
+  dropped (it also makes standardizing the columns divide by zero).
+
+Reference:
+  Sigillito, V. G., Wing, S. P., Hutton, L. V., & Baker, K. B. (1989).
+  Classification of radar returns from the ionosphere using neural networks.
+  Johns Hopkins APL Technical Digest, 10, 262-266.
+
+
+----------
+library(tidyverse)
+DF <- read_csv("ionosphere.csv")
+
+DF
