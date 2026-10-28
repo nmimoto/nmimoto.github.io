@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Normal Probability Calculator</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1d2330;
+    --muted: #5d6779;
+    --border: #d9dee7;
+    --accent: #2563eb;
+    --bar-other: #c4cad6;
+    --error: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b;
+      --card: #1b2029;
+      --text: #e6e9ef;
+      --muted: #9aa3b5;
+      --border: #2f3746;
+      --accent: #6b9bff;
+      --bar-other: #3b4456;
+      --error: #ff8b7d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+  label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
+  input[type="number"] {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #error { color: var(--error); min-height: 1.4em; margin: 12px 0 0; font-size: 0.9rem; }
+  #results { margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); }
+  th { font-weight: 600; color: var(--muted); font-size: 0.85rem; border-top: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  th.num { text-align: right; }
+  tr.main td { font-weight: 700; }
+  .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+  .stats b { color: var(--text); font-weight: 600; }
+  canvas { width: 100%; height: 240px; display: block; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+  .chart-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Normal Probability Calculator</h1>
+  <p class="sub">X ~ Normal(μ, σ): a normal distribution with mean μ and standard deviation σ.</p>
+
+  <section class="card" aria-label="Inputs">
+    <div class="inputs">
+      <div>
+        <label for="mu">Mean, μ <span class="hint">(any number)</span></label>
+        <input id="mu" type="number" step="0.1" value="0" inputmode="decimal">
+      </div>
+      <div>
+        <label for="sigma">Standard deviation, σ <span class="hint">(greater than 0)</span></label>
+        <input id="sigma" type="number" min="0" step="0.1" value="1" inputmode="decimal">
+      </div>
+      <div>
+        <label for="x">Value, x <span class="hint">(any number)</span></label>
+        <input id="x" type="number" step="0.1" value="1.65" inputmode="decimal">
+      </div>
+    </div>
+    <p id="error" role="alert"></p>
+    <div class="stats" id="stats"></div>
+    <div id="results" aria-live="polite" hidden>
+      <table>
+        <thead><tr><th>Quantity</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="chartCard" hidden>
+    <canvas id="chart" role="img" aria-label="Density curve of the normal distribution, with the area up to x highlighted"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>X ≤ x (the cumulative probability)</span>
+      <span><span class="sw" style="background:var(--bar-other)"></span>X &gt; x</span>
+    </div>
+    <div class="chart-note" id="chartNote"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Core math ----------------------------------------------------------
+  // erfc(t) for t >= 0, accurate in the far tail (no 1 - something
+  // subtraction there). Small t: power series for erf. Large t: continued
+  // fraction for erfc, which converges quickly once t >= 2.
+  function erfcPos(t) {
+    var twoOverSqrtPi = 2 / Math.sqrt(Math.PI);
+    if (t < 2) {
+      // erf(t) = 2/sqrt(pi) * exp(-t^2) * sum_n 2^n t^(2n+1) / (2n+1)!!
+      var term = t, sum = t;
+      for (var n = 1; n < 200; n++) {
+        term *= 2 * t * t / (2 * n + 1);
+        sum += term;
+        if (term < 1e-17 * sum) break;
+      }
+      return 1 - twoOverSqrtPi * Math.exp(-t * t) * sum;
+    }
+    // erfc(t) = exp(-t^2)/sqrt(pi) / (t + (1/2)/(t + (2/2)/(t + (3/2)/(t + ...))))
+    var K = t;
+    for (var k = 120; k >= 1; k--) K = t + (k / 2) / K;
+    return Math.exp(-t * t) / Math.sqrt(Math.PI) / K;
+  }
+
+  // Standard normal CDF. The lower tail is evaluated directly, so tiny
+  // probabilities such as P(Z <= -6) keep their precision.
+  function stdNormCdf(z) {
+    var tail = 0.5 * erfcPos(Math.abs(z) / Math.SQRT2);   // P(Z > |z|)
+    return z < 0 ? tail : 1 - tail;
+  }
+
+  // Returns the quantities for X ~ Normal(mu, sigma) at x.
+  function normalProbabilities(mu, sigma, x) {
+    var z = (x - mu) / sigma;
+    return {
+      z: z,
+      le: stdNormCdf(z),    // P(X <= x)
+      gt: stdNormCdf(-z)    // P(X >  x) = 1 - P(X <= x), computed from the upper tail directly
+    };
+  }
+
+  // ---- Formatting ---------------------------------------------------------
+  // Table columns: 4 decimals for the value, 2 for the percent. Tiny nonzero
+  // values would round to 0.0000 / 0.00%, so they are shown differently.
+  function fmt(v) {
+    if (v === 0) return "0";
+    if (v === 1) return "1";
+    if (v < 5e-5) return v.toExponential(4);
+    return v.toFixed(4);
+  }
+  function fmtPct(v) {
+    if (v === 0) return "0%";
+    if (v < 5e-5) return "< 0.01%";
+    return (v * 100).toFixed(2) + "%";
+  }
+  // Plain number with up to 6 significant digits and no trailing zeros.
+  function num(v) {
+    return String(Number(v.toPrecision(6)));
+  }
+
+  // ---- UI -----------------------------------------------------------------
+  var el = {
+    mu: document.getElementById("mu"),
+    sigma: document.getElementById("sigma"),
+    x: document.getElementById("x"),
+    error: document.getElementById("error"),
+    results: document.getElementById("results"),
+    chartCard: document.getElementById("chartCard"),
+    rows: document.getElementById("rows"),
+    stats: document.getElementById("stats"),
+    canvas: document.getElementById("chart"),
+    chartNote: document.getElementById("chartNote")
+  };
+
+  var last = null;   // last successful calculation, used to redraw the chart on resize
+
+  function readInputs() {
+    var muRaw = el.mu.value.trim(), sigmaRaw = el.sigma.value.trim(), xRaw = el.x.value.trim();
+    if (muRaw === "" || sigmaRaw === "" || xRaw === "") return { error: "Enter values for μ, σ and x." };
+    var mu = Number(muRaw), sigma = Number(sigmaRaw), x = Number(xRaw);
+    if (!isFinite(mu)) return { error: "μ must be a number." };
+    if (!isFinite(sigma) || sigma <= 0) return { error: "σ must be a number greater than 0." };
+    if (!isFinite(x)) return { error: "x must be a number." };
+    return { mu: mu, sigma: sigma, x: x };
+  }
+
+  function update() {
+    var inp = readInputs();
+    if (inp.error) {
+      el.error.textContent = inp.error;
+      el.stats.innerHTML = "";
+      el.results.hidden = true;
+      el.chartCard.hidden = true;
+      last = null;
+      return;
+    }
+    el.error.textContent = "";
+
+    var mu = inp.mu, sigma = inp.sigma, x = inp.x;
+    var r = normalProbabilities(mu, sigma, x);
+
+    var rows = [
+      ["CDF: P(X ≤ " + num(x) + ")", r.le, true],
+      ["P(X > " + num(x) + ") = 1 − P(X ≤ " + num(x) + ")", r.gt, false]
+    ];
+    el.rows.innerHTML = "";
+    rows.forEach(function (row) {
+      var tr = document.createElement("tr");
+      if (row[2]) tr.className = "main";
+      [[row[0], ""], [fmt(row[1]), "num"], [fmtPct(row[1]), "num"]].forEach(function (c) {
+        var td = document.createElement("td");
+        td.textContent = c[0];
+        if (c[1]) td.className = c[1];
+        tr.appendChild(td);
+      });
+      el.rows.appendChild(tr);
+    });
+
+    el.stats.innerHTML = "<span>(z-score of value x) = (x−μ)/σ = <b>" + r.z.toFixed(4) + "</b></span>";
+
+    el.results.hidden = false;
+    el.chartCard.hidden = false;
+    last = { mu: mu, sigma: sigma, x: x };
+    drawChart();
+  }
+
+  // ---- Chart: density curve, the area with X <= x highlighted --------------
+  // A "nice" tick spacing (1, 2 or 5 times a power of ten) giving about 8 ticks.
+  function niceStep(range) {
+    var rough = range / 8, mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    var m = rough / mag;
+    return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * mag;
+  }
+
+  function drawChart() {
+    if (!last) return;
+    var mu = last.mu, sigma = last.sigma, x = last.x;
+
+    // Show mu +/- 4 sigma, widened if needed so x (the boundary) is on the chart.
+    var lo = mu - 4 * sigma, hi = mu + 4 * sigma;
+    if (x < lo) lo = x - 0.5 * sigma;
+    if (x > hi) hi = x + 0.5 * sigma;
+
+    var css = getComputedStyle(document.documentElement);
+    var cAccent = css.getPropertyValue("--accent").trim();
+    var cOther = css.getPropertyValue("--bar-other").trim();
+    var cText = css.getPropertyValue("--muted").trim();
+    var cBorder = css.getPropertyValue("--border").trim();
+
+    var dpr = window.devicePixelRatio || 1;
+    var W = el.canvas.clientWidth, H = el.canvas.clientHeight;
+    el.canvas.width = Math.round(W * dpr);
+    el.canvas.height = Math.round(H * dpr);
+    var ctx = el.canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    var padL = 46, padR = 24, padT = 10, padB = 30;   // padR leaves room for the last x label
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    function pdf(v) {
+      var z = (v - mu) / sigma;
+      return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+    }
+    var yMax = pdf(mu) * 1.08;
+    function sx(v) { return padL + (v - lo) / (hi - lo) * plotW; }
+    function sy(f) { return padT + plotH - plotH * f / yMax; }
+    var base = padT + plotH;
+
+    // y axis grid + labels
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.fillStyle = cText; ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    var decimals = yMax < 0.01 ? 4 : (yMax < 0.1 ? 3 : 2);   // one precision for the whole axis
+    for (var g = 0; g <= 4; g++) {
+      var yv = yMax * g / 4, y = padT + plotH - plotH * g / 4;
+      ctx.beginPath(); ctx.moveTo(padL, y + 0.5); ctx.lineTo(W - padR, y + 0.5); ctx.stroke();
+      ctx.fillText(yv.toFixed(decimals), padL - 6, y);
+    }
+
+    // area under the curve: accent up to x, grey beyond it
+    var STEPS = 400;
+    function fillArea(from, to, color) {
+      if (to <= from) return;
+      ctx.beginPath();
+      ctx.moveTo(sx(from), base);
+      for (var i = 0; i <= STEPS; i++) {
+        var v = from + (to - from) * i / STEPS;
+        ctx.lineTo(sx(v), sy(pdf(v)));
+      }
+      ctx.lineTo(sx(to), base);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    var xc = Math.min(Math.max(x, lo), hi);
+    fillArea(lo, xc, cAccent);
+    fillArea(xc, hi, cOther);
+
+    // curve outline and the boundary at x
+    ctx.beginPath();
+    for (var i = 0; i <= STEPS; i++) {
+      var v = lo + (hi - lo) * i / STEPS;
+      if (i === 0) ctx.moveTo(sx(v), sy(pdf(v))); else ctx.lineTo(sx(v), sy(pdf(v)));
+    }
+    ctx.strokeStyle = cAccent; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(xc) + 0.5, base); ctx.lineTo(sx(xc) + 0.5, sy(pdf(xc)));
+    ctx.strokeStyle = cText; ctx.lineWidth = 1; ctx.stroke();
+
+    // x axis labels
+    ctx.fillStyle = cText; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    var step = niceStep(hi - lo);
+    var dec = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+    for (var t = Math.ceil(lo / step) * step; t <= hi + step * 1e-9; t += step) {
+      var lab = t.toFixed(dec);
+      if (Number(lab) === 0) lab = (0).toFixed(dec);   // no "-0"
+      ctx.fillText(lab, sx(t), base + 6);
+    }
+
+    el.chartNote.textContent = "Showing x = " + num(lo) + " to " + num(hi) + ".  Actual range of x is −∞ to ∞.";
+  }
+
+  ["mu", "sigma", "x"].forEach(function (id) { el[id].addEventListener("input", update); });
+  window.addEventListener("resize", drawChart);
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", drawChart);
+  }
+
+  // Exposed for testing in the console: e.g. normalCdf(0, 1, 1.96)
+  window.normalCdf = function (mu, sigma, x) { return normalProbabilities(mu, sigma, x).le; };
+
+  update();
+})();
+</script>
+</body>
+</html>
