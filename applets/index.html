@@ -1,1 +1,175 @@
-aa
+<!DOCTYPE html>
+<html>
+    <link rel="icon"
+          type="image/png"
+          href="favicon.png">
+
+    <head>  <!--html/head/ ----------------------------------------------->
+        <title>datasets</title>
+        <link rel="stylesheet" type="text/css" href="../style/style.css">
+        <link rel="stylesheet" type="text/css" href="../style/title.css">
+        <link rel="stylesheet" type="text/css" href="../style/boxes.css">
+        <link rel="stylesheet" type="text/css" href="../style/tree.css">
+        <link rel="stylesheet" type="text/css" href="../style/footnote.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- MathJax -->
+        <script type="text/javascript" id="MathJax-script" async
+                src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+        <style>
+         :root{
+             <!-------------------------------------------------------->
+             --fontTitle: Arial Black;
+             --fontBody:  Arial Black;
+             --fontBoxH:  Arial Black;
+             --fontBox:   Arial Black;
+
+             /*
+             #64B6AC;    /* Green Sheen */
+             #00C49A;    /* Caribbean Green */
+             #5D576B;    /* Independence */
+             #F8F7F9;    /* Cultured */
+             #ED6A5A;    /* Terra Cotta */
+             */
+
+             --BGoutside:          #EEF8FF; /* Alice Blue */
+             --BGbox1:             #003554; /* Prussian Blue */
+             --BGfootnoteR:        #FF5A5F;   /* Sizzling Red */
+             --fontcolTitle:       Black;
+             --fontcolBody:        White;     /*   when not defined */
+             --fontcolBox:         #EEF8FF; /* Alice Blue */
+             --fontcolLink:        #D1F5FF; /* Light Cyan */
+             --fontcolLinkHover:   White;
+             --fontcolLinkActive:  #EEF8FF; /* Alice Blue */
+             --fontcolLinkVisited: #1E91D6; /* Green Blue Crayola */
+
+             --fsizeTitleH1: 40px;
+             --fsizeTitleH2: 20px;
+             --fsizeTitle:   18px;
+             --fsizeBoxH1:   25px;
+             --fsizeBox:     15px;
+             --opac:         .97;
+
+             /* used in style-tree */
+             --fontTriangle: Black;
+             --BGopentree: SeaGreen;
+         }
+         .bigcontainer {
+             background-image: url("bg-.jpg");
+         }
+        </style>
+    </head>
+    <!-- ONE COLUMN w TREE
+         /* bigcontainer           */
+         /*     container          */
+         /*         /titleR/       */
+         /*         /boxONE/       */
+         /*         /boxONE/       */
+         /*         /boxONE/       */
+         /*         /footnoteL/    */
+         /*         /footnoteR/    */
+         /*         */
+         /*         */
+    -->
+    <body>
+        <!-- /body/container/ --------------------------------------------------------->
+        <div class="bigcontainer">
+            <div class="container">
+
+                <!--------------------------------------->
+                <div class="titleRone">
+                    <h1>Datasets</h1>
+                </div>
+
+                <!--------------------------------------->
+                <div class="boxONE">
+                    <h1>Sites with data</h1>
+                    <ul>
+                        <li> <a href="http://lib.stat.cmu.edu/DASL/DataArchive.html">- The Data and Story Library</a></li>
+                        <li> <a href="http://www.seattlecentral.edu/qelp/Data.html">- Quantitative Environmental Learning Project</a></li>
+                        <li> <a href="http://lib.stat.cmu.edu/">- StatLib - CMU</a></li>
+                        <li> <a href="http://lib.stat.cmu.edu/datasets/">- StatLib - old</a></li>
+                        <li> <a href="http://www.stat.ucla.edu/data/">- UCLA</a></li>
+                        <li> <a href="http://www.itl.nist.gov/div898/strd/">- Statistical Reference Datasets</a></li>
+                        <li> <a href="http://math.whatcom.ctc.edu/student-services/campus-resources/math-center/teaching-math/real-data/">- Whatcom CC Online Math Center</a></li>
+                        <li> <a href="http://datamarket.com/">- Data Market</a></li>
+                        <li> <a href="http://www.gapminder.org/data/">- Gapminder</a></li>
+                        <li> <a href="http://www.nhtsa.gov/">- National Highway Traffic Safety Administration</a></li>
+                    </ul>
+                </div>
+
+                <!-------------------------------------->
+                <div class="boxONE">
+
+                    <h1>Univariate</h1>
+                    <ul>
+                        <li><a href="Pi.csv">- Digits of Pi</a>
+                            <a href="Pi.txt"> &#151 Dsctn</a></li>
+                        <li><a href="Lottery-d.txt">- Maryland Lottery</a>
+                            <a href="Lottery.csv"> &#151 Dsctn</a></li>
+                        <li><a href="light.csv">- Speed of Light</a>
+                            <a href="light.txt"> &#151 Dsctn</a></li>
+                        <li><a href="pitcorrosion.csv">- PitCorrosion</a>
+                            <a href="pitcorrosion.txt"> &#151 Dsctn</a></li>
+                    </ul>
+
+                    <h1>Multivariate</h1>
+                    <ul>
+                        <li><a href="plants-d.txt">- Nuke Plants Capacity vs Cost</a>
+                            <a href="plants.csv"> &#151 Description</a></li>
+                        <li><a href="WolfcampAquifer-d.txt">- Wolfcamp Aquifer Data</a>
+                            <a href="WolfcampAquifer.csv"> &#151 Description</a></li>
+                        <li><a href="BrainToBody-d.txt">- Brain Weight to Body Weight of species</a>
+                            <a href="BrainToBody.csv"> &#151 Description</a></li>
+                        <li><a href="NFL1976-d.txt">- NFL team performance 1976</a>
+                            <a href="NFL1976.csv"> &#151 Description</a></li>
+                        <li><a href="AutoMPG-d.txt">- Automobile MPG</a>
+                            <a href="AutoMPG.csv"> &#151 Description</a></li>
+                        <li><a href="MercuryInBass-d.txt">- Mercury in Large Mouth Bass</a>
+                            <a href="MercuryInBass.csv"> &#151 Description</a></li>
+                    </ul>
+
+                    <h1>Time Series</h1>
+                    <ul>
+                        <li><a href="lake.csv">- Lake Huron</a><a href="lake.txt"> &#151 Description</a></li>
+                        <li><a href="pigs.csv">- Pigs</a><a href="pigs.txt"> &#151 Description</a></li>
+                        <li><a href="gas.csv">- Gas</a><a href="gas.txt"> &#151 Description</a></li>
+                        <li><a href="trade.csv">- Trade</a><a href="trade.txt"> &#151 Description</a></li>
+                        <li><a href="temp.csv">- Temp</a><a href="temp.txt"> &#151 Description</a></li>
+                        <li><a href="temp2.csv">- Temp2</a><a href="temp2.txt"> &#151 Description</a></li>
+                        <li><a href="steel.csv">- Steel</a><a href="steel.txt"> &#151 Description</a></li>
+                        <li><a href="rhine.csv">- Rhine</a><a href="rhine.txt"> &#151 Description</a></li>
+                        <li><a href="snow.csv">- Snow</a><a href="snow.txt"> &#151 Description</a></li>
+                        <li><a href="SP500.csv">- SPY for 15 yrs</a></li>
+                        <li><a href="SP500.txt">- SP500 for 15 yrs</a><a href="SP500.ad.csv"> &#151 Description</a></li>
+                    </ul>
+                </div>
+
+
+                <!-- /Body/container/float-box/ --------------------------------------------------------->
+                <div class="footnoteL">
+                </div>
+
+                <!-- /Body/container/float-box/ --------------------------------------------------------->
+                <div class="footnoteR">
+                    <a href="https://nmimoto.github.io/">Home</a>
+                    &nbsp;
+                    <a href="https://github.com/nmimoto/nmimoto.github.io/tree/master/datasets">Git</a>
+                </div>
+
+                <div class="clr"></div>  <!-- Stop box blelow from coming up -->
+
+            </div><!-- End of /Body/container -->
+        </div><!-- End of /Body/bigcontainer -->
+
+        <!-- /Body/TreeCollapsibleJava/ -->
+        <script>
+         debugger;
+         console.log('wow');
+         var toggler = document.querySelectorAll(".rootTree");
+         Array.from(toggler).forEach(item => {
+             item.addEventListener("click", () => {
+                 item.parentElement .querySelector(".children") .classList.toggle("active");
+                 item.classList.toggle("rootTree-down");  }); });
+        </script>
+    </body>
+</html>
