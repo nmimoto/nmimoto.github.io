@@ -61,6 +61,7 @@
   }
   input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   #error { color: var(--error); min-height: 1.4em; margin: 12px 0 0; font-size: 0.9rem; }
+  #results { margin-top: 12px; }
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); }
   th { font-weight: 600; color: var(--muted); font-size: 0.85rem; border-top: none; }
@@ -69,6 +70,7 @@
   tr.main td { font-weight: 700; }
   .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
   .stats b { color: var(--text); font-weight: 600; }
+  .stats math { font-family: inherit; }
   canvas { width: 100%; height: 240px; display: block; }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
   .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
@@ -88,7 +90,7 @@
       </div>
       <div>
         <label for="p">Success probability, p <span class="hint">(0 to 1)</span></label>
-        <input id="p" type="number" min="0" max="1" step="any" value="0.5" inputmode="decimal">
+        <input id="p" type="number" min="0" max="1" step="0.01" value="0.5" inputmode="decimal">
       </div>
       <div>
         <label for="x">Number of successes, x <span class="hint">(any whole number)</span></label>
@@ -97,13 +99,12 @@
     </div>
     <p id="error" role="alert"></p>
     <div class="stats" id="stats"></div>
-  </section>
-
-  <section class="card" id="results" aria-live="polite" hidden>
-    <table>
-      <thead><tr><th>Probability</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
+    <div id="results" aria-live="polite" hidden>
+      <table>
+        <thead><tr><th>Probability</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
   </section>
 
   <section class="card" id="chartCard" hidden>
@@ -257,7 +258,7 @@
 
     var mean = n * p, sd = Math.sqrt(n * p * (1 - p));
     el.stats.innerHTML = "<span>Mean = np = <b>" + mean.toPrecision(6).replace(/\.?0+$/, "") +
-      "</b></span><span>SD = \u221A(np(1\u2212p)) = <b>" + sd.toFixed(4) + "</b></span>";
+      "</b></span><span>SD = <math><msqrt><mtext>np(1\u2212p)</mtext></msqrt></math> = <b>" + sd.toFixed(4) + "</b></span>";
 
     el.results.hidden = false;
     el.chartCard.hidden = false;
