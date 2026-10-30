@@ -28,50 +28,60 @@
     }
   }
   * { box-sizing: border-box; }
+  /* v02: compact layout (same as binomial_v02.html).  Smaller type, tighter
+     padding and margins, the three inputs always on one row, results on the
+     left and the chart on the right. */
   body {
     margin: 0;
-    padding: 24px 16px 48px;
+    padding: 8px;
     background: var(--bg);
     color: var(--text);
-    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font: 14px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
-  main { max-width: 760px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
+  main { max-width: 608px; margin: 0 auto; }
+  h1 { font-size: 1.15rem; line-height: 1.2; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 0.75rem; line-height: 1.25; margin: 0 0 6px; }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
   }
-  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
-  label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
-  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
+  .inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  label { display: block; font-weight: 600; font-size: 0.8rem; line-height: 1.2; margin-bottom: 2px; }
+  .hint { display: block; font-weight: 400; font-size: 0.68rem; line-height: 1.15; color: var(--muted); }
   input[type="number"] {
     width: 100%;
-    padding: 9px 10px;
-    font-size: 1rem;
+    padding: 3px 6px;
+    font-size: 0.95rem;
     color: var(--text);
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 6px;
   }
-  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  #error { color: var(--error); min-height: 1.4em; margin: 12px 0 0; font-size: 0.9rem; }
-  #results { margin-top: 12px; }
+  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  #error { color: var(--error); margin: 4px 0 0; font-size: 0.8rem; }
+  #error:empty { display: none; }
+  /* Results (left) and chart (right): equal width and equal height, side by side;
+     stacked below 560px.  The results card centres its content vertically. */
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: stretch; }
+  .cols .card { margin-bottom: 0; }
+  #results:not([hidden]) { display: flex; flex-direction: column; justify-content: center; }
+  @media (max-width: 560px) { .cols { grid-template-columns: minmax(0, 1fr); } }
   table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); }
-  th { font-weight: 600; color: var(--muted); font-size: 0.85rem; border-top: none; }
+  th, td { text-align: left; padding: 2px 6px; border-top: 1px solid var(--border); }
+  td:first-child { white-space: pre-line; }   /* lets a row label contain a line break (\n) */
+  th { font-weight: 600; color: var(--muted); font-size: 0.75rem; border-top: none; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
   th.num { text-align: right; }
   tr.main td { font-weight: 700; }
-  .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+  .stats { display: flex; gap: 6px 16px; flex-wrap: wrap; color: var(--muted); font-size: 0.8rem; margin-bottom: 30px; }
   .stats b { color: var(--text); font-weight: 600; }
-  canvas { width: 100%; height: 240px; display: block; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
-  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
-  .chart-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+  canvas { width: 100%; height: 150px; display: block; }
+  .chart-foot { display: flex; justify-content: space-between; gap: 2px 12px; flex-wrap: wrap; font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
 </style>
 </head>
 <body>
@@ -95,23 +105,29 @@
       </div>
     </div>
     <p id="error" role="alert"></p>
-    <div class="stats" id="stats"></div>
-    <div id="results" aria-live="polite" hidden>
+  </section>
+
+  <!-- Two columns: results on the left, chart on the right (stacked on narrow screens) -->
+  <div class="cols">
+    <section class="card" id="results" aria-live="polite" hidden>
+      <div class="stats" id="stats"></div>
       <table>
         <thead><tr><th>Quantity</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
-    </div>
-  </section>
+    </section>
 
-  <section class="card" id="chartCard" hidden>
-    <canvas id="chart" role="img" aria-label="Density curve of the normal distribution, with the area up to x highlighted"></canvas>
-    <div class="legend">
-      <span><span class="sw" style="background:var(--accent)"></span>X ≤ x (the cumulative probability)</span>
-      <span><span class="sw" style="background:var(--bar-other)"></span>X &gt; x</span>
-    </div>
-    <div class="chart-note" id="chartNote"></div>
-  </section>
+    <section class="card" id="chartCard" hidden>
+      <canvas id="chart" role="img" aria-label="Density curve of the normal distribution, with the area up to x highlighted"></canvas>
+      <div class="chart-foot">
+        <div class="legend">
+          <span><span class="sw" style="background:var(--accent)"></span>X ≤ x (the cumulative probability)</span>
+          <span><span class="sw" style="background:var(--bar-other)"></span>X &gt; x</span>
+        </div>
+        <div id="chartNote"></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <script>
@@ -219,7 +235,7 @@
 
     var rows = [
       ["CDF: P(X ≤ " + num(x) + ")", r.le, true],
-      ["P(X > " + num(x) + ") = 1 − P(X ≤ " + num(x) + ")", r.gt, false]
+      ["P(X > " + num(x) + ") =\n1 − P(X ≤ " + num(x) + ")", r.gt, false]
     ];
     el.rows.innerHTML = "";
     rows.forEach(function (row) {
@@ -273,7 +289,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
-    var padL = 46, padR = 24, padT = 10, padB = 30;   // padR leaves room for the last x label
+    var padL = 38, padR = 20, padT = 6, padB = 20;   // padR leaves room for the last x label
     var plotW = W - padL - padR, plotH = H - padT - padB;
 
     function pdf(v) {
@@ -286,14 +302,14 @@
     var base = padT + plotH;
 
     // y axis grid + labels
-    ctx.font = "12px system-ui, sans-serif";
+    ctx.font = "10px system-ui, sans-serif";
     ctx.fillStyle = cText; ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
     ctx.textAlign = "right"; ctx.textBaseline = "middle";
     var decimals = yMax < 0.01 ? 4 : (yMax < 0.1 ? 3 : 2);   // one precision for the whole axis
     for (var g = 0; g <= 4; g++) {
       var yv = yMax * g / 4, y = padT + plotH - plotH * g / 4;
       ctx.beginPath(); ctx.moveTo(padL, y + 0.5); ctx.lineTo(W - padR, y + 0.5); ctx.stroke();
-      ctx.fillText(yv.toFixed(decimals), padL - 6, y);
+      ctx.fillText(yv.toFixed(decimals), padL - 4, y);
     }
 
     // area under the curve: accent up to x, grey beyond it
@@ -332,7 +348,7 @@
     for (var t = Math.ceil(lo / step) * step; t <= hi + step * 1e-9; t += step) {
       var lab = t.toFixed(dec);
       if (Number(lab) === 0) lab = (0).toFixed(dec);   // no "-0"
-      ctx.fillText(lab, sx(t), base + 6);
+      ctx.fillText(lab, sx(t), base + 4);
     }
 
     el.chartNote.textContent = "Showing x = " + num(lo) + " to " + num(hi) + ".  Actual range of x is −∞ to ∞.";

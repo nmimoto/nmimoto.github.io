@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binomial Probability Calculator</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1d2330;
+    --muted: #5d6779;
+    --border: #d9dee7;
+    --accent: #2563eb;
+    --accent-soft: #bcd0fb;
+    --bar-other: #c4cad6;
+    --error: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b;
+      --card: #1b2029;
+      --text: #e6e9ef;
+      --muted: #9aa3b5;
+      --border: #2f3746;
+      --accent: #6b9bff;
+      --accent-soft: #34518f;
+      --bar-other: #3b4456;
+      --error: #ff8b7d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+  label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
+  input[type="number"] {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #error { color: var(--error); min-height: 1.4em; margin: 12px 0 0; font-size: 0.9rem; }
+  #results { margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); }
+  th { font-weight: 600; color: var(--muted); font-size: 0.85rem; border-top: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  th.num { text-align: right; }
+  tr.main td { font-weight: 700; }
+  .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+  .stats b { color: var(--text); font-weight: 600; }
+  .stats math { font-family: inherit; }
+  canvas { width: 100%; height: 240px; display: block; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+  .chart-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Binomial Probability Calculator</h1>
+  <p class="sub">X ~ Binomial(n, p): the number of successes in n independent trials, each with success probability p.</p>
+
+  <section class="card" aria-label="Inputs">
+    <div class="inputs">
+      <div>
+        <label for="n">Number of trials, n <span class="hint">(1 to 1,000,000)</span></label>
+        <input id="n" type="number" min="1" max="1000000" step="1" value="10" inputmode="numeric">
+      </div>
+      <div>
+        <label for="p">Success probability, p <span class="hint">(0 to 1)</span></label>
+        <input id="p" type="number" min="0" max="1" step="0.01" value="0.5" inputmode="decimal">
+      </div>
+      <div>
+        <label for="x">Number of successes, x <span class="hint">(any whole number)</span></label>
+        <input id="x" type="number" step="1" value="5" inputmode="numeric">
+      </div>
+    </div>
+    <p id="error" role="alert"></p>
+    <div class="stats" id="stats"></div>
+    <div id="results" aria-live="polite" hidden>
+      <table>
+        <thead><tr><th>Probability</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="chartCard" hidden>
+    <canvas id="chart" role="img" aria-label="Probability mass function of the binomial distribution, with the outcomes up to x highlighted"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>X ≤ x (the cumulative probability)</span>
+      <span><span class="sw" style="background:var(--bar-other)"></span>X &gt; x</span>
+    </div>
+    <div class="chart-note" id="chartNote"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var MAX_N = 1000000;
+
+  // ---- Core math ----------------------------------------------------------
+  // The pmf is evaluated in log space, using a table of log(i!) built by
+  // accumulating Math.log(i). That stays accurate and avoids overflow for
+  // large n. Each cumulative probability is a direct sum of pmf terms (the
+  // upper tails are NOT computed as 1 - lower tail), so tiny probabilities
+  // keep their precision.
+  var logFact = new Float64Array(1);   // logFact[i] = log(i!)
+  var logFactN = 0;
+
+  function ensureLogFact(n) {
+    if (n <= logFactN) return;
+    var t = new Float64Array(n + 1);
+    t.set(logFact);
+    // Kahan (compensated) summation keeps rounding error from piling up over
+    // up to a million additions.
+    var sum = t[logFactN], c = 0;
+    for (var i = logFactN + 1; i <= n; i++) {
+      var y = Math.log(i) - c;
+      var s2 = sum + y;
+      c = (s2 - sum) - y;
+      sum = s2;
+      t[i] = sum;
+    }
+    logFact = t;
+    logFactN = n;
+  }
+
+  function makePmf(n, p) {
+    ensureLogFact(n);
+    var lp = Math.log(p), lq = Math.log(1 - p);
+    return function (i) {
+      if (i < 0 || i > n) return 0;
+      if (p === 0) return i === 0 ? 1 : 0;
+      if (p === 1) return i === n ? 1 : 0;
+      return Math.exp(logFact[n] - logFact[i] - logFact[n - i] + i * lp + (n - i) * lq);
+    };
+  }
+
+  // Sum of pmf(i) for i from lo to hi (clipped to 0..n).
+  function sumRange(pmf, n, lo, hi) {
+    lo = Math.max(0, lo);
+    hi = Math.min(n, hi);
+    var s = 0;
+    for (var i = lo; i <= hi; i++) s += pmf(i);
+    return Math.min(1, s);
+  }
+
+  // Returns every cumulative quantity for X ~ Binomial(n, p) at x.
+  function binomialProbabilities(n, p, x) {
+    var pmf = makePmf(n, p);
+    return {
+      pmf: pmf,
+      le: sumRange(pmf, n, 0, x),         // P(X <= x)
+      lt: sumRange(pmf, n, 0, x - 1),     // P(X <  x)
+      ge: sumRange(pmf, n, x, n),         // P(X >= x)
+      gt: sumRange(pmf, n, x + 1, n),     // P(X >  x)
+      eq: pmf(x)                          // P(X =  x)
+    };
+  }
+
+  // ---- Formatting ---------------------------------------------------------
+  // Table columns: 4 decimals for the value, 2 for the percent. Tiny nonzero
+  // values would round to 0.0000 / 0.00%, so they are shown differently.
+  function fmt(v) {
+    if (v === 0) return "0";
+    if (v === 1) return "1";
+    if (v < 5e-5) return v.toExponential(4);
+    return v.toFixed(4);
+  }
+  function fmtPct(v) {
+    if (v === 0) return "0%";
+    if (v < 5e-5) return "< 0.01%";
+    return (v * 100).toFixed(2) + "%";
+  }
+
+  // ---- UI -----------------------------------------------------------------
+  var el = {
+    n: document.getElementById("n"),
+    p: document.getElementById("p"),
+    x: document.getElementById("x"),
+    error: document.getElementById("error"),
+    results: document.getElementById("results"),
+    chartCard: document.getElementById("chartCard"),
+    rows: document.getElementById("rows"),
+    stats: document.getElementById("stats"),
+    canvas: document.getElementById("chart"),
+    chartNote: document.getElementById("chartNote")
+  };
+
+  var last = null;   // last successful calculation, used to redraw the chart on resize
+
+  function readInputs() {
+    var nRaw = el.n.value.trim(), pRaw = el.p.value.trim(), xRaw = el.x.value.trim();
+    if (nRaw === "" || pRaw === "" || xRaw === "") return { error: "Enter values for n, p and x." };
+    var n = Number(nRaw), p = Number(pRaw), x = Number(xRaw);
+    if (!Number.isInteger(n) || n < 1 || n > MAX_N) return { error: "n must be a whole number from 1 to " + MAX_N.toLocaleString() + "." };
+    if (!isFinite(p) || p < 0 || p > 1) return { error: "p must be a number between 0 and 1." };
+    if (!Number.isInteger(x)) return { error: "x must be a whole number." };
+    return { n: n, p: p, x: x };
+  }
+
+  function update() {
+    var inp = readInputs();
+    if (inp.error) {
+      el.error.textContent = inp.error;
+      el.stats.innerHTML = "";
+      el.results.hidden = true;
+      el.chartCard.hidden = true;
+      last = null;
+      return;
+    }
+    el.error.textContent = "";
+
+    var n = inp.n, p = inp.p, x = inp.x;
+    var r = binomialProbabilities(n, p, x);
+
+    var rows = [
+      ["CDF: P(X ≤ " + x + ")", r.le, true],
+      ["pmf: P(X = " + x + ")", r.eq, false]
+    ];
+    el.rows.innerHTML = "";
+    rows.forEach(function (row) {
+      var tr = document.createElement("tr");
+      if (row[2]) tr.className = "main";
+      [[row[0], ""], [fmt(row[1]), "num"], [fmtPct(row[1]), "num"]].forEach(function (c) {
+        var td = document.createElement("td");
+        td.textContent = c[0];
+        if (c[1]) td.className = c[1];
+        tr.appendChild(td);
+      });
+      el.rows.appendChild(tr);
+    });
+
+    var mean = n * p, sd = Math.sqrt(n * p * (1 - p));
+    el.stats.innerHTML = "<span>Mean = np = <b>" + mean.toPrecision(6).replace(/\.?0+$/, "") +
+      "</b></span><span>SD = <math><msqrt><mtext>np(1\u2212p)</mtext></msqrt></math> = <b>" + sd.toFixed(4) + "</b></span>";
+
+    el.results.hidden = false;
+    el.chartCard.hidden = false;
+    last = { n: n, p: p, x: x, pmf: r.pmf, mean: mean, sd: sd };
+    drawChart();
+  }
+
+  // ---- Chart: pmf bars, those with X <= x highlighted ----------------------
+  function drawChart() {
+    if (!last) return;
+    var n = last.n, x = last.x, pmf = last.pmf;
+
+    // Show the region that holds essentially all of the probability.
+    var lo = Math.max(0, Math.floor(last.mean - 5 * last.sd));
+    var hi = Math.min(n, Math.ceil(last.mean + 5 * last.sd));
+    if (last.sd === 0) { lo = Math.max(0, Math.round(last.mean) - 2); hi = Math.min(n, Math.round(last.mean) + 2); }
+    // Make sure x is visible, so the highlighted boundary is always on the chart.
+    lo = Math.min(lo, Math.max(0, x));
+    hi = Math.max(hi, Math.min(n, x));
+    if (hi - lo < 4) { lo = Math.max(0, lo - 2); hi = Math.min(n, hi + 2); }
+    var bins = hi - lo + 1;
+
+    var css = getComputedStyle(document.documentElement);
+    var cAccent = css.getPropertyValue("--accent").trim();
+    var cOther = css.getPropertyValue("--bar-other").trim();
+    var cText = css.getPropertyValue("--muted").trim();
+    var cBorder = css.getPropertyValue("--border").trim();
+
+    var dpr = window.devicePixelRatio || 1;
+    var W = el.canvas.clientWidth, H = el.canvas.clientHeight;
+    el.canvas.width = Math.round(W * dpr);
+    el.canvas.height = Math.round(H * dpr);
+    var ctx = el.canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    var padL = 46, padR = 10, padT = 10, padB = 30;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var maxP = 0, vals = new Array(bins);
+    for (var i = 0; i < bins; i++) { vals[i] = pmf(lo + i); if (vals[i] > maxP) maxP = vals[i]; }
+    if (maxP === 0) maxP = 1;
+    var yMax = maxP * 1.08;
+
+    // y axis grid + labels
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.fillStyle = cText; ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    var decimals = yMax < 0.01 ? 4 : (yMax < 0.1 ? 3 : 2);   // one precision for the whole axis
+    for (var g = 0; g <= 4; g++) {
+      var yv = yMax * g / 4, y = padT + plotH - plotH * g / 4;
+      ctx.beginPath(); ctx.moveTo(padL, y + 0.5); ctx.lineTo(W - padR, y + 0.5); ctx.stroke();
+      ctx.fillText(yv.toFixed(decimals), padL - 6, y);
+    }
+
+    // bars
+    var slot = plotW / bins, barW = Math.max(1, slot * 0.85);
+    for (var j = 0; j < bins; j++) {
+      var xv = lo + j, h = plotH * vals[j] / yMax;
+      ctx.fillStyle = xv <= x ? cAccent : cOther;
+      ctx.fillRect(padL + j * slot + (slot - barW) / 2, padT + plotH - h, barW, h);
+    }
+
+    // x axis labels (about 8, on whole numbers)
+    ctx.fillStyle = cText; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    var step = Math.max(1, Math.ceil(bins / 8));
+    for (var t = lo; t <= hi; t++) {
+      if ((t - lo) % step !== 0) continue;
+      ctx.fillText(String(t), padL + (t - lo + 0.5) * slot, padT + plotH + 6);
+    }
+
+    el.chartNote.textContent = "Showing x = " + lo + " to " + hi + ".  Actual range of x is 0 to " + n + ".";
+  }
+
+  ["n", "p", "x"].forEach(function (id) { el[id].addEventListener("input", update); });
+  window.addEventListener("resize", drawChart);
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", drawChart);
+  }
+
+  // Exposed for testing in the console: e.g. binomialCdf(20, 0.3, 6)
+  window.binomialCdf = function (n, p, x) { return binomialProbabilities(n, p, x).le; };
+
+  update();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exponential Probability Calculator</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1d2330;
+    --muted: #5d6779;
+    --border: #d9dee7;
+    --accent: #2563eb;
+    --bar-other: #c4cad6;
+    --error: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b;
+      --card: #1b2029;
+      --text: #e6e9ef;
+      --muted: #9aa3b5;
+      --border: #2f3746;
+      --accent: #6b9bff;
+      --bar-other: #3b4456;
+      --error: #ff8b7d;
+    }
+  }
+  * { box-sizing: border-box; }
+  /* Compact layout (same as normal_v01.html / binomial_v01.html).  Smaller type,
+     tight padding and margins, the inputs on one row, results on the left and
+     the chart on the right. */
+  body {
+    margin: 0;
+    padding: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 608px; margin: 0 auto; }
+  h1 { font-size: 1.15rem; line-height: 1.2; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 0.75rem; line-height: 1.25; margin: 0 0 6px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  label { display: block; font-weight: 600; font-size: 0.8rem; line-height: 1.2; margin-bottom: 2px; }
+  .hint { display: block; font-weight: 400; font-size: 0.68rem; line-height: 1.15; color: var(--muted); }
+  input[type="number"] {
+    width: 100%;
+    padding: 3px 6px;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  #error { color: var(--error); margin: 4px 0 0; font-size: 0.8rem; }
+  #error:empty { display: none; }
+  /* Results (left) and chart (right): equal width and equal height, side by side;
+     stacked below 560px.  The results card centres its content vertically. */
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: stretch; }
+  .cols .card { margin-bottom: 0; }
+  #results:not([hidden]) { display: flex; flex-direction: column; justify-content: center; }
+  @media (max-width: 560px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 2px 6px; border-top: 1px solid var(--border); }
+  td:first-child { white-space: pre-line; }   /* lets a row label contain a line break (\n) */
+  th { font-weight: 600; color: var(--muted); font-size: 0.75rem; border-top: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  th.num { text-align: right; }
+  tr.main td { font-weight: 700; }
+  .stats { display: flex; gap: 6px 16px; flex-wrap: wrap; color: var(--muted); font-size: 0.8rem; margin-bottom: 30px; }
+  .stats b { color: var(--text); font-weight: 600; }
+  canvas { width: 100%; height: 150px; display: block; }
+  .chart-foot { display: flex; justify-content: space-between; gap: 2px 12px; flex-wrap: wrap; font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Exponential Probability Calculator</h1>
+  <p class="sub">X ~ Exponential(λ): an exponential distribution with rate λ (mean 1/λ).</p>
+
+  <section class="card" aria-label="Inputs">
+    <div class="inputs">
+      <div>
+        <label for="rate">Rate, λ <span class="hint">(greater than 0)</span></label>
+        <input id="rate" type="number" min="0" step="0.1" value="1" inputmode="decimal">
+      </div>
+      <div>
+        <label for="x">Value, x <span class="hint">(any number; X is never negative)</span></label>
+        <input id="x" type="number" step="0.1" value="1" inputmode="decimal">
+      </div>
+    </div>
+    <p id="error" role="alert"></p>
+  </section>
+
+  <!-- Two columns: results on the left, chart on the right (stacked on narrow screens) -->
+  <div class="cols">
+    <section class="card" id="results" aria-live="polite" hidden>
+      <div class="stats" id="stats"></div>
+      <table>
+        <thead><tr><th>Quantity</th><th class="num">Value</th><th class="num">Percent</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+
+    <section class="card" id="chartCard" hidden>
+      <canvas id="chart" role="img" aria-label="Density curve of the exponential distribution, with the area up to x highlighted"></canvas>
+      <div class="chart-foot">
+        <div class="legend">
+          <span><span class="sw" style="background:var(--accent)"></span>X ≤ x (the cumulative probability)</span>
+          <span><span class="sw" style="background:var(--bar-other)"></span>X &gt; x</span>
+        </div>
+        <div id="chartNote"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Core math ----------------------------------------------------------
+  // X ~ Exponential(rate): density f(t) = rate * exp(-rate * t) for t >= 0,
+  //   P(X <= x) = 1 - exp(-rate * x)   and   P(X > x) = exp(-rate * x)   for x >= 0.
+  // Math.expm1 keeps P(X <= x) accurate when rate * x is tiny (where
+  // 1 - exp(-rate * x) would lose digits), and the upper tail is computed
+  // directly so tiny probabilities keep their precision.
+  function exponentialProbabilities(rate, x) {
+    if (x <= 0) return { le: 0, gt: 1 };          // X is never negative
+    var t = rate * x;
+    return {
+      le: -Math.expm1(-t),                        // P(X <= x) = 1 - exp(-rate*x)
+      gt: Math.exp(-t)                            // P(X >  x) = 1 - P(X <= x), from the upper tail directly
+    };
+  }
+
+  // ---- Formatting ---------------------------------------------------------
+  // Table columns: 4 decimals for the value, 2 for the percent. Tiny nonzero
+  // values would round to 0.0000 / 0.00%, so they are shown differently.
+  function fmt(v) {
+    if (v === 0) return "0";
+    if (v === 1) return "1";
+    if (v < 5e-5) return v.toExponential(4);
+    return v.toFixed(4);
+  }
+  function fmtPct(v) {
+    if (v === 0) return "0%";
+    if (v < 5e-5) return "< 0.01%";
+    return (v * 100).toFixed(2) + "%";
+  }
+  // Plain number with up to 6 significant digits and no trailing zeros.
+  function num(v) {
+    return String(Number(v.toPrecision(6)));
+  }
+
+  // ---- UI -----------------------------------------------------------------
+  var el = {
+    rate: document.getElementById("rate"),
+    x: document.getElementById("x"),
+    error: document.getElementById("error"),
+    results: document.getElementById("results"),
+    chartCard: document.getElementById("chartCard"),
+    rows: document.getElementById("rows"),
+    stats: document.getElementById("stats"),
+    canvas: document.getElementById("chart"),
+    chartNote: document.getElementById("chartNote")
+  };
+
+  var last = null;   // last successful calculation, used to redraw the chart on resize
+
+  function readInputs() {
+    var rateRaw = el.rate.value.trim(), xRaw = el.x.value.trim();
+    if (rateRaw === "" || xRaw === "") return { error: "Enter values for λ and x." };
+    var rate = Number(rateRaw), x = Number(xRaw);
+    if (!isFinite(rate) || rate <= 0) return { error: "λ must be a number greater than 0." };
+    if (!isFinite(x)) return { error: "x must be a number." };
+    return { rate: rate, x: x };
+  }
+
+  function update() {
+    var inp = readInputs();
+    if (inp.error) {
+      el.error.textContent = inp.error;
+      el.stats.innerHTML = "";
+      el.results.hidden = true;
+      el.chartCard.hidden = true;
+      last = null;
+      return;
+    }
+    el.error.textContent = "";
+
+    var rate = inp.rate, x = inp.x;
+    var r = exponentialProbabilities(rate, x);
+
+    var rows = [
+      ["CDF: P(X ≤ " + num(x) + ")", r.le, true],
+      ["P(X > " + num(x) + ") =\n1 − P(X ≤ " + num(x) + ")", r.gt, false]
+    ];
+    el.rows.innerHTML = "";
+    rows.forEach(function (row) {
+      var tr = document.createElement("tr");
+      if (row[2]) tr.className = "main";
+      [[row[0], ""], [fmt(row[1]), "num"], [fmtPct(row[1]), "num"]].forEach(function (c) {
+        var td = document.createElement("td");
+        td.textContent = c[0];
+        if (c[1]) td.className = c[1];
+        tr.appendChild(td);
+      });
+      el.rows.appendChild(tr);
+    });
+
+    // For an exponential distribution the mean and the standard deviation are both 1/rate.
+    el.stats.innerHTML = "<span>Mean = SD = 1/λ = <b>" + num(1 / rate) + "</b></span>";
+
+    el.results.hidden = false;
+    el.chartCard.hidden = false;
+    last = { rate: rate, x: x };
+    drawChart();
+  }
+
+  // ---- Chart: density curve, the area with X <= x highlighted --------------
+  // A "nice" tick spacing (1, 2 or 5 times a power of ten) giving about 6 ticks.
+  function niceStep(range) {
+    var rough = range / 6, mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    var m = rough / mag;
+    return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * mag;
+  }
+
+  function drawChart() {
+    if (!last) return;
+    var rate = last.rate, x = last.x, mean = 1 / rate;
+
+    // Show 0 to 5 means (where nearly all the probability is), widened if
+    // needed so that x (the boundary) is on the chart.
+    var lo = 0, hi = 5 * mean;
+    if (x < lo) lo = x - 0.5 * mean;
+    if (x > hi) hi = x + 0.5 * mean;
+
+    var css = getComputedStyle(document.documentElement);
+    var cAccent = css.getPropertyValue("--accent").trim();
+    var cOther = css.getPropertyValue("--bar-other").trim();
+    var cText = css.getPropertyValue("--muted").trim();
+    var cBorder = css.getPropertyValue("--border").trim();
+
+    var dpr = window.devicePixelRatio || 1;
+    var W = el.canvas.clientWidth, H = el.canvas.clientHeight;
+    el.canvas.width = Math.round(W * dpr);
+    el.canvas.height = Math.round(H * dpr);
+    var ctx = el.canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    var padL = 38, padR = 20, padT = 6, padB = 20;   // padR leaves room for the last x label
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    function pdf(v) { return v < 0 ? 0 : rate * Math.exp(-rate * v); }
+    var yMax = rate * 1.08;                           // the density is highest at 0, where it equals rate
+    function sx(v) { return padL + (v - lo) / (hi - lo) * plotW; }
+    function sy(f) { return padT + plotH - plotH * f / yMax; }
+    var base = padT + plotH;
+
+    // y axis grid + labels
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.fillStyle = cText; ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    var decimals = yMax >= 100 ? 0 : yMax >= 10 ? 1 : yMax < 0.01 ? 4 : (yMax < 0.1 ? 3 : 2);   // one precision for the whole axis
+    for (var g = 0; g <= 4; g++) {
+      var yv = yMax * g / 4, y = padT + plotH - plotH * g / 4;
+      ctx.beginPath(); ctx.moveTo(padL, y + 0.5); ctx.lineTo(W - padR, y + 0.5); ctx.stroke();
+      ctx.fillText(yv.toFixed(decimals), padL - 4, y);
+    }
+
+    // area under the curve: accent up to x, grey beyond it
+    var STEPS = 400;
+    function fillArea(from, to, color) {
+      if (to <= from) return;
+      ctx.beginPath();
+      ctx.moveTo(sx(from), base);
+      for (var i = 0; i <= STEPS; i++) {
+        var v = from + (to - from) * i / STEPS;
+        ctx.lineTo(sx(v), sy(pdf(v)));
+      }
+      ctx.lineTo(sx(to), base);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    var xc = Math.min(Math.max(x, lo), hi);
+    fillArea(lo, xc, cAccent);
+    fillArea(xc, hi, cOther);
+
+    // curve outline and the boundary at x
+    ctx.beginPath();
+    for (var i = 0; i <= STEPS; i++) {
+      var v = lo + (hi - lo) * i / STEPS;
+      if (i === 0) ctx.moveTo(sx(v), sy(pdf(v))); else ctx.lineTo(sx(v), sy(pdf(v)));
+    }
+    ctx.strokeStyle = cAccent; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(xc) + 0.5, base); ctx.lineTo(sx(xc) + 0.5, sy(pdf(xc)));
+    ctx.strokeStyle = cText; ctx.lineWidth = 1; ctx.stroke();
+
+    // x axis labels
+    ctx.fillStyle = cText; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    var step = niceStep(hi - lo);
+    var dec = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+    for (var t = Math.ceil(lo / step) * step; t <= hi + step * 1e-9; t += step) {
+      var lab = t.toFixed(dec);
+      if (Number(lab) === 0) lab = (0).toFixed(dec);   // no "-0"
+      ctx.fillText(lab, sx(t), base + 4);
+    }
+
+    el.chartNote.textContent = "Showing x = " + num(lo) + " to " + num(hi) + ".  Actual range of x is 0 to ∞.";
+  }
+
+  ["rate", "x"].forEach(function (id) { el[id].addEventListener("input", update); });
+  window.addEventListener("resize", drawChart);
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", drawChart);
+  }
+
+  // Exposed for testing in the console: e.g. exponentialCdf(1, 1)
+  window.exponentialCdf = function (rate, x) { return exponentialProbabilities(rate, x).le; };
+
+  update();
+})();
+</script>
+</body>
+</html>
