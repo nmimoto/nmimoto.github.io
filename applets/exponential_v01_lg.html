@@ -34,27 +34,37 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 24px 16px 48px;
+    padding: 16px 16px 16px;
     background: var(--bg);
     color: var(--text);
     font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   main { max-width: 760px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 0 0 4px; }
+  h1 { font-size: 1.5rem; margin: 0; }
+  /* λ | β switch: the highlighted side is the form the formulas are currently written in */
+  .toggle {
+    flex: none; display: inline-flex; padding: 2px; margin-top: 2px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    color: var(--muted); font: inherit; cursor: pointer;
+  }
+  .toggle span { min-width: 2.2em; padding: 0 10px; border-radius: 999px; text-align: center; }
+  .toggle span.on { background: var(--accent); color: var(--on-accent); }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sub { color: var(--muted); margin: 0 0 8px; }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
   }
-  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
-  label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
-  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); min-height: 1.2em; }
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  label { display: block; font-weight: 600; font-size: 0.9rem; line-height: 1.3; margin-bottom: 2px; }
+  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); line-height: 1.3; }
   input[type="number"] {
     width: 100%;
-    padding: 9px 10px;
+    padding: 6px 10px;
     font-size: 1rem;
     color: var(--text);
     background: var(--bg);
@@ -62,37 +72,48 @@
     border-radius: 8px;
   }
   input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  #error { color: var(--error); min-height: 1.4em; margin: 12px 0 0; font-size: 0.9rem; }
-  #results { margin-top: 12px; }
+  #error { color: var(--error); margin: 8px 0 0; font-size: 0.9rem; }
+  #error:empty { display: none; }
+  #results { margin-top: 6px; }
   table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); }
+  th, td { text-align: left; padding: 3px 6px; border-top: 1px solid var(--border); }
   th { font-weight: 600; color: var(--muted); font-size: 0.85rem; border-top: none; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
   th.num { text-align: right; }
   tr.main td { font-weight: 700; }
   sup { line-height: 0; }   /* keep the pdf row the same height as the others */
-  .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+  .stats { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
   .stats b { color: var(--text); font-weight: 600; }
-  canvas { width: 100%; height: 240px; display: block; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+  canvas { width: 100%; height: 228px; display: block; touch-action: pan-y; }   /* pan-y: sideways drags go to the chart (moving x), vertical swipes still scroll */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
   .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
-  .chart-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+  .chart-note { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Exponential Probability Calculator</h1>
-  <p class="sub">X ~ Exponential(λ): an exponential distribution with rate λ (mean 1/λ).</p>
+  <div class="top">
+    <h1>Exponential Probability Calculator</h1>
+    <button type="button" class="toggle" id="formToggle" aria-pressed="true"
+            title="Write the formulas in terms of λ or β" aria-label="Write the formulas in terms of λ">
+      <span>λ</span><span class="on">β</span>
+    </button>
+  </div>
+  <p class="sub" id="sub"></p>
 
   <section class="card" aria-label="Inputs">
     <div class="inputs">
       <div>
-        <label for="rate">Rate, λ <span class="hint">(greater than 0)</span></label>
-        <input id="rate" type="number" min="0" step="0.1" value="1" inputmode="decimal">
+        <label for="beta">Mean, β <span class="hint">(β = 1/λ; greater than 0)</span></label>
+        <input id="beta" type="number" min="0" step="0.1" value="5" inputmode="decimal">
       </div>
       <div>
-        <label for="x">Value, x <span class="hint">(any number; X is never negative)</span></label>
-        <input id="x" type="number" step="0.01" value="1" inputmode="decimal">
+        <label for="rate">Rate, λ <span class="hint">(λ = 1/β, greater than 0)</span></label>
+        <input id="rate" type="number" min="0" step="0.1" value="0.2" inputmode="decimal">
+      </div>
+      <div>
+        <label for="x">Value, x <span class="hint">(any number ≥ 0)</span></label>
+        <input id="x" type="number" step="0.01" value="5" inputmode="decimal">
       </div>
     </div>
     <p id="error" role="alert"></p>
@@ -155,6 +176,9 @@
 
   // ---- UI -----------------------------------------------------------------
   var el = {
+    sub: document.getElementById("sub"),
+    toggle: document.getElementById("formToggle"),
+    beta: document.getElementById("beta"),
     rate: document.getElementById("rate"),
     x: document.getElementById("x"),
     error: document.getElementById("error"),
@@ -167,14 +191,41 @@
   };
 
   var last = null;   // last successful calculation, used to redraw the chart on resize
+  var dragRange = null;   // while x is being dragged on the chart: the axis range, held fixed so the axis does not rescale under the pointer
+  var geom = null;        // where the chart's plot area and the x line were last drawn (CSS pixels), for hit-testing
+
+  // ---- Formula wording: λ version or β version (β = 1/λ) ---------------------
+  // f(x) = λe^(−λx) = (1/β)e^(−x/β), and the page shows whichever the λ | β switch selects, with the actual x filled in.
+  var useBeta = true;   // the page opens in the β version
+  function pdfHead() { return useBeta ? "(1/β)e" : "λe"; }                       // the part of f(x) before the exponent
+  function expoText(xs) { return useBeta ? "\u2212(" + xs + ")/β" : "\u2212λ(" + xs + ")"; }
+  function showSubtitle() {
+    el.sub.textContent = useBeta
+      ? "X ~ Exponential(β): an exponential distribution with mean β (rate λ = 1/β)."
+      : "X ~ Exponential(λ): an exponential distribution with rate λ (mean β = 1/λ).";
+  }
+
+  // β and λ are the same parameter (β = 1/λ). Whichever box the user last edited is the source of truth, and the
+  // other box is just a display of its reciprocal, so typing β = 3 uses exactly 1/3 rather than a rounded 0.333333.
+  var source = "beta";
 
   function readInputs() {
-    var rateRaw = el.rate.value.trim(), xRaw = el.x.value.trim();
-    if (rateRaw === "" || xRaw === "") return { error: "Enter values for λ and x." };
-    var rate = Number(rateRaw), x = Number(xRaw);
-    if (!isFinite(rate) || rate <= 0) return { error: "λ must be a number greater than 0." };
+    var name = source === "beta" ? "β" : "λ";
+    var paramRaw = el[source].value.trim(), xRaw = el.x.value.trim();
+    if (paramRaw === "" || xRaw === "") return { error: "Enter values for " + name + " and x." };
+    var param = Number(paramRaw), x = Number(xRaw);
+    var rate = source === "beta" ? 1 / param : param;
+    if (!isFinite(param) || param <= 0 || !isFinite(rate) || rate <= 0) return { error: name + " must be a number greater than 0." };
     if (!isFinite(x)) return { error: "x must be a number." };
     return { rate: rate, x: x };
+  }
+
+  // Keep the box that was not edited showing the reciprocal of the one that was.
+  function syncOther() {
+    var param = Number(el[source].value.trim());
+    var other = source === "beta" ? el.rate : el.beta;
+    if (el[source].value.trim() === "" || !isFinite(param) || param <= 0 || !isFinite(1 / param)) return;   // leave it alone while the entry is invalid
+    other.value = num(1 / param);
   }
 
   function update() {
@@ -195,9 +246,11 @@
     // Each row: [label (HTML), value text, percent text, bold?]
     var density = x < 0 ? 0 : rate * Math.exp(-rate * x);     // f(x); a density, not a probability, so it has no percent
     var pdfLabel = x < 0 ? "pdf: f(" + num(x) + ") = 0"
-                         : "pdf: f(" + num(x) + ") = λe<sup>\u2212λ(" + num(x) + ")</sup>";
+                         : "pdf: f(" + num(x) + ") = " + pdfHead() + "<sup>" + expoText(num(x)) + "</sup>";
+    var cdfLabel = x < 0 ? "CDF: F(" + num(x) + ") = 0"
+                         : "CDF: F(" + num(x) + ") = 1 \u2212 e<sup>" + expoText(num(x)) + "</sup>";
     var rows = [
-      ["CDF: P(X ≤ " + num(x) + ")", fmt(r.le), fmtPct(r.le), true],
+      [cdfLabel, fmt(r.le), fmtPct(r.le), true],
       ["P(X > " + num(x) + ") = 1 − P(X ≤ " + num(x) + ")", fmt(r.gt), fmtPct(r.gt), false],
       [pdfLabel, fmt(density), "—", false]
     ];
@@ -215,7 +268,7 @@
     });
 
     // For an exponential distribution the mean and the standard deviation are both 1/rate.
-    el.stats.innerHTML = "<span>Mean = SD = 1/λ = <b>" + num(1 / rate) + "</b></span>";
+    el.stats.innerHTML = "<span>Mean = SD = " + (useBeta ? "β" : "1/λ") + " = <b>" + num(1 / rate) + "</b></span>";
 
     el.results.hidden = false;
     el.chartCard.hidden = false;
@@ -240,6 +293,7 @@
     var lo = 0, hi = 5 * mean;
     if (x < lo) lo = x - 0.5 * mean;
     if (x > hi) hi = x + 0.5 * mean;
+    if (dragRange) { lo = dragRange.lo; hi = dragRange.hi; }
 
     var css = getComputedStyle(document.documentElement);
     var cAccent = css.getPropertyValue("--accent").trim();
@@ -307,6 +361,12 @@
     ctx.beginPath(); ctx.moveTo(sx(xc) + 0.5, base); ctx.lineTo(sx(xc) + 0.5, sy(pdf(xc)));
     ctx.strokeStyle = cText; ctx.lineWidth = 1; ctx.stroke();
 
+    // drag handle on the axis at x (the line itself can be grabbed anywhere along its length)
+    ctx.beginPath(); ctx.arc(sx(xc) + 0.5, base, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = cLabel; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = css.getPropertyValue("--card").trim(); ctx.stroke();
+    geom = { lo: lo, hi: hi, padL: padL, plotW: plotW, tx: sx(xc) + 0.5 };
+
     // Label + formula (exponent drawn raised and smaller) in a shaded area between pixel columns x0 and x1, as close to its
     // centre as will fit under the curve (moving left, where the curve is higher). With a heading it is two lines, falling
     // back to the formula alone; with head = "" it is the formula alone. Skipped when the area is too small.
@@ -335,9 +395,9 @@
       }
     }
     // the formulas show the actual value of x: e.g. x = 2.5 gives e^(−λ(2.5))
-    var xs = num(x), expo = "\u2212λ(" + xs + ")";
+    var xs = num(x), expo = expoText(xs);
     if (x >= 0) {                                                                      // (below 0 these formulas do not apply)
-      areaLabel("CDF:", "1 \u2212 e", expo, sx(lo), sx(xc), cOnAccent);             // blue area: P(X ≤ x)
+      areaLabel("F(" + xs + ") =", "1 \u2212 e", expo, sx(lo), sx(xc), cOnAccent);             // blue area: P(X ≤ x)
       areaLabel("", "e", expo, sx(xc), sx(hi), cLabel);                               // grey area: P(X > x), formula only
     }
 
@@ -345,7 +405,7 @@
     var tx = sx(xc), ty = sy(pdf(xc));
     var len = 32, head = 8;
     ctx.font = "bold 13px system-ui, sans-serif";
-    var LAB = x < 0 ? "f(" + xs + ") = 0" : "f(" + xs + ") = λe", SUP = x < 0 ? "" : expo;            // label, with the exponent drawn raised and smaller
+    var LAB = x < 0 ? "f(" + xs + ") = 0" : "f(" + xs + ") = " + pdfHead(), SUP = x < 0 ? "" : expo;            // label, with the exponent drawn raised and smaller
     var labW = ctx.measureText(LAB).width;
     ctx.font = "bold 10px system-ui, sans-serif";
     var supW = ctx.measureText(SUP).width, fullW = labW + 1 + supW;
@@ -381,8 +441,64 @@
     el.chartNote.textContent = "Showing x = " + num(lo) + " to " + num(hi) + ".  Actual range of x is 0 to ∞.";
   }
 
-  ["rate", "x"].forEach(function (id) { el[id].addEventListener("input", update); });
+  ["beta", "rate"].forEach(function (id) {
+    el[id].addEventListener("input", function () { source = id; syncOther(); update(); });
+  });
+  el.x.addEventListener("input", update);
+  function showToggle() {
+    el.toggle.setAttribute("aria-pressed", String(useBeta));
+    el.toggle.setAttribute("aria-label", "Write the formulas in terms of " + (useBeta ? "λ" : "β"));
+    el.toggle.children[0].className = useBeta ? "" : "on";
+    el.toggle.children[1].className = useBeta ? "on" : "";
+  }
+  el.toggle.addEventListener("click", function () {
+    useBeta = !useBeta;
+    showToggle();
+    showSubtitle();
+    update();
+  });
+  showToggle();
+  showSubtitle();
   window.addEventListener("resize", drawChart);
+
+  // ---- Drag x on the chart ---------------------------------------------------
+  // Grab the vertical line at x (or its handle) and slide it; x snaps to 0.01 and stays within the chart, from 0 upward.
+  var dragging = false;
+  function nearLine(e) {
+    if (!geom) return false;
+    var r = el.canvas.getBoundingClientRect();
+    return Math.abs(e.clientX - r.left - geom.tx) <= (e.pointerType === "touch" ? 22 : 12);
+  }
+  function dragTo(e) {
+    var r = el.canvas.getBoundingClientRect();
+    var v = geom.lo + (e.clientX - r.left - geom.padL) / geom.plotW * (geom.hi - geom.lo);
+    v = Math.min(Math.max(v, 0), geom.hi);
+    v = Math.round(v * 100) / 100;
+    if (String(v) === String(Number(el.x.value))) return;
+    el.x.value = num(v);
+    update();
+  }
+  el.canvas.addEventListener("pointerdown", function (e) {
+    if (!nearLine(e)) return;
+    dragging = true;
+    dragRange = { lo: geom.lo, hi: geom.hi };
+    el.canvas.setPointerCapture(e.pointerId);
+    el.canvas.style.cursor = "ew-resize";
+    e.preventDefault();
+  });
+  el.canvas.addEventListener("pointermove", function (e) {
+    if (dragging) dragTo(e);
+    else el.canvas.style.cursor = nearLine(e) ? "ew-resize" : "";
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    dragRange = null;
+    el.canvas.style.cursor = "";   // the next pointermove sets it again if the pointer is still over the line
+    drawChart();
+  }
+  el.canvas.addEventListener("pointerup", endDrag);
+  el.canvas.addEventListener("pointercancel", endDrag);
   if (window.matchMedia) {
     var mq = window.matchMedia("(prefers-color-scheme: dark)");
     if (mq.addEventListener) mq.addEventListener("change", drawChart);
